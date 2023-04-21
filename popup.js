@@ -1,14 +1,11 @@
-// popup.js
-document.getElementById('add_checkboxes').addEventListener('click', () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, { message: 'add_checkboxes' });
-    });
+document.getElementById('add-checkboxes').addEventListener('click', () => {
+    chrome.tabs.executeScript({ file: 'addCheckboxes.js' });
   });
   
-  document.getElementById('delete_selected').addEventListener('click', () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      chrome.tabs.sendMessage(tabs[0].id, { message: 'delete_selected_conversations' });
-    });
-  });
-  
-  
+document.getElementById('bulk-delete').addEventListener('click', () => {
+  chrome.tabs.executeScript({ file: 'bulkDeleteConversations.js' });
+});
+
+document.getElementById('remove-checkboxes').addEventListener('click', () => {
+  chrome.tabs.executeScript({ file: 'removeCheckboxes.js' });
+});  
