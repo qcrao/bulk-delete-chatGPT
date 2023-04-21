@@ -9,3 +9,7 @@ document.getElementById('bulk-delete').addEventListener('click', () => {
 document.getElementById('remove-checkboxes').addEventListener('click', () => {
   chrome.tabs.executeScript({ file: 'removeCheckboxes.js' });
 });  
+
+// Update copyright year
+const currentYear = new Date().getFullYear();
+document.getElementById('copyright').innerHTML = '&copy; ' + currentYear + ' @qcrao';
