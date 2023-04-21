@@ -2,14 +2,14 @@
     "manifest_version": 2,
     "name": "ChatGPT Bulk Delete",
     "version": "1.0",
-    "description": "一个批量删除 ChatGPT 对话的 Chrome 插件",
+    "description": "A Chrome extension to bulk delete ChatGPT conversations",
     "icons": {
       "48": "icon48.png"
     },
     "browser_action": {
       "default_icon": "icon48.png",
       "default_popup": "popup.html",
-      "default_title": "批量删除对话"
+      "default_title": "Bulk Delete Conversations"
     },
     "permissions": [
       "activeTab",
