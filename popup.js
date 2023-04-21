@@ -12,4 +12,7 @@ document.getElementById('remove-checkboxes').addEventListener('click', () => {
 
 // Update copyright year
 const currentYear = new Date().getFullYear();
-document.getElementById('copyright').innerHTML = '&copy; ' + currentYear + ' @qcrao';
+document.getElementById('copyright').innerHTML =
+  '&copy; ' + currentYear + ' <a href="https://github.com/qcrao" target="_blank">@qcrao</a>';
+
+

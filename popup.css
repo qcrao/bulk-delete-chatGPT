@@ -1,34 +1,35 @@
 body {
-    width: 200px;
+    width: 240px;
     padding: 15px;
     font-family: Arial, sans-serif;
     display: flex;
     flex-direction: column;
     align-items: center;
-}
-
-.header {
+  }
+  
+  .header {
     margin-bottom: 10px;
     width: 100%;
     border-bottom: 1px solid #ccc;
     padding-bottom: 10px;
-}
-
-.header h1 {
+  }
+  
+  .header h1 {
     font-size: 16px;
     font-weight: bold;
     text-align: center;
     margin: 0;
-}
-
-.buttons-row {
+  }
+  
+  .buttons-row {
     display: flex;
     justify-content: space-between;
     width: 100%;
     margin-bottom: 10px;
-}
-
-button {
+    align-items: flex-start;
+  }
+  
+  button {
     padding: 8px 12px;
     font-size: 14px;
     cursor: pointer;
@@ -39,32 +40,49 @@ button {
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     transition-duration: 0.4s;
-}
-
-button:hover {
+    margin: 0; /* 去掉左右外边距 */
+  }
+  
+  button:hover {
     background-color: #16A085;
     border-color: #14967F;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-button#bulk-delete {
-    width: 100%;
+  }
+  
+  button#bulk-delete {
     font-size: 16px;
     background-color: #e74c3c;
     border-color: #c0392b;
     margin-top: 10px;
-}
-
-button#bulk-delete:hover {
-    background-color: #c0392b;
-    border-color: #a93226;
-}
-
-.footer {
+    width: calc(200px + 40px); /* bulk-delete 宽度等于 body 的宽度减去左右内边距再加上两者之间的距离 */
+  }
+  
+  .buttons-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
     margin-top: 10px;
+  }
+  
+  .buttons-row button {
+    width: 120px; /* 将 remove-checkboxes 和 add-checkboxes 按钮的宽度增加到 120px */
+  }
+  
+  .buttons-row button:first-child {
+    margin-right: 10px; /* 添加一个右外边距来增加两个按钮之间的距离 */
+  }
+  
+  .footer {
+    margin-top: 20px;
     width: 100%;
     font-size: 12px;
     text-align: center;
     border-top: 1px solid #ccc;
     padding-top: 10px;
-}
+  }
+
+  button#remove-checkboxes {
+    background-color: #badb34;
+    border-color: #b6b929;
+  }
+  
