@@ -6,7 +6,9 @@ English | [中文版本](./README-CN.md)
 
 `bulk-delete-chatGPT` is a Chrome extension designed to bulk-delete conversations on ChatGPT pages. This extension allows you to quickly and easily manage conversations on ChatGPT pages. It features a clean and intuitive user interface, providing an efficient way to perform bulk deletion of conversations.
 
-## Screencast
+## Screenshot
+
+![](./assets/1.jpg) ![](./assets/2.jpg) ![](./assets/3.jpg)
 
 ## Usage Instructions
 

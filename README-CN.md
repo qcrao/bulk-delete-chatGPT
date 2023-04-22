@@ -4,7 +4,9 @@
 
 bulk-delete-chatGPT 是一个 Chrome 扩展程序，用于批量删除 ChatGPT 页面上的对话。使用此扩展程序可以快速、轻松地管理 ChatGPT 页面上的对话。它包含一个简洁的用户界面，提供了一种高效的方式来执行批量删除对话操作。
 
-# 录屏
+# 截图
+
+![](./assets/1.jpg) ![](./assets/2.jpg) ![](./assets/3.jpg)
 
 # 使用说明
 
