@@ -1,14 +1,30 @@
 document.getElementById('add-checkboxes').addEventListener('click', () => {
-    chrome.tabs.executeScript({ file: 'addCheckboxes.js' });
+  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['addCheckboxes.js']
+    });
   });
-  
+});
+
 document.getElementById('bulk-delete').addEventListener('click', () => {
-  chrome.tabs.executeScript({ file: 'bulkDeleteConversations.js' });
+  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['bulkDeleteConversations.js']
+    });
+  });
 });
 
 document.getElementById('remove-checkboxes').addEventListener('click', () => {
-  chrome.tabs.executeScript({ file: 'removeCheckboxes.js' });
-});  
+  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['removeCheckboxes.js']
+    });
+  });
+});
+
 
 // Update copyright year
 const currentYear = new Date().getFullYear();

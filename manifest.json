@@ -1,29 +1,24 @@
 {
-    "manifest_version": 2,
-    "name": "ChatGPT Bulk Delete",
-    "version": "1.0",
-    "description": "A Chrome extension to bulk delete ChatGPT conversations",
-    "icons": {
-      "48": "icon48.png"
-    },
-    "browser_action": {
-      "default_icon": "icon48.png",
-      "default_popup": "popup.html",
-      "default_title": "Bulk Delete Conversations"
-    },
-    "permissions": [
-      "activeTab",
-      "storage"
-    ],
-    "background": {
-      "scripts": ["background.js"],
-      "persistent": false
-    },
-    "content_scripts": [
-      {
-        "matches": ["*://chat.openai.com/*"],
-        "js": ["addCheckboxes.js", "bulkDeleteConversations.js"]
-      }
-    ]
-  }
-  
+  "manifest_version": 3,
+  "name": "ChatGPT Bulk Delete",
+  "version": "1.0",
+  "description": "A Chrome extension to bulk delete ChatGPT conversations",
+  "icons": {
+    "48": "icon48.png"
+  },
+  "action": {
+    "default_icon": "icon48.png",
+    "default_popup": "popup.html",
+    "default_title": "Bulk Delete Conversations"
+  },
+  "permissions": [
+    "scripting",
+    "activeTab"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["*://chat.openai.com/*"],
+      "js": ["addCheckboxes.js", "bulkDeleteConversations.js"]
+    }
+  ]
+}

@@ -66,7 +66,21 @@ async function bulkDeleteConversations() {
     if (confirmButton) {
       console.log("点击确认按钮...")
       confirmButton.click();
-      await new Promise(resolve => setTimeout(resolve, 1000)); // Add a delay of 1 second
+      // await new Promise(resolve => setTimeout(resolve, 1000)); // Add a delay of 1 second
+      // 等待删除按钮消失
+      const deleteButtonDisappeared = new Promise((resolve) => {
+        const observer = new MutationObserver(() => {
+          if (!document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible')) {
+            observer.disconnect();
+            resolve();
+          }
+        });
+        observer.observe(document.body, {
+          childList: true,
+          subtree: true,
+        });
+      });
+      await deleteButtonDisappeared;
     }
   }
 
@@ -102,6 +116,12 @@ async function bulkDeleteConversations() {
 }
 
 async function addCheckboxesWithState(checkedIndexes) {
+  // 移除现有的复选框
+  const existingCheckboxes = document.querySelectorAll('.conversation-checkbox');
+  existingCheckboxes.forEach((checkbox) => {
+    checkbox.remove();
+  });
+  
   // 在这里重新添加复选框
   const conversations = document.querySelectorAll('.flex.py-3.px-3.items-center.gap-3.relative.rounded-md.hover\\:bg-\\[\\#2A2B32\\].cursor-pointer.break-all.hover\\:pr-4.group');
   conversations.forEach((conversation, index) => {
@@ -122,6 +142,8 @@ async function addCheckboxesWithState(checkedIndexes) {
   for (let i = 0; i < remainingCheckboxes.length; i++) {
     remainingCheckboxes[i].dataset.index = i;
   }
+
+  return Promise.resolve();
 }
 
 bulkDeleteConversations();
