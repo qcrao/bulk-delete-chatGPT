@@ -6,11 +6,13 @@ bulk-delete-chatGPT 是一个 Chrome 扩展程序，用于批量删除 ChatGPT �
 
 # 截图
 
-<div style="display: flex; overflow-x: auto; white-space: nowrap;">
-  <img src="./assets/1.jpg" alt="图片1" style="max-width: 100%; margin-right: 10px;">
-  <img src="./assets/2.jpg" alt="图片2" style="max-width: 100%; margin-right: 10px;">
-  <img src="./assets/3.jpg" alt="图片3" style="max-width: 100%;">
-</div>
+<table>
+  <tr>
+    <td><img src="./assets/1.jpg" alt="图片1" style="max-width: 100%;"></td>
+    <td><img src="./assets/2.jpg" alt="图片2" style="max-width: 100%;"></td>
+    <td><img src="./assets/3.jpg" alt="图片3" style="max-width: 100%;"></td>
+  </tr>
+</table>
 
 
 # 使用说明
