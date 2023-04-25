@@ -17,14 +17,8 @@ bulk-delete-chatGPT 是一个 Chrome 扩展程序，用于批量删除 ChatGPT �
 
 # 使用说明
 
-- 克隆或下载此项目。
-
-```shell
-git@github.com:qcrao/bulk-delete-chatGPT.git
-```
-
-- 在 Chrome 浏览器中，转到 chrome://extensions/ 页面。打开 "开发者模式"。
-- 点击 "加载已解压的扩展程序"，然后选择下载的项目文件夹。现在，您应该在 Chrome 扩展程序列表中看到 bulk-delete-chatGPT 扩展程序。
+- 访问 Chrome 网上应用商店中的 [ChatGPT Bulk Delete](https://chrome.google.com/webstore/detail/chatgpt-bulk-delete/effkgioceefcfaegehhfafjneeiabdjg) 页面。
+- 点击 "添加至Chrome" 按钮以安装扩展程序。
 - 打开 [ChatGPT 网站页面](https://chat.openai.com/)。
 - 点击浏览器右上角的 bulk-delete-chatGPT 扩展程序图标。
 - 点击 "添加复选框"按钮。扩展会自动地在 ChatGPT 页面左侧的每个对话前添加一个复选框。
