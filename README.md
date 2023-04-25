@@ -10,11 +10,13 @@ English | [中文版本](./README-CN.md)
 
 ## Screenshot
 
-<div style="display: flex; overflow-x: auto; white-space: nowrap;">
-  <img src="./assets/1.jpg" alt="图片1" style="max-width: 100%; margin-right: 10px;">
-  <img src="./assets/2.jpg" alt="图片2" style="max-width: 100%; margin-right: 10px;">
-  <img src="./assets/3.jpg" alt="图片3" style="max-width: 100%;">
-</div>
+<table>
+  <tr>
+    <td><img src="./assets/1.jpg" alt="图片1" style="max-width: 100%;"></td>
+    <td><img src="./assets/2.jpg" alt="图片2" style="max-width: 100%;"></td>
+    <td><img src="./assets/3.jpg" alt="图片3" style="max-width: 100%;"></td>
+  </tr>
+</table>
 
 ## Usage Instructions
 
