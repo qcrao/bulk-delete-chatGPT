@@ -1,6 +1,6 @@
 function addCheckboxes() {
   const conversations = document.querySelectorAll(
-    '.flex.flex-col.gap-2.pb-2.text-gray-100.text-sm > .flex.py-3.px-3.items-center.gap-3.relative.rounded-md'
+    '.flex.py-3.px-3.items-center.gap-3.relative.rounded-md'
   );
 
   conversations.forEach((conversation, index) => {
