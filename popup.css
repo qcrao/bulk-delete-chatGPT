@@ -85,4 +85,9 @@ body {
     background-color: #badb34;
     border-color: #b6b929;
   }
+
+  button#toggle-checkboxes {
+    background-color: #2287da;
+    border-color: #2758ab;
+  }
   
