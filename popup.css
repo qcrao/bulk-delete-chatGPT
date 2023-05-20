@@ -49,7 +49,7 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   }
   
-  button#bulk-delete {
+  button#bulk-delete, button#toggle-checkboxes {
     font-size: 16px;
     background-color: #e74c3c;
     border-color: #c0392b;
