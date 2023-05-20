@@ -16,6 +16,15 @@ document.getElementById('bulk-delete').addEventListener('click', () => {
   });
 });
 
+document.getElementById('toggle-checkboxes').addEventListener('click', () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+    chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      files: ['toggleCheckboxes.js']
+    });
+  });
+});
+
 document.getElementById('remove-checkboxes').addEventListener('click', () => {
   chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
     chrome.scripting.executeScript({
