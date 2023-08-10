@@ -55,14 +55,14 @@ async function bulkDeleteConversations() {
   conversationElement.click(); // Click the conversation first
   await new Promise(resolve => setTimeout(resolve, 500)); // Add a delay of 0.5 second
 
-  const deleteButton = document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible button:nth-child(3)'); // Updated delete button selector
+  const deleteButton = document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible button:nth-child(2)'); // Updated delete button selector
 
   if (deleteButton) {
     console.log("点击删除按钮...")
     deleteButton.click(); // Click the delete button
     await waitForElement('.absolute.flex.right-1.z-10.text-gray-300.visible');
-    const buttonsContainer = document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible');
-    const confirmButton = buttonsContainer.querySelector('button:nth-child(1)'); // Get the first button as confirm button
+    const modalButtonsContainer = document.querySelector('.mt-5.flex.flex-col.gap-3.sm\\:mt-4.sm\\:flex-row-reverse');
+    const confirmButton = modalButtonsContainer.querySelector('button:nth-child(1)'); // Get the first button as confirm button
     if (confirmButton) {
       console.log("点击确认按钮...")
       confirmButton.click();
