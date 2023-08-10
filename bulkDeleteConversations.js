@@ -66,21 +66,6 @@ async function bulkDeleteConversations() {
     if (confirmButton) {
       console.log("点击确认按钮...")
       confirmButton.click();
-      // await new Promise(resolve => setTimeout(resolve, 1000)); // Add a delay of 1 second
-      // 等待删除按钮消失
-      const deleteButtonDisappeared = new Promise((resolve) => {
-        const observer = new MutationObserver(() => {
-          if (!document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible')) {
-            observer.disconnect();
-            resolve();
-          }
-        });
-        observer.observe(document.body, {
-          childList: true,
-          subtree: true,
-        });
-      });
-      await deleteButtonDisappeared;
     }
   }
 
