@@ -13,39 +13,16 @@ async function bulkDeleteConversations() {
     return;
   }
 
-  const waitForElement = (selector, timeout = 5000) => {
-    return new Promise((resolve, reject) => {
-      const element = document.querySelector(selector);
-      if (element) {
-        resolve(element);
-      }
-
-      const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-          if (!mutation.addedNodes) return;
-      
-          for (const node of mutation.addedNodes) {
-            if (node.matches && node.matches(selector)) {
-              observer.disconnect();
-              resolve(node);
-              return;
-            }
-          }
-        });
-      });
-      
-
-      setTimeout(() => {
-        observer.disconnect();
-        reject(new Error('Element not found.'));
-      }, timeout);
-
-      observer.observe(document.body, {
-        childList: true,
-        subtree: true
-      });
-    });
-  };
+  async function waitForElement(selector, timeout = 5000) {
+    const startedAt = Date.now();
+    let el = null;
+    while ((Date.now() - startedAt) < timeout) {
+        el = document.querySelector(selector);
+        if (el) return el;
+        await new Promise(r => setTimeout(r, 100));
+    }
+    throw new Error(`Element ${selector} not found within ${timeout}ms`);
+}
 
   console.log("开始删除...")
   const checkbox = conversationCheckboxes[0];
@@ -55,14 +32,18 @@ async function bulkDeleteConversations() {
   conversationElement.click(); // Click the conversation first
   await new Promise(resolve => setTimeout(resolve, 500)); // Add a delay of 0.5 second
 
-  const deleteButton = document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible button:nth-child(3)'); // Updated delete button selector
+  const deleteButton = document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible button:nth-child(2)'); // Updated delete button selector
 
   if (deleteButton) {
-    console.log("点击删除按钮...")
+    console.log("点击删除按钮1...")
     deleteButton.click(); // Click the delete button
-    await waitForElement('.absolute.flex.right-1.z-10.text-gray-300.visible');
-    const buttonsContainer = document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible');
-    const confirmButton = buttonsContainer.querySelector('button:nth-child(1)'); // Get the first button as confirm button
+    console.log("点击删除按钮2...")
+    await waitForElement('div[role="dialog"][data-state="open"] button.btn-danger');
+
+    console.log("点击删除按钮3...")
+    // const buttonsContainer = document.querySelector('mt-5 flex flex-col gap-3 sm:mt-4 sm:flex-row-reverse');
+    const confirmButton = document.querySelector('button.btn.btn-danger');
+
     if (confirmButton) {
       console.log("点击确认按钮...")
       confirmButton.click();
@@ -70,7 +51,7 @@ async function bulkDeleteConversations() {
       // 等待删除按钮消失
       const deleteButtonDisappeared = new Promise((resolve) => {
         const observer = new MutationObserver(() => {
-          if (!document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible')) {
+          if (!document.querySelector('button.btn.btn-danger')) {
             observer.disconnect();
             resolve();
           }
