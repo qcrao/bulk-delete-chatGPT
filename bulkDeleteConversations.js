@@ -32,7 +32,7 @@ async function bulkDeleteConversations() {
   conversationElement.click(); // Click the conversation first
   await new Promise(resolve => setTimeout(resolve, 500)); // Add a delay of 0.5 second
 
-  const deleteButton = document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible button:nth-child(2)'); // Updated delete button selector
+  const deleteButton = document.querySelector('.absolute.flex.right-1.z-10.text-gray-300.visible button:nth-child(3)'); // Updated delete button selector
 
   if (deleteButton) {
     console.log("点击删除按钮1...")

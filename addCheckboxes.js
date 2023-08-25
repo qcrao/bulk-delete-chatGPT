@@ -1,32 +1,36 @@
+function toggleCheckbox(event) {
+    // 从标题元素获取其前一个兄弟元素，即复选框
+    const checkbox = event.currentTarget.parentElement.querySelector('.conversation-checkbox');
+    if (checkbox && checkbox.type === 'checkbox') {
+        checkbox.checked = !checkbox.checked;
+    }
+    event.stopPropagation();
+}
+
+function preventEventPropagation(event) {
+    event.stopPropagation();
+}
+
 function addCheckboxes() {
-    const conversations = document.querySelectorAll('.flex.py-3.px-3.items-center.gap-3.relative.rounded-md');
-  
-    conversations.forEach((conversation, index) => {
+    const conversationSelectors = '.flex.py-3.px-3.items-center.gap-3.relative.rounded-md';
+    const titleSelectors = '.flex-1.text-ellipsis.max-h-5.overflow-hidden.break-all.relative';
+    const conversations = document.querySelectorAll(conversationSelectors);
+
+    for (const [index, conversation] of conversations.entries()) {
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'conversation-checkbox';
         checkbox.dataset.index = index;
-  
+
         conversation.insertAdjacentElement('afterbegin', checkbox);
-  
-        // Add click event listener to the conversation title
-        const titleElement = conversation.querySelector('.flex-1.text-ellipsis.max-h-5.overflow-hidden.break-all.relative');
+
+        const titleElement = conversation.querySelector(titleSelectors);
         if (titleElement) {
-            titleElement.style.cursor = 'default'; // Ensure the cursor is the default arrow pointer
-            titleElement.addEventListener('click', function(event) {
-                // Toggle the checkbox state
-                checkbox.checked = !checkbox.checked;
-                // Prevent the event from propagating further
-                event.stopPropagation();
-            });
-  
-            // Ensure the checkbox click doesn't trigger the title's click event
-            checkbox.addEventListener('click', function(event) {
-                event.stopPropagation();
-            });
+            titleElement.style.cursor = 'default';
+            titleElement.addEventListener('click', toggleCheckbox);
+            checkbox.addEventListener('click', preventEventPropagation);
         }
-    });
-  }
-  
-  addCheckboxes();
-  
+    }
+}
+
+addCheckboxes();
