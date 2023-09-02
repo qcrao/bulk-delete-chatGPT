@@ -1,6 +1,11 @@
+function findAncestorWithCheckbox(el, selector) {
+    while ((el = el.parentElement) && !el.querySelector(selector));
+    return el;
+}
+
 function toggleCheckbox(event) {
-    // 从标题元素获取其前一个兄弟元素，即复选框
-    const checkbox = event.currentTarget.parentElement.querySelector('.conversation-checkbox');
+    const parentElement = findAncestorWithCheckbox(event.currentTarget, '.conversation-checkbox');
+    const checkbox = parentElement ? parentElement.querySelector('.conversation-checkbox') : null;
     if (checkbox && checkbox.type === 'checkbox') {
         checkbox.checked = !checkbox.checked;
     }
@@ -17,6 +22,12 @@ function addCheckboxes() {
     const conversations = document.querySelectorAll(conversationSelectors);
 
     for (const [index, conversation] of conversations.entries()) {
+        // 检查是否已经有复选框
+        const existingCheckbox = conversation.querySelector('.conversation-checkbox');
+        if (existingCheckbox) {
+            return; // 如果已经有复选框，直接返回
+        }
+
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
         checkbox.className = 'conversation-checkbox';
