@@ -17,7 +17,7 @@ function preventEventPropagation(event) {
 }
 
 function addCheckboxes() {
-    const conversationSelectors = '.flex.py-3.px-3.items-center.gap-3.relative.rounded-md';
+    const conversationSelectors = 'div div span div ol li>a.flex';
     const titleSelectors = '.flex-1.text-ellipsis.max-h-5.overflow-hidden.break-all.relative';
     const conversations = document.querySelectorAll(conversationSelectors);
 
