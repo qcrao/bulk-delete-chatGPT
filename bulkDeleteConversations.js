@@ -33,7 +33,7 @@ async function deleteConversation(checkbox) {
 
   // debugger
 
-  const deleteButton = await waitForElement('.absolute.flex.right-1.z-10.text-gray-300.visible button:nth-child(2)');
+  const deleteButton = await waitForElement("nav div a>div>button:nth-child(2)");
 
   if (deleteButton) {
       console.log("2. 点击删除按钮");
