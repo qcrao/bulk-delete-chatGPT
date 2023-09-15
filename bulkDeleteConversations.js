@@ -11,7 +11,7 @@ async function bulkDeleteConversations() {
 
   // 使用 for 循环按顺序删除选中的对话
   for (const element of selectedConversations) {
-    await delay(500);
+    await delay(300);
     await deleteConversation(element);
   }
 }
