@@ -26,7 +26,7 @@ function removeAllCheckboxes() {
 }
 
 async function deleteConversation(checkbox) {
-  const conversationElement = checkbox.closest('.flex.py-3.px-3.items-center.gap-3.relative.rounded-md');
+  const conversationElement = await checkbox.closest('.flex.p-3.items-center.gap-3.relative.rounded-md')
 
   console.log("1. 开始删除", conversationElement);
   conversationElement.click(); // 点击对话
