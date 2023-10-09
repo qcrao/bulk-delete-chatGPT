@@ -36,7 +36,9 @@ async function deleteConversation(checkbox) {
   const deleteButton = await waitForElement("nav div a>div>button:nth-child(2)");
 
   if (deleteButton) {
+      await delay(100);
       console.log("2. 点击删除按钮");
+
       deleteButton.click(); // 点击删除按钮
 
       // 等待确认删除对话框的按钮出现
@@ -62,6 +64,7 @@ async function waitForElement(selector, timeout = 5000) {
       if (element) return element;
       await delay(100);
   }
+  console.log('do not found delete confirm button')
   throw new Error(`Element ${selector} not found within ${timeout}ms`);
 }
 
