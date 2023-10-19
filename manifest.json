@@ -21,6 +21,7 @@
         "*://chat.openai.com/*"
       ],
       "js": [
+        "globals.js",
         "addCheckboxes.js",
         "bulkDeleteConversations.js"
       ]
