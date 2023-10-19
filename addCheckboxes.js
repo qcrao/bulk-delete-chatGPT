@@ -1,47 +1,57 @@
+// 查找带有特定选择器的祖先元素
 function findAncestorWithCheckbox(el, selector) {
     while ((el = el.parentElement) && !el.querySelector(selector));
     return el;
 }
 
+// 切换复选框的选中状态
 function toggleCheckbox(event) {
-    const parentElement = findAncestorWithCheckbox(event.currentTarget, '.conversation-checkbox');
-    const checkbox = parentElement ? parentElement.querySelector('.conversation-checkbox') : null;
-    if (checkbox && checkbox.type === 'checkbox') {
+    const parentElement = findAncestorWithCheckbox(event.currentTarget, `.${CHECKBOX_CLASS}`);
+    const checkbox = parentElement ? parentElement.querySelector(`.${CHECKBOX_CLASS}`) : null;
+    if (checkbox) {
         checkbox.checked = !checkbox.checked;
     }
     event.stopPropagation();
 }
 
+// 阻止事件冒泡
 function preventEventPropagation(event) {
     event.stopPropagation();
 }
 
+// 添加复选框到每个对话
 function addCheckboxes() {
-    const conversationSelectors = 'div div span div ol li>a.flex';
-    const titleSelectors = '.flex-1.text-ellipsis.max-h-5.overflow-hidden.break-all.relative';
-    const conversations = document.querySelectorAll(conversationSelectors);
+    const conversations = document.querySelectorAll(CONVERSATION_SELECTOR);
 
-    for (const [index, conversation] of conversations.entries()) {
-        // 检查是否已经有复选框
-        const existingCheckbox = conversation.querySelector('.conversation-checkbox');
+    conversations.forEach((conversation, index) => {
+        let existingCheckbox = conversation.querySelector(`.${CHECKBOX_CLASS}`);
+
+        // 如果复选框已存在，获取其选中状态并移除它
+        let isChecked = existingCheckbox ? existingCheckbox.checked : false;
         if (existingCheckbox) {
-            return; // 如果已经有复选框，直接返回
+            existingCheckbox.remove();
         }
 
+        // 创建新的复选框并设置其属性
         const checkbox = document.createElement('input');
         checkbox.type = 'checkbox';
-        checkbox.className = 'conversation-checkbox';
+        checkbox.className = CHECKBOX_CLASS;
         checkbox.dataset.index = index;
-
+        checkbox.checked = isChecked;
+        checkbox.addEventListener('click', preventEventPropagation);
         conversation.insertAdjacentElement('afterbegin', checkbox);
 
-        const titleElement = conversation.querySelector(titleSelectors);
+        // 为对话标题添加点击事件
+        const titleElement = conversation.querySelector(TITLE_SELECTOR);
         if (titleElement) {
             titleElement.style.cursor = 'default';
-            titleElement.addEventListener('click', toggleCheckbox);
-            checkbox.addEventListener('click', preventEventPropagation);
+            if (!titleElement.dataset.hasClickListener) { // 检查是否已经添加了监听器
+                titleElement.addEventListener('click', toggleCheckbox);
+                titleElement.dataset.hasClickListener = 'true'; // 标记已经添加了监听器
+            }
         }
-    }
+    });
 }
 
+// 执行主函数
 addCheckboxes();
