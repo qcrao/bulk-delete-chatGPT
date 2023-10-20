@@ -7,29 +7,10 @@ async function bulkDeleteConversations() {
     return;
   }
 
-  for (let i = 0; i < selectedConversations.length; i++) {
-    const element = selectedConversations[i];
-    const deleteButton = element.querySelector(Selectors.deleteButton);
-
-    // If it is the first conversation and there is a delete button, skip it
-    if (i === 0 && deleteButton) {
-        console.log("Skipping first conversation due to existing delete button.");
-        continue;
-    }
-
-    // If it's not the first conversation but has a delete button, remove it
-    if (i !== 0 && deleteButton) {
-      console.log("delete the delete button.");
-      deleteButton.remove();
-      break;
-    }
-  }
-
   console.log("Selected Conversations:", selectedConversations);
 
   for (const element of selectedConversations) {
     await deleteConversation(element);
-    await delay(300);
   }
 }
 
@@ -47,6 +28,7 @@ async function deleteConversation(checkbox) {
 
   console.log("1. Clicking conversation", conversationElement);
   conversationElement.click();
+  await delay(300);
 
   const deleteButton = await waitForElement(Selectors.deleteButton);
 
