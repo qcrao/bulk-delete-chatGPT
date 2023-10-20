@@ -13,8 +13,12 @@
   },
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "tabs"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": [

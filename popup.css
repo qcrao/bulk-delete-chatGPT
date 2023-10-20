@@ -79,15 +79,45 @@ body {
     text-align: center;
     border-top: 1px solid #ccc;
     padding-top: 10px;
+    display: flex; /* 添加这一行使得.footer下的直接子元素并排排列 */
+    justify-content: center; /* 使得子元素在中心对齐 */
+    gap: 10px; /* 如果需要，可以添加这一行以在子元素之间创建一些空间 */
   }
 
-  button#remove-checkboxes {
-    background-color: #badb34;
-    border-color: #b6b929;
-  }
+.footer button {
+  font-size: inherit; /* 这行代码使按钮的字体大小继承自其父元素，即.footer */
+  background-color: #383E46;
+  border-color: #78838F;
+}
 
-  button#toggle-checkboxes {
-    background-color: #2287da;
-    border-color: #2758ab;
-  }
-  
+button#remove-checkboxes {
+  background-color: #badb34;
+  border-color: #b6b929;
+}
+
+button#toggle-checkboxes {
+  background-color: #2287da;
+  border-color: #2758ab;
+}
+
+#sponsorLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #383E46;
+  border-color: #78838F;
+  border-radius: 5px;
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#sponsorLink .icon-text {
+  display: flex;
+  align-items: center;
+}
+
+#sponsorLink:hover {
+  background-color: #993366;
+}
