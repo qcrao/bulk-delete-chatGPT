@@ -24,29 +24,19 @@ function removeAllCheckboxes() {
 }
 
 async function deleteConversation(checkbox) {
-  const conversationElement = await checkbox.closest('.flex.p-3.items-center.gap-3.relative.rounded-md');
 
-  console.log("1. Clicking conversation", conversationElement);
-  conversationElement.click();
+  const conversationBoxElement = checkbox.parentElement;
+  console.log("1. Clicking conversation", conversationBoxElement);
+  conversationBoxElement.click();
+
   await delay(300);
+  console.log("2. open delete dialog");
+  openDeleteDialog();
 
+  await delay(300);
   const deleteButton = await waitForElement(Selectors.deleteButton);
-
-  if (deleteButton) {
-    console.log("2. Clicking delete button", deleteButton);
-
-    deleteButton.click();
-    const confirmButton = await waitForElement(Selectors.confirmDeleteButton);
-
-    if (confirmButton) {
-      console.log("3. Clicking confirm button");
-      confirmButton.click();
-
-      await waitForElementToDisappear(Selectors.confirmDeleteButton);
-    }
-  }
-
-  console.log("4. Deletion completed");
+  deleteButton.click();
+  console.log("3. Clicking delete button", deleteButton);
 }
 
 async function waitForElement(selector, timeout = 2000) {
@@ -74,4 +64,13 @@ function delay(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
+function openDeleteDialog() {
+  var event = new KeyboardEvent('keydown', {
+    key: 'Delete',
+    keyCode: 46, // keyCode for Delete
+    ctrlKey: true,
+    shiftKey: true
+  });
+  document.dispatchEvent(event);
+}
 bulkDeleteConversations();
