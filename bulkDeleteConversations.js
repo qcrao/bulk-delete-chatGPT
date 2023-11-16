@@ -1,3 +1,5 @@
+console.log('bulkDeleteConversations.js loaded');
+
 async function bulkDeleteConversations() {
   const selectedConversations = getSelectedConversations();
 
@@ -24,11 +26,28 @@ function removeAllCheckboxes() {
 }
 
 async function deleteConversation(checkbox) {
-  const conversationElement = await checkbox.closest('.flex.p-3.items-center.gap-3.relative.rounded-md');
+  const conversationElement = checkbox.parentElement;
 
   console.log("1. Clicking conversation", conversationElement);
   conversationElement.click();
-  await delay(300);
+  await delay(500);
+
+  if (isPlusUser()) {
+    // Plus 用户的处理逻辑
+    const threeDotButton = conversationElement.parentElement.querySelector('[id^="radix-"]');
+    await delay(800);
+    console.log(threeDotButton);
+
+    // 创建一个指针事件对象
+    const pointerDownEvent = new PointerEvent('pointerdown', {
+      bubbles: true,
+      cancelable: true,
+      pointerType: 'mouse' // 可以是 'mouse', 'pen', 'touch'
+    });
+
+    // 触发 onPointerDown 事件
+    threeDotButton.dispatchEvent(pointerDownEvent);
+  }
 
   const deleteButton = await waitForElement(Selectors.deleteButton);
 

@@ -1,3 +1,4 @@
+console.log('addCheckboxes.js loaded');
 // 查找带有特定选择器的祖先元素
 function findAncestorWithCheckbox(el, selector) {
     while ((el = el.parentElement) && !el.querySelector(selector));
@@ -6,6 +7,11 @@ function findAncestorWithCheckbox(el, selector) {
 
 // 切换复选框的选中状态
 function toggleCheckbox(event) {
+    // 阻止事件的默认行为（例如链接跳转）
+    event.preventDefault();
+    // 阻止事件冒泡到父元素
+    event.stopPropagation();
+
     const parentElement = findAncestorWithCheckbox(event.currentTarget, `.${CHECKBOX_CLASS}`);
     const checkbox = parentElement ? parentElement.querySelector(`.${CHECKBOX_CLASS}`) : null;
     if (checkbox) {
@@ -21,7 +27,8 @@ function preventEventPropagation(event) {
 
 // 添加复选框到每个对话
 function addCheckboxes() {
-    const conversations = document.querySelectorAll(CONVERSATION_SELECTOR);
+    console.log('Adding checkboxes to conversations...', Selectors, isPlusUser());
+    const conversations = document.querySelectorAll(Selectors.CONVERSATION_SELECTOR);
 
     conversations.forEach((conversation, index) => {
         let existingCheckbox = conversation.querySelector(`.${CHECKBOX_CLASS}`);
