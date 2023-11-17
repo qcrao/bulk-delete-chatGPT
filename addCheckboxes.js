@@ -28,8 +28,8 @@ function preventEventPropagation(event) {
 
 // 添加复选框到每个对话
 function addCheckboxes() {
-    console.log('Adding checkboxes to conversations...', window.getSelectors(), isPlusUser());
-    const conversations = document.querySelectorAll(window.getSelectors().CONVERSATION_SELECTOR);
+    console.log('Adding checkboxes to conversations...', Selectors);
+    const conversations = document.querySelectorAll(Selectors.CONVERSATION_SELECTOR);
 
     conversations.forEach((conversation, index) => {
         let existingCheckbox = conversation.querySelector(`.${CHECKBOX_CLASS}`);
@@ -50,7 +50,7 @@ function addCheckboxes() {
         conversation.insertAdjacentElement('afterbegin', checkbox);
 
         // 为对话标题添加点击事件
-        const titleElement = conversation.querySelector(window.getSelectors().TITLE_SELECTOR);
+        const titleElement = conversation.querySelector(Selectors.TITLE_SELECTOR);
         if (titleElement) {
             titleElement.style.cursor = 'default';
             if (!titleElement.dataset.hasClickListener) { // 检查是否已经添加了监听器
