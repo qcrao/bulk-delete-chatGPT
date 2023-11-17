@@ -17,61 +17,58 @@ async function bulkDeleteConversations() {
 }
 
 function getSelectedConversations() {
-  return [...document.querySelectorAll(window.getSelectors().conversationsCheckbox)];
+  return [...document.querySelectorAll(Selectors.conversationsCheckbox)];
 }
 
 function removeAllCheckboxes() {
-  const allCheckboxes = document.querySelectorAll(window.getSelectors().conversationsCheckbox);
+  const allCheckboxes = document.querySelectorAll(Selectors.conversationsCheckbox);
   allCheckboxes.forEach(checkbox => checkbox.remove());
 }
 
 async function deleteConversation(checkbox) {
   const conversationElement = checkbox.parentElement;
-
+  await delay(300);
   console.log("1. Clicking conversation...", conversationElement);
   conversationElement.click();
-  await delay(300);
 
-  const threeDotButton = conversationElement.parentElement.querySelector(window.getSelectors().threeDotButton);
-  await delay(500);
-
-  console.log("2. Clicking three dot button...", conversationElement);
   const pointerDownEvent = new PointerEvent('pointerdown', {
     bubbles: true,
     cancelable: true,
     pointerType: 'mouse'
   });
-
+  const threeDotButton = await waitForElement(Selectors.threeDotButton, conversationElement.parentElement);
   threeDotButton.dispatchEvent(pointerDownEvent);
+  await delay(300);
+  console.log("2. Clicking three dot button...", threeDotButton);
 
-  const deleteButton = await waitForElement(window.getSelectors().deleteButton);
+  const deleteButton = await waitForElement(Selectors.deleteButton);
 
   if (deleteButton) {
     console.log("3. Clicking delete button...", deleteButton);
 
     deleteButton.click();
-    const confirmButton = await waitForElement(window.getSelectors().confirmDeleteButton);
+    const confirmButton = await waitForElement(Selectors.confirmDeleteButton);
 
     if (confirmButton) {
       console.log("4. Clicking confirm button...");
       confirmButton.click();
 
-      await waitForElementToDisappear(window.getSelectors().confirmDeleteButton);
+      await waitForElementToDisappear(Selectors.confirmDeleteButton);
     }
   }
 
   console.log("5. Deletion completed.");
 }
 
-async function waitForElement(selector, timeout = 2000) {
+async function waitForElement(selector, parent = document, timeout = 2000) {
   const startedAt = Date.now();
   while ((Date.now() - startedAt) < timeout) {
-    const element = document.querySelector(selector);
-    if (element) return element;
+    const element = parent.querySelector(selector);
+    if (element) return element; // 返回找到的元素
     await delay(100);
   }
-  console.log(`Element ${selector} not found within ${timeout}ms`);
-  throw new Error(`Element ${selector} not found within ${timeout}ms`);
+  console.log(`Element ${selector} not found within ${timeout}ms in the specified parent`);
+  throw new Error(`Element ${selector} not found within ${timeout}ms in the specified parent`);
 }
 
 async function waitForElementToDisappear(selector, timeout = 2000) {
