@@ -1,3 +1,5 @@
+console.log('bulkDeleteConversations.js loaded');
+
 async function bulkDeleteConversations() {
   const selectedConversations = getSelectedConversations();
 
@@ -15,38 +17,50 @@ async function bulkDeleteConversations() {
 }
 
 function getSelectedConversations() {
-  return [...document.querySelectorAll(Selectors.conversationsCheckbox)];
+  return [...document.querySelectorAll(window.getSelectors().conversationsCheckbox)];
 }
 
 function removeAllCheckboxes() {
-  const allCheckboxes = document.querySelectorAll(Selectors.conversationsCheckbox);
+  const allCheckboxes = document.querySelectorAll(window.getSelectors().conversationsCheckbox);
   allCheckboxes.forEach(checkbox => checkbox.remove());
 }
 
 async function deleteConversation(checkbox) {
-  const conversationElement = await checkbox.closest('.flex.p-3.items-center.gap-3.relative.rounded-md');
+  const conversationElement = checkbox.parentElement;
 
-  console.log("1. Clicking conversation", conversationElement);
+  console.log("1. Clicking conversation...", conversationElement);
   conversationElement.click();
   await delay(300);
 
-  const deleteButton = await waitForElement(Selectors.deleteButton);
+  const threeDotButton = conversationElement.parentElement.querySelector(window.getSelectors().threeDotButton);
+  await delay(500);
+
+  console.log("2. Clicking three dot button...", conversationElement);
+  const pointerDownEvent = new PointerEvent('pointerdown', {
+    bubbles: true,
+    cancelable: true,
+    pointerType: 'mouse'
+  });
+
+  threeDotButton.dispatchEvent(pointerDownEvent);
+
+  const deleteButton = await waitForElement(window.getSelectors().deleteButton);
 
   if (deleteButton) {
-    console.log("2. Clicking delete button", deleteButton);
+    console.log("3. Clicking delete button...", deleteButton);
 
     deleteButton.click();
-    const confirmButton = await waitForElement(Selectors.confirmDeleteButton);
+    const confirmButton = await waitForElement(window.getSelectors().confirmDeleteButton);
 
     if (confirmButton) {
-      console.log("3. Clicking confirm button");
+      console.log("4. Clicking confirm button...");
       confirmButton.click();
 
-      await waitForElementToDisappear(Selectors.confirmDeleteButton);
+      await waitForElementToDisappear(window.getSelectors().confirmDeleteButton);
     }
   }
 
-  console.log("4. Deletion completed");
+  console.log("5. Deletion completed.");
 }
 
 async function waitForElement(selector, timeout = 2000) {
