@@ -1,4 +1,5 @@
 console.log('addCheckboxes.js loaded');
+
 // 查找带有特定选择器的祖先元素
 function findAncestorWithCheckbox(el, selector) {
     while ((el = el.parentElement) && !el.querySelector(selector));
@@ -27,8 +28,8 @@ function preventEventPropagation(event) {
 
 // 添加复选框到每个对话
 function addCheckboxes() {
-    console.log('Adding checkboxes to conversations...', Selectors, isPlusUser());
-    const conversations = document.querySelectorAll(Selectors.CONVERSATION_SELECTOR);
+    console.log('Adding checkboxes to conversations...', window.getSelectors(), isPlusUser());
+    const conversations = document.querySelectorAll(window.getSelectors().CONVERSATION_SELECTOR);
 
     conversations.forEach((conversation, index) => {
         let existingCheckbox = conversation.querySelector(`.${CHECKBOX_CLASS}`);
@@ -49,7 +50,7 @@ function addCheckboxes() {
         conversation.insertAdjacentElement('afterbegin', checkbox);
 
         // 为对话标题添加点击事件
-        const titleElement = conversation.querySelector(TITLE_SELECTOR);
+        const titleElement = conversation.querySelector(window.getSelectors().TITLE_SELECTOR);
         if (titleElement) {
             titleElement.style.cursor = 'default';
             if (!titleElement.dataset.hasClickListener) { // 检查是否已经添加了监听器
