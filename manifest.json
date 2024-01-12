@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ChatGPT Bulk Delete",
-  "version": "4.2",
+  "version": "4.3",
   "description": "A Chrome extension to bulk delete ChatGPT conversations",
   "icons": {
     "48": "icon48.png"
