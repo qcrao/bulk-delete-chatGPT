@@ -53,9 +53,27 @@ function addCheckboxes() {
         const titleElement = conversation.querySelector(Selectors.TITLE_SELECTOR);
         if (titleElement) {
             titleElement.style.cursor = 'default';
-            if (!titleElement.dataset.hasClickListener) { // 检查是否已经添加了监听器
-                titleElement.addEventListener('click', toggleCheckbox);
-                titleElement.dataset.hasClickListener = 'true'; // 标记已经添加了监听器
+
+            // 获取 titleElement 的父元素
+            const parentElement = titleElement.parentElement;
+
+            // 定义一个通用的事件处理函数
+            const handleTitleClick = (event) => {
+                toggleCheckbox(event);
+                event.stopPropagation(); // 防止事件冒泡
+            };
+
+            // 为 titleElement 添加点击事件
+            if (!titleElement.dataset.hasClickListener) {
+                titleElement.addEventListener('click', handleTitleClick);
+                titleElement.dataset.hasClickListener = 'true';
+            }
+
+            // 为 titleElement 的父元素添加点击事件
+            if (parentElement && !parentElement.dataset.hasClickListener) {
+                parentElement.style.cursor = 'default';
+                parentElement.addEventListener('click', handleTitleClick);
+                parentElement.dataset.hasClickListener = 'true';
             }
         }
     });
