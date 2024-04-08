@@ -9,7 +9,7 @@ let Selectors = {
     confirmDeleteButton: 'button.btn.btn-danger',
     threeDotButton: '[id^="radix-"]',
     // 其他 Plus 用户选择器...
-    CONVERSATION_SELECTOR: 'div > div > div > div > div > div > nav > div > div > div > span > div > ol > li > div > a',
+    CONVERSATION_SELECTOR: 'div > div > div > div > div > div > nav > div > div > div > div > ol > li > div > a',
     TITLE_SELECTOR: '.relative.grow.overflow-hidden.whitespace-nowrap',
 };
 
