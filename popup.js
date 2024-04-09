@@ -1,43 +1,37 @@
-document.getElementById('add-checkboxes').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+function loadGlobalsThenExecute(tabId, secondaryScript) {
+  chrome.scripting.executeScript({
+    target: { tabId: tabId },
+    files: ['globals.js']
+  }, () => {
     chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ['addCheckboxes.js']
+      target: { tabId: tabId },
+      files: [secondaryScript]
     });
   });
-});
+}
 
-document.getElementById('bulk-delete').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ['bulkDeleteConversations.js']
+function addButtonListener(buttonId, scriptName) {
+  document.getElementById(buttonId).addEventListener('click', () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+      if (tab) {
+        loadGlobalsThenExecute(tab.id, scriptName);
+      }
     });
   });
-});
+}
 
-document.getElementById('toggle-checkboxes').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ['toggleCheckboxes.js']
-    });
-  });
-});
+function initializeButtons() {
+  addButtonListener('add-checkboxes', 'addCheckboxes.js');
+  addButtonListener('bulk-delete', 'bulkDeleteConversations.js');
+  addButtonListener('toggle-checkboxes', 'toggleCheckboxes.js');
+  addButtonListener('remove-checkboxes', 'removeCheckboxes.js');
+}
 
-document.getElementById('remove-checkboxes').addEventListener('click', () => {
-  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ['removeCheckboxes.js']
-    });
-  });
-});
+function updateCopyrightYear() {
+  const currentYear = new Date().getFullYear();
+  document.getElementById('copyright').innerHTML =
+    `&copy; ${currentYear} <a href="https://github.com/qcrao/bulk-delete-chatGPT" target="_blank">qcrao@GitHub</a>`;
+}
 
-
-// Update copyright year
-const currentYear = new Date().getFullYear();
-document.getElementById('copyright').innerHTML =
-  '&copy; ' + currentYear + ' <a href="https://github.com/qcrao/bulk-delete-chatGPT" target="_blank">qcrao@GitHub</a>';
-
-
+initializeButtons();
+updateCopyrightYear();
