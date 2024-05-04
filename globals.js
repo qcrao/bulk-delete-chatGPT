@@ -8,7 +8,6 @@ if (typeof window.globalsLoaded === 'undefined') {
     let Selectors = {
         // Plus 用户的选择器
         conversationsCheckbox: '.conversation-checkbox:checked',
-        deleteButton: '[class*="text-red"]',
         confirmDeleteButton: 'button.btn.btn-danger',
         threeDotButton: '[id^="radix-"]',
         // 其他 Plus 用户选择器...

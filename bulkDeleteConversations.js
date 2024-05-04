@@ -54,7 +54,7 @@ async function deleteConversation(checkbox) {
   await delay(300);
   console.log("2. Clicking three dot button...", threeDotButton);
 
-  const deleteButton = await waitForElement(Selectors.deleteButton);
+  const deleteButton = await waitForDeleteButton();
 
   if (deleteButton) {
     console.log("3. Clicking delete button...", deleteButton);
@@ -71,6 +71,27 @@ async function deleteConversation(checkbox) {
   }
 
   console.log("5. Deletion completed.");
+}
+
+async function waitForDeleteButton(parent = document, timeout = 2000) {
+  const selector = 'div[role="menuitem"]'; // 设定好选择器
+  const textContent = "Delete chat"; // 指定文本内容
+  const startedAt = Date.now();
+
+  while ((Date.now() - startedAt) < timeout) {
+    const elements = parent.querySelectorAll(selector);
+    const element = Array.from(elements).find(el => el.textContent.trim() === textContent);
+    if (element) return element; // 返回找到的元素
+    await delay(100);
+  }
+  
+  console.log(`Delete button not found within ${timeout}ms`);
+  throw new Error(`Delete button not found within ${timeout}ms`);
+}
+
+// Helper function to create a delay
+function delay(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 async function waitForElement(selector, parent = document, timeout = 2000) {
