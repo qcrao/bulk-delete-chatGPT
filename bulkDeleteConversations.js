@@ -75,7 +75,7 @@ async function deleteConversation(checkbox) {
 
 async function waitForDeleteButton(parent = document, timeout = 2000) {
   const selector = 'div[role="menuitem"]'; // 设定好选择器
-  const textContent = "Delete chat"; // 指定文本内容
+  const textContent = "Delete"; // 指定文本内容
   const startedAt = Date.now();
 
   while ((Date.now() - startedAt) < timeout) {
