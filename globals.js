@@ -3,8 +3,6 @@ if (typeof window.globalsLoaded === 'undefined') {
 
     window.globalsLoaded = true;
 
-    let lastChecked = null;
-
     let Selectors = {
         // Plus 用户的选择器
         conversationsCheckbox: '.conversation-checkbox:checked',
@@ -17,7 +15,7 @@ if (typeof window.globalsLoaded === 'undefined') {
 
     let CHECKBOX_CLASS = 'conversation-checkbox';
 
-    window.lastChecked = lastChecked;
+    window.shiftPressed = false;
     window.Selectors = Selectors;
     window.CHECKBOX_CLASS = CHECKBOX_CLASS;
 } else {
