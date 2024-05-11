@@ -28,3 +28,4 @@ English | [中文版本](./README-CN.md)
 - Select the conversations you wish to delete.
 - Click the "Bulk delete" button, and the selected conversations will be deleted.
 - If needed, you can click the "Remove checkboxes" button to hide the checkboxes.
+- It's possible to select all checkboxes between your last selection and the one being selected by holding shift.

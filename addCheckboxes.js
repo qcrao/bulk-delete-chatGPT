@@ -17,13 +17,50 @@ function toggleCheckbox(event) {
     const checkbox = parentElement ? parentElement.querySelector(`.${CHECKBOX_CLASS}`) : null;
     if (checkbox) {
         checkbox.checked = !checkbox.checked;
+        checkPreviousCheckboxes(checkbox);
     }
     event.stopPropagation();
 }
 
-// 阻止事件冒泡
-function preventEventPropagation(event) {
+function handleCheckboxClick(event) {
+    // 阻止事件冒泡
     event.stopPropagation();
+
+    checkPreviousCheckboxes(event.target);
+}
+
+function checkPreviousCheckboxes(clickedCheckbox) {
+    if (shiftPressed && clickedCheckbox.checked) {
+        const allCheckboxes = Array.from(document.querySelectorAll(`.${CHECKBOX_CLASS}`));
+        const previousCheckboxes = allCheckboxes.slice(0, allCheckboxes.indexOf(clickedCheckbox));
+
+        let index = previousCheckboxes.length - 1;
+        while (index >= 0 && !previousCheckboxes[index].checked) {
+            index--;
+        }
+
+        // A negative index means no previous checkbox is checked
+        if (index >= 0) {
+            previousCheckboxes.slice(index).forEach((checkbox) => {
+                checkbox.checked = true;    
+            });
+        }
+    }
+}
+
+function addShiftKeyEventListeners() {
+    console.log('Adding Shift key event listeners...');
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Shift') {
+            shiftPressed = true;
+        }
+    });
+
+    document.addEventListener('keyup', (event) => {
+        if (event.key === 'Shift') {
+            shiftPressed = false;
+        }
+    });
 }
 
 // 添加复选框到每个对话
@@ -46,7 +83,7 @@ function addCheckboxes() {
         checkbox.className = CHECKBOX_CLASS;
         checkbox.dataset.index = index;
         checkbox.checked = isChecked;
-        checkbox.addEventListener('click', preventEventPropagation);
+        checkbox.addEventListener('click', handleCheckboxClick);
         conversation.insertAdjacentElement('afterbegin', checkbox);
 
         // 为对话标题添加点击事件
@@ -77,6 +114,8 @@ function addCheckboxes() {
             }
         }
     });
+
+    addShiftKeyEventListeners();
 }
 
 // 执行主函数
