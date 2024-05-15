@@ -3,20 +3,19 @@ if (typeof window.globalsLoaded === 'undefined') {
 
     window.globalsLoaded = true;
 
-    let lastChecked = null;
+    const lastChecked = null;
 
-    let Selectors = {
-        // Plus 用户的选择器
+    const Selectors = {
         conversationsCheckbox: '.conversation-checkbox:checked',
         confirmDeleteButton: 'button.btn.btn-danger',
         threeDotButton: '[id^="radix-"]',
-        // 其他 Plus 用户选择器...
         CONVERSATION_SELECTOR: 'div > div > div > div > div > div > nav > div > div > div > div > ol > li > div > a',
         TITLE_SELECTOR: '.relative.grow.overflow-hidden.whitespace-nowrap',
     };
 
-    let CHECKBOX_CLASS = 'conversation-checkbox';
+    const CHECKBOX_CLASS = 'conversation-checkbox';
 
+    // Expose variables to the global scope
     window.lastChecked = lastChecked;
     window.Selectors = Selectors;
     window.CHECKBOX_CLASS = CHECKBOX_CLASS;
