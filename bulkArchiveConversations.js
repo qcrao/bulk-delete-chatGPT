@@ -66,12 +66,18 @@ async function archiveConversation(checkbox) {
 async function waitForArchiveButton(parent = document, timeout = 2000) {
   const selector = 'div[role="menuitem"]';
   const textContent = "Archive";
+  const textContentSimplifiedChinese = "归档";
+  const textContentTraditionalChinese = "封存";
+
   const startedAt = Date.now();
 
   while (Date.now() - startedAt < timeout) {
     const elements = parent.querySelectorAll(selector);
     const element = Array.from(elements).find(
-      (el) => el.textContent.trim() === textContent
+      (el) =>
+        el.textContent.trim() === textContent ||
+        el.textContent.trim() === textContentSimplifiedChinese ||
+        el.textContent.trim() === textContentTraditionalChinese
     );
     if (element) return element;
     await delay(100);

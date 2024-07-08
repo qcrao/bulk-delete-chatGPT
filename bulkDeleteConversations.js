@@ -1,4 +1,4 @@
-console.log('bulkDeleteConversations.js loaded');
+console.log("bulkDeleteConversations.js loaded");
 
 async function bulkDeleteConversations() {
   const selectedConversations = getSelectedConversations();
@@ -22,29 +22,32 @@ function getSelectedConversations() {
 
 function removeAllCheckboxes() {
   const allCheckboxes = document.querySelectorAll(`.${CHECKBOX_CLASS}`);
-  allCheckboxes.forEach(checkbox => checkbox.remove());
+  allCheckboxes.forEach((checkbox) => checkbox.remove());
 }
 
 async function deleteConversation(checkbox) {
   await delay(100);
 
   const conversationElement = checkbox.parentElement;
-  const hoverEvent = new MouseEvent('mouseover', {
+  const hoverEvent = new MouseEvent("mouseover", {
     view: window,
     bubbles: true,
-    cancelable: true
+    cancelable: true,
   });
 
   console.log("1. Hovering over conversation...", conversationElement);
-  conversationElement.dispatchEvent(hoverEvent);  
+  conversationElement.dispatchEvent(hoverEvent);
   await delay(200);
 
-  const pointerDownEvent = new PointerEvent('pointerdown', {
+  const pointerDownEvent = new PointerEvent("pointerdown", {
     bubbles: true,
     cancelable: true,
-    pointerType: 'mouse'
+    pointerType: "mouse",
   });
-  const threeDotButton = await waitForElement(Selectors.threeDotButton, conversationElement.parentElement);
+  const threeDotButton = await waitForElement(
+    Selectors.threeDotButton,
+    conversationElement.parentElement
+  );
   console.log("2. Clicking three dot button...", threeDotButton);
   threeDotButton.dispatchEvent(pointerDownEvent);
   await delay(300);
@@ -73,10 +76,12 @@ async function waitForDeleteButton(parent = document, timeout = 2000) {
   const textContent = "Delete";
   const startedAt = Date.now();
 
-  while ((Date.now() - startedAt) < timeout) {
+  while (Date.now() - startedAt < timeout) {
     const elements = parent.querySelectorAll(selector);
-    const element = Array.from(elements).find(el => 
-      el.textContent.trim() === textContent || el.querySelector('.text-token-text-error')
+    const element = Array.from(elements).find(
+      (el) =>
+        el.textContent.trim() === textContent ||
+        el.querySelector(".text-token-text-error")
     );
     if (element) return element;
     await delay(100);
@@ -86,23 +91,25 @@ async function waitForDeleteButton(parent = document, timeout = 2000) {
 }
 
 function delay(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function waitForElement(selector, parent = document, timeout = 2000) {
   const startedAt = Date.now();
-  while ((Date.now() - startedAt) < timeout) {
+  while (Date.now() - startedAt < timeout) {
     const element = parent.querySelector(selector);
     if (element) return element;
     await delay(100);
   }
 
-  throw new Error(`Element ${selector} not found within ${timeout}ms in the specified parent`);
+  throw new Error(
+    `Element ${selector} not found within ${timeout}ms in the specified parent`
+  );
 }
 
 async function waitForElementToDisappear(selector, timeout = 2000) {
   const startedAt = Date.now();
-  while ((Date.now() - startedAt) < timeout) {
+  while (Date.now() - startedAt < timeout) {
     const element = document.querySelector(selector);
     if (!element) return;
     await delay(100);
