@@ -104,6 +104,14 @@ button#bulk-archive {
   width: 100%;
   margin-top: 5px;
   padding: 12px 15px;
+  position: relative;
+}
+
+button#bulk-archive span {
+  position: absolute;
+  left: 75px;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 button#add-checkboxes {
