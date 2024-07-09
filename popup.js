@@ -91,24 +91,51 @@ async function handleBulkArchive() {
       }
     });
   } else {
-    if (confirm("一次性付费 0.99 USD，购买权限。是否继续？")) {
-      const payResponse = await fetch(
-        `https://bulk-delete-chatgpt-worker.qcrao.com/pay-bulk-archive?user_id=${encodeURIComponent(
-          userInfo.id
-        )}`,
-        {
-          method: "POST",
+    showModal().then(async (result) => {
+      if (result) {
+        const payResponse = await fetch(
+          `https://bulk-delete-chatgpt-worker.qcrao.com/pay-bulk-archive?user_id=${encodeURIComponent(
+            userInfo.id
+          )}`,
+          { method: "POST" }
+        );
+        const payData = await payResponse.json();
+        console.log("payData", payData);
+        if (payData.paymentUrl) {
+          window.open(payData.paymentUrl, "_blank");
+        } else {
+          alert("Failed to get payment link. Please try again later.");
         }
-      );
-      const payData = await payResponse.json();
-      console.log("payData", payData);
-      if (payData.paymentUrl) {
-        window.open(payData.paymentUrl, "_blank");
-      } else {
-        alert("获取支付链接失败，请稍后再试。");
       }
-    }
+    });
   }
+}
+
+function showModal() {
+  return new Promise((resolve) => {
+    const modal = document.getElementById("customModal");
+    const okButton = document.getElementById("modalOK");
+    const cancelButton = document.getElementById("modalCancel");
+
+    modal.style.display = "block";
+
+    okButton.onclick = () => {
+      modal.style.display = "none";
+      resolve(true);
+    };
+
+    cancelButton.onclick = () => {
+      modal.style.display = "none";
+      resolve(false);
+    };
+
+    window.onclick = (event) => {
+      if (event.target == modal) {
+        modal.style.display = "none";
+        resolve(false);
+      }
+    };
+  });
 }
 
 function getUserInfo() {
