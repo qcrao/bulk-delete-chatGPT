@@ -13,17 +13,17 @@
   },
   "permissions": [
     "scripting",
-    "activeTab"
+    "activeTab",
+    "https://bulk-delete-chatgpt-worker.qcrao.com/*"
   ],
   "content_scripts": [
     {
-      "matches": [
-        "*://chat.openai.com/*"
-      ],
+      "matches": ["*://chat.openai.com/*"],
       "js": [
         "globals.js",
         "addCheckboxes.js",
-        "bulkDeleteConversations.js"
+        "bulkDeleteConversations.js",
+        "deleteConversations.js"
       ],
       "run_at": "document_idle"
     }
