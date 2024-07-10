@@ -33,9 +33,8 @@ function initializeButtons() {
   bulkArchiveButton.addEventListener("click", handleBulkArchive);
 }
 
+const storageKey = "BulkDeleteChatGPT_isPaid";
 async function checkMembershipStatus() {
-  const storageKey = "BulkDeleteChatGPT_isPaid";
-
   const localIsPaid = localStorage.getItem(storageKey) === "true";
 
   updateBulkArchiveButton(localIsPaid);
@@ -74,6 +73,19 @@ function updateBulkArchiveButton(isPaid) {
 }
 
 async function handleBulkArchive() {
+  const localIsPaid = localStorage.getItem(storageKey) === "true";
+  if (localIsPaid) {
+    chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+      if (tab) {
+        chrome.scripting.executeScript({
+          target: { tabId: tab.id },
+          files: ["bulkArchiveConversations.js"],
+        });
+      }
+    });
+    return;
+  }
+
   const userInfo = await getUserInfo();
   if (!userInfo) {
     console.error("Unable to get user info");
