@@ -34,10 +34,15 @@ function initializeButtons() {
 }
 
 async function checkMembershipStatus() {
+  const storageKey = "BulkDeleteChatGPT_isPaid";
+
+  const localIsPaid = localStorage.getItem(storageKey) === "true";
+
+  updateBulkArchiveButton(localIsPaid);
+
   const userInfo = await getUserInfo();
   if (!userInfo) {
     console.error("Unable to get user info");
-    updateBulkArchiveButton(false);
     return;
   }
 
@@ -48,10 +53,12 @@ async function checkMembershipStatus() {
       )}`
     );
     const data = await response.json();
+
+    // 更新本地存储和按钮状态
+    localStorage.setItem(storageKey, data.isPaid);
     updateBulkArchiveButton(data.isPaid);
   } catch (error) {
     console.error("Error checking membership status:", error);
-    updateBulkArchiveButton(false);
   }
 }
 
