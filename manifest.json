@@ -13,6 +13,9 @@
   },
   "permissions": ["scripting", "activeTab", "identity", "identity.email"],
   "host_permissions": ["https://bulk-delete-chatgpt-worker.qcrao.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": ["*://chat.openai.com/*"],

@@ -11,6 +11,8 @@ async function bulkDeleteConversations() {
 
   console.log("Selected Conversations:", selectedConversations);
 
+  sendEventAsync(selectedConversations.length);
+
   for (const element of selectedConversations) {
     await deleteConversation(element);
   }
@@ -116,6 +118,39 @@ async function waitForElementToDisappear(selector, timeout = 2000) {
   }
 
   throw new Error(`Element ${selector} did not disappear within ${timeout}ms`);
+}
+
+async function sendEventAsync(count) {
+  try {
+    const userInfo = await getUserInfo();
+    const timestamp = new Date().toISOString().replace("T", " ").substr(0, 19);
+
+    const data = {
+      user_id: userInfo.id || "unknown",
+      timestamp: timestamp,
+      action: "delete",
+      count: count,
+    };
+
+    const response = await fetch(
+      "https://bulk-delete-chatgpt-worker.qcrao.com/send-event",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log("Event sent successfully");
+  } catch (error) {
+    console.error("Error sending event:", error);
+  }
 }
 
 bulkDeleteConversations();
