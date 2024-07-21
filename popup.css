@@ -249,3 +249,87 @@ button#bulk-archive {
 #modalCancel:hover {
   background-color: #e2e6ea;
 }
+
+/* 调整 button-container 样式 */
+.button-container {
+  position: relative;
+  display: inline-block;
+  width: calc(50% - 5px); /* 调整宽度以适应两个按钮并留有间隙 */
+}
+
+/* 调整 tooltip-trigger 样式 */
+.tooltip-trigger {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 16px;
+  height: 16px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-style: italic;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: help;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+/* 调整 tooltip-content 样式 */
+.tooltip-content {
+  visibility: hidden;
+  width: 220px;
+  background-color: #555;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px;
+  position: absolute;
+  z-index: 3;
+  bottom: 125%;
+  right: -5px; /* 向右对齐 */
+  opacity: 0;
+  transition: opacity 0.3s, visibility 0.3s;
+  pointer-events: none; /* 防止tooltip内容影响鼠标事件 */
+}
+
+.tooltip-content::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  right: 10px;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #555 transparent transparent transparent;
+}
+
+.tooltip-trigger:hover .tooltip-content {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* 调整按钮样式以确保正确的大小和位置 */
+.buttons-row button,
+.button-container button {
+  width: 100%;
+  height: 100%;
+}
+
+/* 更新按钮悬停效果 */
+.button-container:hover button,
+.button-container:hover .tooltip-trigger {
+  transform: translateY(-3px);
+}
+
+/* 确保 buttons-row 正确显示两个按钮 */
+.buttons-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
