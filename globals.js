@@ -3,8 +3,6 @@ if (typeof window.globalsLoaded === "undefined") {
 
   window.globalsLoaded = true;
 
-  const lastChecked = null;
-
   const Selectors = {
     conversationsCheckbox: ".conversation-checkbox:checked",
     confirmDeleteButton: "button.btn.btn-danger",
@@ -32,8 +30,9 @@ if (typeof window.globalsLoaded === "undefined") {
   }
 
   // Expose variables to the global scope
-  window.lastChecked = lastChecked;
   window.Selectors = Selectors;
+  window.shiftPressed = false;
+  window.lastCheckedCheckbox = null;
   window.CHECKBOX_CLASS = CHECKBOX_CLASS;
 } else {
   console.log("globals.js already loaded, skipping re-initialization");
