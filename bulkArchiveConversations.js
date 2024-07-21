@@ -1,20 +1,18 @@
-console.log("bulkDeleteConversations.js loaded");
+console.log("bulkArchiveConversations.js loaded");
 
-async function bulkDeleteConversations() {
+async function bulkArchiveConversations() {
   const selectedConversations = getSelectedConversations();
 
   if (selectedConversations.length === 0) {
-    console.log("No conversations to delete.");
+    console.log("No conversations to archive.");
     removeAllCheckboxes();
     return;
   }
 
   console.log("Selected Conversations:", selectedConversations);
 
-  sendEventAsync(selectedConversations.length);
-
   for (const element of selectedConversations) {
-    await deleteConversation(element);
+    await archiveConversation(element);
   }
 }
 
@@ -27,7 +25,7 @@ function removeAllCheckboxes() {
   allCheckboxes.forEach((checkbox) => checkbox.remove());
 }
 
-async function deleteConversation(checkbox) {
+async function archiveConversation(checkbox) {
   await delay(100);
 
   const conversationElement = checkbox.parentElement;
@@ -54,28 +52,23 @@ async function deleteConversation(checkbox) {
   threeDotButton.dispatchEvent(pointerDownEvent);
   await delay(300);
 
-  const deleteButton = await waitForDeleteButton();
+  const archiveButton = await waitForArchiveButton();
 
-  if (deleteButton) {
-    console.log("3. Clicking delete button...", deleteButton);
-
-    deleteButton.click();
-
-    const confirmButton = await waitForElement(Selectors.confirmDeleteButton);
-    if (confirmButton) {
-      console.log("4. Clicking confirm button...");
-      confirmButton.click();
-
-      await waitForElementToDisappear(Selectors.confirmDeleteButton);
-    }
+  if (archiveButton) {
+    console.log("3. Clicking archive button...", archiveButton);
+    archiveButton.click();
+    await delay(500);
   }
 
-  console.log("5. Deletion completed.");
+  console.log("4. Archiving completed.");
 }
 
-async function waitForDeleteButton(parent = document, timeout = 2000) {
+async function waitForArchiveButton(parent = document, timeout = 2000) {
   const selector = 'div[role="menuitem"]';
-  const textContent = "Delete";
+  const textContent = "Archive";
+  const textContentSimplifiedChinese = "归档";
+  const textContentTraditionalChinese = "封存";
+
   const startedAt = Date.now();
 
   while (Date.now() - startedAt < timeout) {
@@ -83,7 +76,8 @@ async function waitForDeleteButton(parent = document, timeout = 2000) {
     const element = Array.from(elements).find(
       (el) =>
         el.textContent.trim() === textContent ||
-        el.querySelector(".text-token-text-error")
+        el.textContent.trim() === textContentSimplifiedChinese ||
+        el.textContent.trim() === textContentTraditionalChinese
     );
     if (element) return element;
     await delay(100);
@@ -109,48 +103,4 @@ async function waitForElement(selector, parent = document, timeout = 2000) {
   );
 }
 
-async function waitForElementToDisappear(selector, timeout = 2000) {
-  const startedAt = Date.now();
-  while (Date.now() - startedAt < timeout) {
-    const element = document.querySelector(selector);
-    if (!element) return;
-    await delay(100);
-  }
-
-  throw new Error(`Element ${selector} did not disappear within ${timeout}ms`);
-}
-
-async function sendEventAsync(count) {
-  try {
-    const userInfo = await getUserInfo();
-    const timestamp = new Date().toISOString().replace("T", " ").substr(0, 19);
-
-    const data = {
-      user_id: userInfo.id || "unknown",
-      timestamp: timestamp,
-      action: "delete",
-      count: count,
-    };
-
-    const response = await fetch(
-      "https://bulk-delete-chatgpt-worker.qcrao.com/send-event",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    console.log("Event sent successfully");
-  } catch (error) {
-    console.error("Error sending event:", error);
-  }
-}
-
-bulkDeleteConversations();
+bulkArchiveConversations();

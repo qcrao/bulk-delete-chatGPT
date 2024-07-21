@@ -1,75 +1,133 @@
 body {
-    width: 240px;
-    padding: 15px;
-    font-family: Arial, sans-serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  width: 280px;
+  padding: 20px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: #f0f2f5;
+  color: #333;
 }
 
 .header {
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   width: 100%;
-  border-bottom: 1px solid #ccc;
-  padding-bottom: 10px;
+  border-bottom: 2px solid #e1e4e8;
+  padding-bottom: 15px;
 }
 
 .header h1 {
-  font-size: 16px;
-  font-weight: bold;
+  font-size: 18px;
+  font-weight: 600;
   text-align: center;
   margin: 0;
-}
-
-.buttons-row {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 10px;
-  align-items: flex-start;
-}
-
-button {
-  padding: 8px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  background-color: #1ABC9C;
-  color: white;
-  border: 1px solid #16A085;
-  border-radius: 6px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition-duration: 0.4s;
-  margin: 0; /* 去掉左右外边距 */
-}
-
-button:hover {
-  background-color: #16A085;
-  border-color: #14967F;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-}
-
-button#bulk-delete, button#toggle-checkboxes {
-  font-size: 16px;
-  background-color: #e74c3c;
-  border-color: #c0392b;
-  margin-top: 10px;
-  width: calc(200px + 40px); /* bulk-delete 宽度等于 body 的宽度减去左右内边距再加上两者之间的距离 */
+  color: #2c3e50;
 }
 
 .buttons-wrapper {
   display: flex;
   flex-direction: column;
   width: 100%;
-  margin-top: 10px;
+  gap: 15px;
+}
+
+.buttons-row {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  gap: 10px;
+}
+
+button {
+  padding: 10px 15px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  text-align: center;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+button::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 5px;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.5);
+  opacity: 0;
+  border-radius: 100%;
+  transform: scale(1, 1) translate(-50%);
+  transform-origin: 50% 50%;
+}
+
+button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.18);
+}
+
+button:hover::after {
+  animation: ripple 1s ease-out;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0, 0);
+    opacity: 0.5;
+  }
+  20% {
+    transform: scale(25, 25);
+    opacity: 0.3;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(40, 40);
+  }
 }
 
 .buttons-row button {
-  width: 120px; /* 将 remove-checkboxes 和 add-checkboxes 按钮的宽度增加到 120px */
+  flex: 1;
 }
 
-.buttons-row button:first-child {
-  margin-right: 10px; /* 添加一个右外边距来增加两个按钮之间的距离 */
+button#bulk-delete,
+button#toggle-checkboxes,
+button#bulk-archive {
+  font-size: 16px;
+  width: 100%;
+  margin-top: 5px;
+  padding: 12px 15px;
+  position: relative;
+}
+
+button#bulk-archive span {
+  position: absolute;
+  left: 75px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+button#add-checkboxes {
+  background-color: #2ecc71;
+}
+button#remove-checkboxes {
+  background-color: #e74c3c;
+}
+button#toggle-checkboxes {
+  background-color: #f39c12;
+}
+button#bulk-delete {
+  background-color: #e74c3c;
+}
+button#bulk-archive {
+  background-color: #9b59b6;
 }
 
 .footer {
@@ -77,41 +135,117 @@ button#bulk-delete, button#toggle-checkboxes {
   width: 100%;
   font-size: 12px;
   text-align: center;
-  border-top: 1px solid #ccc;
-  padding-top: 10px;
-  display: flex; /* 添加这一行使得.footer下的直接子元素并排排列 */
-  justify-content: center; /* 使得子元素在中心对齐 */
-  gap: 10px; /* 如果需要，可以添加这一行以在子元素之间创建一些空间 */
-}
-
-button#remove-checkboxes {
-  background-color: #badb34;
-  border-color: #b6b929;
-}
-
-button#toggle-checkboxes {
-  background-color: #2287da;
-  border-color: #2758ab;
+  border-top: 2px solid #e1e4e8;
+  padding-top: 15px;
+  display: flex;
+  justify-content: center;
+  gap: 20px;
 }
 
 #sponsorLink {
   display: inline-flex;
   align-items: center;
-  padding: 10px 20px;
-  background-color: #383E46;
-  border-color: #78838F;
+  padding: 8px 15px;
+  background-color: #34495e;
   border-radius: 5px;
   color: #fff;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+#sponsorLink:hover {
+  background-color: #2c3e50;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 #sponsorLink .icon-text {
   display: flex;
   align-items: center;
+  gap: 8px;
 }
 
 #sponsorLink:hover {
   background-color: #993366;
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 10px;
+  width: 260px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  overflow: hidden;
+}
+
+.modal h2 {
+  margin: 0;
+  padding: 15px 0;
+  background-color: #4a4a4a;
+  color: white;
+  font-size: 18px;
+  width: 100%;
+}
+
+.modal p {
+  color: #666;
+  font-size: 14px;
+  margin: 20px 15px;
+}
+
+.modal-separator {
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 15px 0;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 20px;
+}
+
+.modal-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.modal-button-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.modal-button-primary:hover {
+  background-color: #0056b3;
+}
+
+#modalCancel {
+  background-color: #f8f9fa;
+  color: #333;
+}
+
+#modalCancel:hover {
+  background-color: #e2e6ea;
 }

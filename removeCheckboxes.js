@@ -1,9 +1,9 @@
-(function() {
-    const removeConversationCheckboxes = document.querySelectorAll('.conversation-checkbox');
-    removeConversationCheckboxes.forEach(checkbox => {
-      checkbox.remove();
-    });
-    // 在移除所有复选框后刷新页面
-    location.reload();
-  })();
-  
+function removeCheckboxesAndReload() {
+  const checkboxes = document.querySelectorAll(`.${CHECKBOX_CLASS}`);
+  checkboxes.forEach(checkbox => checkbox.remove());
+
+  // Refresh the page after removing all checkboxes
+  location.reload();
+}
+
+removeCheckboxesAndReload();
