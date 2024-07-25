@@ -13,9 +13,20 @@ async function bulkArchiveConversations() {
 
   sendEventAsync("archive", selectedConversations.length);
 
-  for (const element of selectedConversations) {
-    await archiveConversation(element);
+  for (let i = 0; i < selectedConversations.length; i++) {
+    await archiveConversation(selectedConversations[i]);
+    const progress = Math.round(((i + 1) / selectedConversations.length) * 100);
+    chrome.runtime.sendMessage({
+      action: "updateProgress",
+      buttonId: "bulk-archive",
+      progress: progress,
+    });
   }
+
+  chrome.runtime.sendMessage({
+    action: "operationComplete",
+    buttonId: "bulk-archive",
+  });
 }
 
 function getSelectedConversations() {

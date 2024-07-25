@@ -21,7 +21,7 @@ function addButtonListener(buttonId, scriptName) {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab) {
         if (buttonId === "bulk-delete") {
-          const bulkDeleteButton = document.getElementById("bulk-delete");
+          const bulkDeleteButton = document.getElementById(buttonId);
           bulkDeleteButton.disabled = true;
           bulkDeleteButton.classList.add("progress");
 
@@ -34,18 +34,20 @@ function addButtonListener(buttonId, scriptName) {
   });
 }
 
-function updateProgressBar(progress) {
-  console.log("Updating progress bar:", progress);
-  const bulkDeleteButton = document.getElementById("bulk-delete");
-  bulkDeleteButton.style.setProperty("--progress", `${progress}%`);
-  bulkDeleteButton.setAttribute("data-progress", progress);
+function updateProgressBar(buttonId, progress) {
+  console.log(`Updating progress bar for ${buttonId}:`, progress);
+  const button = document.getElementById(buttonId);
+  button.style.setProperty("--progress", `${progress}%`);
+  button.setAttribute("data-progress", progress);
 
   if (progress === 100 || progress === 0) {
-    bulkDeleteButton.disabled = false;
-    bulkDeleteButton.classList.remove("progress");
-    bulkDeleteButton.textContent = "Bulk Delete"; // Reset button text
+    button.disabled = false;
+    button.classList.remove("progress");
+    button.textContent =
+      buttonId === "bulk-delete" ? "Bulk Delete" : "Bulk Archive";
   } else {
-    bulkDeleteButton.textContent = "Deleting..."; // Change button text during deletion
+    button.textContent =
+      buttonId === "bulk-delete" ? "Deleting..." : "Archiving...";
   }
 }
 
@@ -53,9 +55,12 @@ function updateProgressBar(progress) {
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log("Received message:", request);
   if (request.action === "updateProgress") {
-    updateProgressBar(request.progress);
-  } else if (request.action === "deleteComplete") {
-    updateProgressBar(0); // This will reset the button text
+    updateProgressBar(request.buttonId, request.progress);
+  } else if (request.action === "operationComplete") {
+    const button = document.getElementById(request.buttonId);
+    button.disabled = false;
+    button.classList.remove("progress");
+    updateProgressBar(request.buttonId, 0);
   }
 });
 
@@ -113,6 +118,9 @@ async function handleBulkArchive() {
   if (localIsPaid) {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab) {
+        const bulkArchiveButton = document.getElementById("bulk-archive");
+        bulkArchiveButton.disabled = true;
+        bulkArchiveButton.classList.add("progress");
         loadGlobalsThenExecute(tab.id, "bulkArchiveConversations.js");
       }
     });
@@ -136,6 +144,10 @@ async function handleBulkArchive() {
   if (data.isPaid) {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab) {
+        const bulkArchiveButton = document.getElementById("bulk-archive");
+        bulkArchiveButton.disabled = true;
+        bulkArchiveButton.classList.add("progress");
+
         loadGlobalsThenExecute(tab.id, "bulkArchiveConversations.js");
       }
     });

@@ -21,11 +21,15 @@ async function bulkDeleteConversations() {
     const progress = Math.round(((i + 1) / selectedConversations.length) * 100);
     chrome.runtime.sendMessage({
       action: "updateProgress",
+      buttonId: "bulk-delete",
       progress: progress,
     });
   }
 
-  chrome.runtime.sendMessage({ action: "deleteComplete" });
+  chrome.runtime.sendMessage({
+    action: "operationComplete",
+    buttonId: "bulk-delete",
+  });
 }
 
 function getSelectedConversations() {

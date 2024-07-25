@@ -353,8 +353,17 @@ button#bulk-delete {
   transition: background-color 0.3s ease;
 }
 
+button#bulk-archive {
+  background-color: #9b59b6;
+  color: white;
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+}
+
 /* New styles for progress bar */
-button#bulk-delete::before {
+button#bulk-delete::before,
+button#bulk-archive::before {
   content: "";
   position: absolute;
   top: 0;
@@ -366,24 +375,32 @@ button#bulk-delete::before {
   transition: transform 0.3s ease-out;
 }
 
-button#bulk-delete::after {
+button#bulk-delete::after,
+button#bulk-archive::after {
   content: attr(data-progress) "%";
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  color: white;
+  color: rgb(149, 20, 20);
   font-weight: bold;
-  z-index: 1;
+  z-index: 100;
 }
 
-button#bulk-delete.progress {
+button#bulk-delete.progress,
+button#bulk-archive.progress {
   cursor: not-allowed;
   background-color: #34495e; /* Darker background when in progress */
 }
 
-button#bulk-delete.progress::before {
+button#bulk-delete.progress::before,
+button#bulk-archive.progress::before {
   transform: translateX(var(--progress, -100%));
+}
+
+button#bulk-delete.progress::before,
+button#bulk-archive.progress::before {
+  animation: pulse 2s infinite;
 }
 
 /* Add a pulsing animation to the progress bar */
@@ -397,8 +414,4 @@ button#bulk-delete.progress::before {
   100% {
     opacity: 1;
   }
-}
-
-button#bulk-delete.progress::before {
-  animation: pulse 2s infinite;
 }
