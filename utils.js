@@ -12,3 +12,36 @@ function getUserInfo() {
     });
   });
 }
+
+async function sendEventAsync(count) {
+  try {
+    const userInfo = await getUserInfo();
+    const timestamp = new Date().toISOString().replace("T", " ").substr(0, 19);
+
+    const data = {
+      user_id: userInfo.id || "unknown",
+      timestamp: timestamp,
+      action: "delete",
+      count: count,
+    };
+
+    const response = await fetch(
+      "https://bulk-delete-chatgpt-worker.qcrao.com/send-event",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log("Event sent successfully");
+  } catch (error) {
+    console.error("Error sending event:", error);
+  }
+}
