@@ -13,7 +13,7 @@ function getUserInfo() {
   });
 }
 
-async function sendEventAsync(count) {
+async function sendEventAsync(action, count) {
   try {
     const userInfo = await getUserInfo();
     const timestamp = new Date().toISOString().replace("T", " ").substr(0, 19);
@@ -21,7 +21,7 @@ async function sendEventAsync(count) {
     const data = {
       user_id: userInfo.id || "unknown",
       timestamp: timestamp,
-      action: "delete",
+      action: action,
       count: count,
     };
 
@@ -40,8 +40,8 @@ async function sendEventAsync(count) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
-    console.log("Event sent successfully");
+    console.log(`Event '${action}' sent successfully`);
   } catch (error) {
-    console.error("Error sending event:", error);
+    console.error(`Error sending '${action}' event:`, error);
   }
 }

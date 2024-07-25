@@ -11,6 +11,8 @@ async function bulkArchiveConversations() {
 
   console.log("Selected Conversations:", selectedConversations);
 
+  sendEventAsync("archive", selectedConversations.length);
+
   for (const element of selectedConversations) {
     await archiveConversation(element);
   }

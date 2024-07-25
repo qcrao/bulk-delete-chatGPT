@@ -14,7 +14,7 @@ async function bulkDeleteConversations() {
 
   console.log("Selected Conversations:", selectedConversations.length);
 
-  sendEventAsync(selectedConversations.length);
+  sendEventAsync("delete", selectedConversations.length);
 
   for (let i = 0; i < selectedConversations.length; i++) {
     await deleteConversation(selectedConversations[i]);
