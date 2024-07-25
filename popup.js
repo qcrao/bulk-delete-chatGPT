@@ -37,18 +37,25 @@ function addButtonListener(buttonId, scriptName) {
 function updateProgressBar(progress) {
   console.log("Updating progress bar:", progress);
   const bulkDeleteButton = document.getElementById("bulk-delete");
-  bulkDeleteButton.style.setProperty("--progress", `${progress}%`);
+  bulkDeleteButton.style.setProperty('--progress', `${progress}%`);
+  bulkDeleteButton.setAttribute('data-progress', progress);
+  
+  if (progress === 100 || progress === 0) {
+    bulkDeleteButton.disabled = false;
+    bulkDeleteButton.classList.remove("progress");
+    bulkDeleteButton.textContent = "Bulk Delete";  // Reset button text
+  } else {
+    bulkDeleteButton.textContent = "Deleting...";  // Change button text during deletion
+  }
 }
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+// 在消息监听器中也添加文本重置
+chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   console.log("Received message:", request);
   if (request.action === "updateProgress") {
     updateProgressBar(request.progress);
   } else if (request.action === "deleteComplete") {
-    const bulkDeleteButton = document.getElementById("bulk-delete");
-    bulkDeleteButton.disabled = false;
-    bulkDeleteButton.classList.remove("progress");
-    updateProgressBar(0);
+    updateProgressBar(0);  // This will reset the button text
   }
 });
 

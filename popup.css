@@ -345,12 +345,12 @@ button#bulk-archive {
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.5); /* 增强悬停时的光晕效果 */
 }
 
-/* Existing styles for the bulk delete button */
 button#bulk-delete {
   background-color: #e74c3c;
   color: white;
   position: relative;
   overflow: hidden;
+  transition: background-color 0.3s ease;
 }
 
 /* New styles for progress bar */
@@ -361,15 +361,44 @@ button#bulk-delete::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: #2ecc71; /* Bright green color for progress */
   transform: translateX(-100%);
   transition: transform 0.3s ease-out;
 }
 
+button#bulk-delete::after {
+  content: attr(data-progress) "%";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: bold;
+  z-index: 1;
+}
+
 button#bulk-delete.progress {
   cursor: not-allowed;
+  background-color: #34495e; /* Darker background when in progress */
 }
 
 button#bulk-delete.progress::before {
   transform: translateX(var(--progress, -100%));
+}
+
+/* Add a pulsing animation to the progress bar */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+button#bulk-delete.progress::before {
+  animation: pulse 2s infinite;
 }
