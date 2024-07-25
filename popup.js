@@ -37,17 +37,33 @@ function addButtonListener(buttonId, scriptName) {
 function updateProgressBar(buttonId, progress) {
   console.log(`Updating progress bar for ${buttonId}:`, progress);
   const button = document.getElementById(buttonId);
+  button.classList.add("progress");
   button.style.setProperty("--progress", `${progress}%`);
   button.setAttribute("data-progress", progress);
 
-  if (progress === 100 || progress === 0) {
-    button.disabled = false;
-    button.classList.remove("progress");
-    button.textContent =
-      buttonId === "bulk-delete" ? "Bulk Delete" : "Bulk Archive";
+  const buttonText =
+    buttonId === "bulk-delete" ? "Bulk Delete" : "Bulk Archive";
+  const actionText = buttonId === "bulk-delete" ? "Deleting" : "Archiving";
+
+  if (progress === 100) {
+    button.disabled = true;
+    button.innerHTML = `
+      <span class="progress-text">100%</span>
+      <span class="button-text">${actionText} Complete</span>
+    `;
+
+    // 显示 100% 一段时间后恢复原始状态
+    setTimeout(() => {
+      button.disabled = false;
+      button.classList.remove("progress");
+      button.innerHTML = `<span class="button-text">${buttonText}</span>`;
+    }, 500); // 1000 毫秒 = 1 秒，您可以根据需要调整这个时间
   } else {
-    button.textContent =
-      buttonId === "bulk-delete" ? "Deleting..." : "Archiving...";
+    button.disabled = true;
+    button.innerHTML = `
+      <span class="progress-text">${progress}%</span>
+      <span class="button-text">${actionText}...</span>
+    `;
   }
 }
 
@@ -60,7 +76,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const button = document.getElementById(request.buttonId);
     button.disabled = false;
     button.classList.remove("progress");
-    updateProgressBar(request.buttonId, 0);
+    updateProgressBar(request.buttonId, 100);
   }
 });
 
@@ -105,10 +121,8 @@ async function checkMembershipStatus() {
 function updateBulkArchiveButton(isPaid) {
   const bulkArchiveButton = document.getElementById("bulk-archive");
   if (isPaid) {
-    bulkArchiveButton.classList.remove("locked");
     bulkArchiveButton.querySelector("span").textContent = "";
   } else {
-    bulkArchiveButton.classList.add("locked");
     bulkArchiveButton.querySelector("span").textContent = "🔒";
   }
 }

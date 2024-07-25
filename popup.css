@@ -107,7 +107,7 @@ button#bulk-archive {
   position: relative;
 }
 
-button#bulk-archive span {
+button#bulk-archive#locked {
   position: absolute;
   left: 75px;
   top: 50%;
@@ -118,7 +118,7 @@ button#add-checkboxes {
   background-color: #2ecc71;
 }
 button#remove-checkboxes {
-  background-color: #e74c3c;
+  background-color: #e86354;
 }
 button#toggle-checkboxes {
   background-color: #f39c12;
@@ -345,23 +345,23 @@ button#bulk-archive {
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.5); /* 增强悬停时的光晕效果 */
 }
 
-button#bulk-delete {
+button#bulk-delete,
+button#bulk-archive {
   background-color: #e74c3c;
   color: white;
   position: relative;
   overflow: hidden;
   transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 button#bulk-archive {
   background-color: #9b59b6;
-  color: white;
-  position: relative;
-  overflow: hidden;
-  transition: background-color 0.3s ease;
 }
 
-/* New styles for progress bar */
+/* Progress bar styles */
 button#bulk-delete::before,
 button#bulk-archive::before {
   content: "";
@@ -370,27 +370,15 @@ button#bulk-archive::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #2ecc71; /* Bright green color for progress */
+  background-color: rgba(46, 204, 113, 0.5);
   transform: translateX(-100%);
   transition: transform 0.3s ease-out;
-}
-
-button#bulk-delete::after,
-button#bulk-archive::after {
-  content: attr(data-progress) "%";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: rgb(149, 20, 20);
-  font-weight: bold;
-  z-index: 100;
 }
 
 button#bulk-delete.progress,
 button#bulk-archive.progress {
   cursor: not-allowed;
-  background-color: #34495e; /* Darker background when in progress */
+  background-color: #34495e;
 }
 
 button#bulk-delete.progress::before,
@@ -398,12 +386,19 @@ button#bulk-archive.progress::before {
   transform: translateX(var(--progress, -100%));
 }
 
-button#bulk-delete.progress::before,
-button#bulk-archive.progress::before {
-  animation: pulse 2s infinite;
+/* Progress text styles */
+.progress-text {
+  position: absolute;
+  left: 10px;
+  font-weight: bold;
 }
 
-/* Add a pulsing animation to the progress bar */
+.button-text {
+  z-index: 1;
+  position: relative;
+}
+
+/* Pulsing animation for the progress bar */
 @keyframes pulse {
   0% {
     opacity: 1;
@@ -414,4 +409,9 @@ button#bulk-archive.progress::before {
   100% {
     opacity: 1;
   }
+}
+
+button#bulk-delete.progress::before,
+button#bulk-archive.progress::before {
+  animation: pulse 2s infinite;
 }
