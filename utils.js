@@ -1,14 +1,14 @@
+// Define getUserInfo function
 function getUserInfo() {
-  return new Promise((resolve) => {
-    chrome.identity.getProfileUserInfo({ accountStatus: "ANY" }, (userInfo) => {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ action: "getUserInfo" }, (response) => {
       if (chrome.runtime.lastError) {
-        console.error(chrome.runtime.lastError);
-        resolve(null);
+        reject(chrome.runtime.lastError);
+      } else if (response.error) {
+        reject(new Error(response.error));
       } else {
-        resolve(userInfo);
+        resolve(response.userInfo);
       }
     });
   });
 }
-
-window.getUserInfo = getUserInfo;

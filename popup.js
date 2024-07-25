@@ -2,7 +2,7 @@ function loadGlobalsThenExecute(tabId, secondaryScript, callback) {
   chrome.scripting.executeScript(
     {
       target: { tabId: tabId },
-      files: ["globals.js"],
+      files: ["globals.js", "utils.js"],
     },
     () => {
       chrome.scripting.executeScript(
@@ -37,25 +37,25 @@ function addButtonListener(buttonId, scriptName) {
 function updateProgressBar(progress) {
   console.log("Updating progress bar:", progress);
   const bulkDeleteButton = document.getElementById("bulk-delete");
-  bulkDeleteButton.style.setProperty('--progress', `${progress}%`);
-  bulkDeleteButton.setAttribute('data-progress', progress);
-  
+  bulkDeleteButton.style.setProperty("--progress", `${progress}%`);
+  bulkDeleteButton.setAttribute("data-progress", progress);
+
   if (progress === 100 || progress === 0) {
     bulkDeleteButton.disabled = false;
     bulkDeleteButton.classList.remove("progress");
-    bulkDeleteButton.textContent = "Bulk Delete";  // Reset button text
+    bulkDeleteButton.textContent = "Bulk Delete"; // Reset button text
   } else {
-    bulkDeleteButton.textContent = "Deleting...";  // Change button text during deletion
+    bulkDeleteButton.textContent = "Deleting..."; // Change button text during deletion
   }
 }
 
 // 在消息监听器中也添加文本重置
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log("Received message:", request);
   if (request.action === "updateProgress") {
     updateProgressBar(request.progress);
   } else if (request.action === "deleteComplete") {
-    updateProgressBar(0);  // This will reset the button text
+    updateProgressBar(0); // This will reset the button text
   }
 });
 
