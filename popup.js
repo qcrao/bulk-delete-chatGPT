@@ -113,10 +113,7 @@ async function handleBulkArchive() {
   if (localIsPaid) {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab) {
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ["bulkArchiveConversations.js"],
-        });
+        loadGlobalsThenExecute(tab.id, "bulkArchiveConversations.js");
       }
     });
     return;
@@ -139,10 +136,7 @@ async function handleBulkArchive() {
   if (data.isPaid) {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab) {
-        chrome.scripting.executeScript({
-          target: { tabId: tab.id },
-          files: ["bulkArchiveConversations.js"],
-        });
+        loadGlobalsThenExecute(tab.id, "bulkArchiveConversations.js");
       }
     });
   } else {
