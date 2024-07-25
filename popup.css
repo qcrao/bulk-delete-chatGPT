@@ -344,3 +344,32 @@ button#bulk-archive {
   color: #fff; /* 完全白色 */
   text-shadow: 0 0 4px rgba(255, 255, 255, 0.5); /* 增强悬停时的光晕效果 */
 }
+
+/* Existing styles for the bulk delete button */
+button#bulk-delete {
+  background-color: #e74c3c;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+/* New styles for progress bar */
+button#bulk-delete::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.3);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease-out;
+}
+
+button#bulk-delete.progress {
+  cursor: not-allowed;
+}
+
+button#bulk-delete.progress::before {
+  transform: translateX(var(--progress, -100%));
+}

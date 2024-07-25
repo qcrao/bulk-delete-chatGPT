@@ -1,14 +1,17 @@
-function loadGlobalsThenExecute(tabId, secondaryScript) {
+function loadGlobalsThenExecute(tabId, secondaryScript, callback) {
   chrome.scripting.executeScript(
     {
       target: { tabId: tabId },
       files: ["globals.js"],
     },
     () => {
-      chrome.scripting.executeScript({
-        target: { tabId: tabId },
-        files: [secondaryScript],
-      });
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: tabId },
+          files: [secondaryScript],
+        },
+        callback
+      );
     }
   );
 }
@@ -17,11 +20,37 @@ function addButtonListener(buttonId, scriptName) {
   document.getElementById(buttonId).addEventListener("click", () => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab) {
-        loadGlobalsThenExecute(tab.id, scriptName);
+        if (buttonId === "bulk-delete") {
+          const bulkDeleteButton = document.getElementById("bulk-delete");
+          bulkDeleteButton.disabled = true;
+          bulkDeleteButton.classList.add("progress");
+
+          loadGlobalsThenExecute(tab.id, scriptName);
+        } else {
+          loadGlobalsThenExecute(tab.id, scriptName);
+        }
       }
     });
   });
 }
+
+function updateProgressBar(progress) {
+  console.log("Updating progress bar:", progress);
+  const bulkDeleteButton = document.getElementById("bulk-delete");
+  bulkDeleteButton.style.setProperty("--progress", `${progress}%`);
+}
+
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  console.log("Received message:", request);
+  if (request.action === "updateProgress") {
+    updateProgressBar(request.progress);
+  } else if (request.action === "deleteComplete") {
+    const bulkDeleteButton = document.getElementById("bulk-delete");
+    bulkDeleteButton.disabled = false;
+    bulkDeleteButton.classList.remove("progress");
+    updateProgressBar(0);
+  }
+});
 
 function initializeButtons() {
   addButtonListener("add-checkboxes", "addCheckboxes.js");

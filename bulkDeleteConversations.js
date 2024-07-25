@@ -1,21 +1,31 @@
 console.log("bulkDeleteConversations.js loaded");
 
+console.log("bulkDeleteConversations.js loaded");
+
 async function bulkDeleteConversations() {
   const selectedConversations = getSelectedConversations();
 
   if (selectedConversations.length === 0) {
     console.log("No conversations to delete.");
     removeAllCheckboxes();
+    chrome.runtime.sendMessage({ action: "deleteComplete" });
     return;
   }
 
-  console.log("Selected Conversations:", selectedConversations);
+  console.log("Selected Conversations:", selectedConversations.length);
 
   sendEventAsync(selectedConversations.length);
 
-  for (const element of selectedConversations) {
-    await deleteConversation(element);
+  for (let i = 0; i < selectedConversations.length; i++) {
+    await deleteConversation(selectedConversations[i]);
+    const progress = Math.round(((i + 1) / selectedConversations.length) * 100);
+    chrome.runtime.sendMessage({
+      action: "updateProgress",
+      progress: progress,
+    });
   }
+
+  chrome.runtime.sendMessage({ action: "deleteComplete" });
 }
 
 function getSelectedConversations() {
