@@ -234,3 +234,28 @@ chrome.runtime.onConnect.addListener(function (port) {
     });
   }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  const body = document.body;
+
+  // 检查是否有保存的暗黑模式偏好
+  const isDarkMode = localStorage.getItem("darkMode") === "true";
+
+  // 设置初始暗黑模式状态
+  if (isDarkMode) {
+    body.classList.add("dark-mode");
+    darkModeToggle.checked = true;
+  }
+
+  // 切换暗黑模式
+  darkModeToggle.addEventListener("change", function () {
+    if (this.checked) {
+      body.classList.add("dark-mode");
+      localStorage.setItem("darkMode", "true");
+    } else {
+      body.classList.remove("dark-mode");
+      localStorage.setItem("darkMode", "false");
+    }
+  });
+});
