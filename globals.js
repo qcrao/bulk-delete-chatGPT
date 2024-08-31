@@ -3,14 +3,13 @@ if (typeof window.globalsLoaded === "undefined") {
 
   window.globalsLoaded = true;
 
-  const Selectors = {
-    conversationsCheckbox: ".conversation-checkbox:checked",
-    confirmDeleteButton: "button.btn.btn-danger",
-    threeDotButton: '[id^="radix-"]',
-    CONVERSATION_SELECTOR:
-      "div > div > div > div > div > div > nav > div > div > div > div > ol > li > div > a",
-    TITLE_SELECTOR: ".relative.grow.overflow-hidden.whitespace-nowrap",
-  };
+const Selectors = {
+  conversationsCheckbox: ".conversation-checkbox:checked",
+  confirmDeleteButton: "button.btn.btn-danger",
+  threeDotButton: '[id^="radix-"]',
+  CONVERSATION_SELECTOR: "div.relative > ol > li > div > a",
+  TITLE_SELECTOR: ".relative.grow.overflow-hidden.whitespace-nowrap",
+};
 
   const CHECKBOX_CLASS = "conversation-checkbox";
 
