@@ -1,4 +1,4 @@
-
+# [🌟Ads：MyNav chrome extension](https://chromewebstore.google.com/detail/my-nav/hagcohiondnnjimialmlneleljfmkflf?authuser=0&hl=en)
 
 # bulk-delete-chatGPT
 
