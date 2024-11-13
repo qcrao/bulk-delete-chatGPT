@@ -68,6 +68,11 @@ async function deleteConversation(checkbox) {
   );
   if (!hoverableDiv) {
     console.log("Skipping conversation - no hoverable element found");
+    // Show notification to user
+    const title =
+      conversationElement.querySelector(Selectors.TITLE_SELECTOR)
+        ?.textContent || "this conversation";
+    alert(`Unable to delete unread conversation: "${title}".`);
     return false;
   }
 
