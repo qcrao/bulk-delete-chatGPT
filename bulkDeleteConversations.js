@@ -1,7 +1,5 @@
 console.log("bulkDeleteConversations.js loaded");
 
-console.log("bulkDeleteConversations.js loaded");
-
 async function bulkDeleteConversations() {
   const selectedConversations = getSelectedConversations();
 
@@ -14,10 +12,22 @@ async function bulkDeleteConversations() {
 
   console.log("Selected Conversations:", selectedConversations.length);
 
+  // Send analytics event
   sendEventAsync("delete", selectedConversations.length);
 
+  // Track how many conversations were actually processed
+  let processedCount = 0;
+  let skippedCount = 0;
+
   for (let i = 0; i < selectedConversations.length; i++) {
-    await deleteConversation(selectedConversations[i]);
+    const result = await deleteConversation(selectedConversations[i]);
+    if (result) {
+      processedCount++;
+    } else {
+      skippedCount++;
+    }
+
+    // Calculate progress based on total attempts
     const progress = Math.round(((i + 1) / selectedConversations.length) * 100);
     chrome.runtime.sendMessage({
       action: "updateProgress",
@@ -25,6 +35,10 @@ async function bulkDeleteConversations() {
       progress: progress,
     });
   }
+
+  console.log(
+    `Processed ${processedCount} conversations, skipped ${skippedCount} conversations`
+  );
 
   chrome.runtime.sendMessage({
     action: "operationComplete",
@@ -45,6 +59,18 @@ async function deleteConversation(checkbox) {
   await delay(100);
 
   const conversationElement = checkbox.parentElement;
+
+  console.log("conversationElement", conversationElement);
+
+  // Look for hoverable element within the conversation element
+  const hoverableDiv = conversationElement.querySelector(
+    "div.can-hover\\:group-hover\\:flex"
+  );
+  if (!hoverableDiv) {
+    console.log("Skipping conversation - no hoverable element found");
+    return false;
+  }
+
   const hoverEvent = new MouseEvent("mouseover", {
     view: window,
     bubbles: true,
@@ -55,36 +81,43 @@ async function deleteConversation(checkbox) {
   conversationElement.dispatchEvent(hoverEvent);
   await delay(200);
 
-  const pointerDownEvent = new PointerEvent("pointerdown", {
-    bubbles: true,
-    cancelable: true,
-    pointerType: "mouse",
-  });
-  const threeDotButton = await waitForElement(
-    Selectors.threeDotButton,
-    conversationElement.parentElement
-  );
-  console.log("2. Clicking three dot button...", threeDotButton);
-  threeDotButton.dispatchEvent(pointerDownEvent);
-  await delay(300);
+  // Try to find the three dot button
+  try {
+    const threeDotButton = await waitForElement(
+      Selectors.threeDotButton,
+      conversationElement.parentElement,
+      1000 // Reduced timeout for non-hoverable items
+    );
 
-  const deleteButton = await waitForDeleteButton();
+    console.log("2. Clicking three dot button...", threeDotButton);
+    const pointerDownEvent = new PointerEvent("pointerdown", {
+      bubbles: true,
+      cancelable: true,
+      pointerType: "mouse",
+    });
+    threeDotButton.dispatchEvent(pointerDownEvent);
+    await delay(300);
 
-  if (deleteButton) {
-    console.log("3. Clicking delete button...", deleteButton);
+    const deleteButton = await waitForDeleteButton();
 
-    deleteButton.click();
+    if (deleteButton) {
+      console.log("3. Clicking delete button...", deleteButton);
+      deleteButton.click();
 
-    const confirmButton = await waitForElement(Selectors.confirmDeleteButton);
-    if (confirmButton) {
-      console.log("4. Clicking confirm button...");
-      confirmButton.click();
-
-      await waitForElementToDisappear(Selectors.confirmDeleteButton);
+      const confirmButton = await waitForElement(Selectors.confirmDeleteButton);
+      if (confirmButton) {
+        console.log("4. Clicking confirm button...");
+        confirmButton.click();
+        await waitForElementToDisappear(Selectors.confirmDeleteButton);
+        return true;
+      }
     }
+  } catch (error) {
+    console.log("Could not complete deletion process:", error);
+    return false;
   }
 
-  console.log("5. Deletion completed.");
+  return false;
 }
 
 async function waitForDeleteButton(parent = document, timeout = 2000) {
@@ -134,4 +167,5 @@ async function waitForElementToDisappear(selector, timeout = 2000) {
   throw new Error(`Element ${selector} did not disappear within ${timeout}ms`);
 }
 
+// Start the bulk delete process
 bulkDeleteConversations();
