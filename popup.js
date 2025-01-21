@@ -213,16 +213,16 @@ function showModal() {
   });
 }
 
-function updateCopyrightYear() {
-  const currentYear = new Date().getFullYear();
-  document.getElementById(
-    "copyright"
-  ).innerHTML = `&copy; ${currentYear} <a href="https://github.com/qcrao/bulk-delete-chatGPT" target="_blank">qcrao@GitHub</a>`;
-}
+// function updateCopyrightYear() {
+//   const currentYear = new Date().getFullYear();
+//   document.getElementById(
+//     "copyright"
+//   ).innerHTML = `&copy; ${currentYear} <a href="https://github.com/qcrao/bulk-delete-chatGPT" target="_blank">qcrao@GitHub</a>`;
+// }
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeButtons();
-  updateCopyrightYear();
+  // updateCopyrightYear();
   checkMembershipStatus();
 });
 

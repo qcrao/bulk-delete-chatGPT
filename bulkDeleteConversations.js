@@ -64,7 +64,7 @@ async function deleteConversation(checkbox) {
 
   // Look for hoverable element within the conversation element
   const hoverableDiv = conversationElement.querySelector(
-    "div.can-hover\\:group-hover\\:flex"
+    "div.can-hover\\:group-hover\\:visible"
   );
   if (!hoverableDiv) {
     console.log("Skipping conversation - no hoverable element found");

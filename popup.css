@@ -1,6 +1,6 @@
 body {
   width: 280px;
-  padding: 20px;
+  padding: 20px 20px 12px;
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   display: flex;
   flex-direction: column;
@@ -131,46 +131,118 @@ button#bulk-archive {
 }
 
 .footer {
-  margin-top: 20px;
+  margin-top: 12px;
   width: 100%;
-  font-size: 12px;
-  text-align: center;
+  padding: 12px 0 0;
   border-top: 2px solid #e1e4e8;
-  padding-top: 15px;
   display: flex;
   justify-content: center;
-  gap: 20px;
-}
-
-#sponsorLink {
-  display: inline-flex;
   align-items: center;
-  padding: 8px 15px;
-  background-color: #34495e;
-  border-radius: 5px;
-  color: #fff;
+  gap: 8px;
+}
+
+.footer-button {
   text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  padding: 8px 12px;
+  flex-shrink: 0;
 }
 
-#sponsorLink:hover {
-  background-color: #2c3e50;
+.footer-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-#sponsorLink .icon-text {
+.footer-button .button-content {
   display: flex;
   align-items: center;
   gap: 8px;
 }
 
+/* Sponsor button styles */
+#sponsorLink {
+  background: #2d333b;
+  color: white;
+  min-width: auto;
+  padding: 8px;
+}
+
+#sponsorLink .button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#sponsorLink span {
+  display: none;
+}
+
+#sponsorLink svg {
+  width: 20px;
+  height: 20px;
+  fill: #ff69b4;
+  animation: pulse 2s infinite;
+  margin: 0;
+}
+
 #sponsorLink:hover {
-  background-color: #993366;
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  background: linear-gradient(to right, #373e47, #545d68);
+}
+
+/* MyNav ad styles */
+.nav-ad {
+  background: #5046e5;
+  color: white;
+  flex-grow: 0;
+  width: auto;
+}
+
+.nav-ad .button-content {
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  gap: 8px;
+  width: 100%;
+}
+
+.nav-ad .title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.nav-ad .description {
+  display: none;
+}
+
+.nav-ad .emoji {
+  position: static;
+  transform: none;
+  font-size: 16px;
+}
+
+.nav-ad:hover {
+  background: #4038cc;
+}
+
+.footer-separator {
+  height: 24px;
+  width: 1px;
+  background-color: #e5e7eb;
+  margin: 0 2px;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .modal {
