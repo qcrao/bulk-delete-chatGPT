@@ -18,10 +18,32 @@ English | [中文版本](./README-CN.md)
   </tr>
 </table>
 
-## Usage Instructions
+## Installation
+### Chrome:
 
 - Go to the [ChatGPT Bulk Delete Chrome extension page](https://chrome.google.com/webstore/detail/chatgpt-bulk-delete/effkgioceefcfaegehhfafjneeiabdjg) in the Chrome Web Store.
 - Click the "Add to Chrome" button to install the extension.
+
+### Firefox:
+1. **Download the Extension**  
+   - Go to the [GitHub repository](https://github.com/qcrao/bulk-delete-chatGPT).  
+   - Click **Code → Download ZIP** or use this [direct link](https://github.com/qcrao/bulk-delete-chatGPT/archive/refs/heads/master.zip).  
+
+2. **Extract the Files**  
+   - Locate the downloaded `.zip` file.  
+   - Extract the contents to a folder.  
+
+3. **Load the Extension in Firefox**  
+   - Open **Firefox** and navigate to:  
+     ```
+     about:debugging#/runtime/this-firefox
+     ```
+   - Click **"Load Temporary Add-on..."**.  
+   - Select the **manifest.json** file from the extracted folder.  
+
+📌 **Note:** This extension is **not signed yet**, so you will need to **reload manifest.json manually** each time you restart Firefox.  
+
+## Usage Instructions
 - Open the [ChatGPT website page](https://chat.openai.com/).
 - Click the `bulk-delete-chatGPT` extension icon in the top-right corner of your browser.
 - Click the "Add checkboxes" button. The extension will automatically add a checkbox in front of each conversation on the ChatGPT page.
