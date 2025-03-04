@@ -63,8 +63,8 @@ async function deleteConversation(checkbox) {
   console.log("conversationElement", conversationElement);
 
   // Look for draggable element within the conversation element
-  const draggableElement = conversationElement.querySelector("[draggable=\"true\"]");
-  if (!draggableElement) {
+  const interactiveElement = conversationElement.querySelector("[draggable=\"true\"]");
+  if (!interactiveElement) {
     console.log("Skipping conversation - no interactive elements found");
     // Show notification to user
     const title =
@@ -81,7 +81,7 @@ async function deleteConversation(checkbox) {
   });
 
   console.log("1. Hovering over conversation...", conversationElement);
-  draggableElement.dispatchEvent(hoverEvent);
+  interactiveElement.dispatchEvent(hoverEvent);
   await delay(200);
 
   // Try to find the three dot button
