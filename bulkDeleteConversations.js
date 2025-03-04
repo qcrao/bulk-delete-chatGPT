@@ -62,7 +62,7 @@ async function deleteConversation(checkbox) {
 
   console.log("conversationElement", conversationElement);
 
-  // Look for draggable element within the conversation element
+  // Look for interactive element within the conversation element
   const interactiveElement = conversationElement.querySelector("[draggable=\"true\"]");
   if (!interactiveElement) {
     console.log("Skipping conversation - no interactive elements found");
