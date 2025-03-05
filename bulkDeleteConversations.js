@@ -62,17 +62,15 @@ async function deleteConversation(checkbox) {
 
   console.log("conversationElement", conversationElement);
 
-  // Look for hoverable element within the conversation element
-  const hoverableDiv = conversationElement.querySelector(
-    "div.can-hover\\:group-hover\\:visible"
-  );
-  if (!hoverableDiv) {
-    console.log("Skipping conversation - no hoverable element found");
+  // Look for interactive element within the conversation element
+  const interactiveElement = conversationElement.querySelector("[draggable=\"true\"]");
+  if (!interactiveElement) {
+    console.log("Skipping conversation - no interactive elements found");
     // Show notification to user
     const title =
       conversationElement.querySelector(Selectors.TITLE_SELECTOR)
         ?.textContent || "this conversation";
-    alert(`Unable to delete unread conversation: "${title}".`);
+    alert(`Unable to delete the conversation: "${title}".`);
     return false;
   }
 
@@ -83,7 +81,7 @@ async function deleteConversation(checkbox) {
   });
 
   console.log("1. Hovering over conversation...", conversationElement);
-  conversationElement.dispatchEvent(hoverEvent);
+  interactiveElement.dispatchEvent(hoverEvent);
   await delay(200);
 
   // Try to find the three dot button
