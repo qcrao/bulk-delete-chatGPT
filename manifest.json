@@ -14,7 +14,8 @@
   "permissions": ["scripting", "activeTab", "identity", "identity.email"],
   "host_permissions": ["https://bulk-delete-chatgpt-worker.qcrao.com/*"],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "background.js",
+    "scripts": ["background.js"]
   },
   "content_scripts": [
     {
@@ -28,5 +29,10 @@
       ],
       "run_at": "document_idle"
     }
-  ]
+  ],
+  "browser_specific_settings": {
+  "gecko": {
+    "id": "BulkDeleteChatGPT-qrcao@github.com"
+  }
+}
 }
