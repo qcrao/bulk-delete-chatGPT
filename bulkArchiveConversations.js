@@ -49,7 +49,19 @@ async function archiveConversation(checkbox) {
   });
 
   console.log("1. Hovering over conversation...", conversationElement);
-  conversationElement.dispatchEvent(hoverEvent);
+
+  const interactiveElement = conversationElement.querySelector("[draggable=\"true\"]");
+  if (!interactiveElement) {
+    console.log("Skipping conversation - no interactive elements found");
+    // Show notification to user
+    const title =
+      conversationElement.querySelector(Selectors.TITLE_SELECTOR)
+        ?.textContent || "this conversation";
+    alert(`Unable to archive the conversation: "${title}".`);
+    return false;
+  }
+
+  interactiveElement.dispatchEvent(hoverEvent);
   await delay(200);
 
   const pointerDownEvent = new PointerEvent("pointerdown", {
