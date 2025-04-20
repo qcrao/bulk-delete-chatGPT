@@ -50,7 +50,7 @@ async function archiveConversation(checkbox) {
 
   console.log("1. Hovering over conversation...", conversationElement);
 
-  const interactiveElement = conversationElement.querySelector("[draggable]");
+  const interactiveElement = conversationElement.querySelector(Selectors.INTERACTIVE_ELEMENT_SELECTOR);
   if (!interactiveElement) {
     console.log("Skipping conversation - no interactive elements found");
     // Show notification to user

@@ -12,6 +12,7 @@ if (typeof window.globalsLoaded === "undefined") {
     CONVERSATION_SELECTOR: 'li[data-testid^="history-item-"]',
     // 更新标题选择器，保持相对路径
     TITLE_SELECTOR: ".relative.grow.overflow-hidden.whitespace-nowrap",
+    INTERACTIVE_ELEMENT_SELECTOR: '[draggable]',
   };
 
   // Constants
