@@ -9,10 +9,10 @@ if (typeof window.globalsLoaded === "undefined") {
     confirmDeleteButton: "button.btn.btn-danger",
     threeDotButton: '[id^="radix-"]',
     // 更新为新的对话选择器格式
-    CONVERSATION_SELECTOR: 'li[data-testid^="history-item-"]',
+    CONVERSATION_SELECTOR: '[href^="/c/"]',
     // 更新标题选择器，保持相对路径
     TITLE_SELECTOR: ".relative.grow.overflow-hidden.whitespace-nowrap",
-    INTERACTIVE_ELEMENT_SELECTOR: '[draggable]',
+    INTERACTIVE_ELEMENT_SELECTOR: "button",
   };
 
   // Constants
