@@ -73,7 +73,9 @@ function addShiftKeyEventListeners() {
 // 添加复选框到每个对话
 function addCheckboxes() {
   console.log("Adding checkboxes to conversations...", Selectors);
-  const conversations = document.querySelectorAll(
+  //Select history div which contains all regular chats
+  const history = document.querySelector(Selectors.HISTORY);
+  const conversations = history.querySelectorAll(
     Selectors.CONVERSATION_SELECTOR
   );
 
@@ -93,7 +95,6 @@ function addCheckboxes() {
       align-items: center;
       width: 100%;
       padding: 0;
-      min-height: inherit;
     `;
 
     // 创建新的复选框并添加到 flexContainer
