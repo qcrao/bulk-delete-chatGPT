@@ -1,135 +1,79 @@
 console.log("addCheckboxes.js loaded");
 
-// Create a new checkbox element with specific styles
-function createCheckbox(index) {
-  const checkbox = document.createElement("input");
-  checkbox.type = "checkbox";
-  checkbox.className = CHECKBOX_CLASS;
-  checkbox.dataset.index = index;
-  checkbox.style.cssText = `
-    margin-right: 8px;
-    margin-left: 4px;
-    position: relative;
-    top: 1px;
-  `;
-  checkbox.addEventListener("click", handleCheckboxClick);
-  return checkbox;
-}
+// Checkbox management module
+const CheckboxManager = {
+  // Create checkbox with event handling
+  createCheckbox(index) {
+    const checkbox = DOMHandler.createCheckbox(index);
+    checkbox.addEventListener("click", (event) => {
+      EventHandler.handleCheckboxClick(event, checkbox);
+    });
+    return checkbox;
+  },
 
-function handleCheckboxClick(event) {
-  event.stopPropagation();
-  const clickedCheckbox = event.target;
-  checkPreviousCheckboxes(clickedCheckbox);
-  window.lastCheckedCheckbox = clickedCheckbox;
-}
-
-function toggleCheckboxInConversation(conversation, event) {
-  event.preventDefault();
-  event.stopPropagation();
-
-  const checkbox = conversation.querySelector(`.${CHECKBOX_CLASS}`);
-  if (checkbox) {
-    checkbox.checked = !checkbox.checked;
-    checkPreviousCheckboxes(checkbox);
-    if (checkbox.checked) {
-      window.lastCheckedCheckbox = checkbox;
-    }
-  }
-}
-
-function checkPreviousCheckboxes(clickedCheckbox) {
-  if (window.shiftPressed && window.lastCheckedCheckbox) {
-    const allCheckboxes = Array.from(
-      document.querySelectorAll(`.${CHECKBOX_CLASS}`)
-    );
-    const start = allCheckboxes.indexOf(window.lastCheckedCheckbox);
-    const end = allCheckboxes.indexOf(clickedCheckbox);
-
-    const [lower, upper] = start < end ? [start, end] : [end, start];
-
-    for (let i = lower; i <= upper; i++) {
-      allCheckboxes[i].checked = true;
-    }
-  }
-}
-
-function addShiftKeyEventListeners() {
-  console.log("Adding Shift key event listeners...");
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Shift") {
-      console.log("Shift key pressed");
-      window.shiftPressed = true;
-    }
-  });
-
-  document.addEventListener("keyup", (event) => {
-    if (event.key === "Shift") {
-      console.log("Shift key released");
-      window.shiftPressed = false;
-    }
-  });
-}
-
-// 添加复选框到每个对话
-function addCheckboxes() {
-  console.log("Adding checkboxes to conversations...", Selectors);
-  //Select history div which contains all regular chats
-  const history = document.querySelector(Selectors.HISTORY);
-  const conversations = history.querySelectorAll(
-    Selectors.CONVERSATION_SELECTOR
-  );
-
-  conversations.forEach((conversation, index) => {
-    let existingCheckbox = conversation.querySelector(`.${CHECKBOX_CLASS}`);
-
-    // 如果复选框已存在，获取其选中状态并移除它
+  // Add checkbox to conversation with layout
+  addCheckboxToConversation(conversation, index) {
+    let existingCheckbox = conversation.querySelector(`.${CSS_CLASSES.CHECKBOX}`);
+    
+    // Preserve existing checkbox state
     let isChecked = existingCheckbox ? existingCheckbox.checked : false;
     if (existingCheckbox) {
       existingCheckbox.remove();
     }
 
-    // 创建一个新的 flexbox 容器
-    const flexContainer = document.createElement("div");
-    flexContainer.style.cssText = `
-      display: flex;
-      align-items: center;
-      width: 100%;
-      padding: 0;
-    `;
-
-    // 创建新的复选框并添加到 flexContainer
-    const checkbox = createCheckbox(index);
+    // Create new layout structure
+    const flexContainer = DOMHandler.createFlexContainer();
+    const checkbox = this.createCheckbox(index);
     checkbox.checked = isChecked;
     flexContainer.appendChild(checkbox);
 
-    // 将原有内容移动到 flexContainer 中
+    // Move existing content to container
     while (conversation.firstChild) {
       flexContainer.appendChild(conversation.firstChild);
     }
 
-    // 将 flexContainer 添加到对话中
     conversation.appendChild(flexContainer);
+    return checkbox;
+  },
 
-    // 禁用对话的默认点击行为
-    const link = conversation.querySelector("a");
-    if (link) {
-      link.style.pointerEvents = "none";
-      link.style.cursor = "default";
-    }
-
-    // 添加点击事件到当前对话元素
+  // Setup conversation interaction
+  setupConversationInteraction(conversation) {
+    // Disable default link behavior
+    DOMHandler.toggleConversationInteraction(conversation, true);
+    
+    // Add click handler for checkbox toggle
     conversation.addEventListener("click", (event) => {
-      // 只有当点击的不是复选框时才触发
-      if (!event.target.classList.contains(CHECKBOX_CLASS)) {
-        toggleCheckboxInConversation(conversation, event);
+      if (!event.target.classList.contains(CSS_CLASSES.CHECKBOX)) {
+        EventHandler.toggleCheckboxInConversation(conversation, event);
       }
     });
 
     conversation.style.cursor = "pointer";
-  });
+  }
+};
 
-  addShiftKeyEventListeners();
+// Main function to add checkboxes
+function addCheckboxes() {
+  try {
+    console.log("Adding checkboxes to conversations...");
+    
+    const conversations = DOMHandler.getAllConversations();
+    console.log(`Found ${conversations.length} conversations`);
+
+    conversations.forEach((conversation, index) => {
+      CheckboxManager.addCheckboxToConversation(conversation, index);
+      CheckboxManager.setupConversationInteraction(conversation);
+    });
+
+    // Add keyboard event listeners
+    EventHandler.addKeyboardListeners();
+    
+    console.log("Checkboxes added successfully");
+  } catch (error) {
+    console.error("Error adding checkboxes:", error);
+    CommonUtils.showNotification(`Error adding checkboxes: ${error.message}`, 'error');
+  }
 }
 
-// run the main function
+// Run the main function
 addCheckboxes();

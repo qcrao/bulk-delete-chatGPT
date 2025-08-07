@@ -66,22 +66,40 @@ This extension has no build system - files are loaded directly. Changes to any `
 - Host permission for `bulk-delete-chatgpt-worker.qcrao.com`
 
 ### ChatGPT UI Integration
-- Uses mouse events (`mouseover`, `pointerdown`) to trigger ChatGPT's context menus
+- Uses mouse events (`mouseover`, `pointer down`) to trigger ChatGPT's context menus
 - Waits for dynamic elements to appear/disappear using polling with timeouts
 - Handles ChatGPT's dynamic UI updates and element recreation
 
 ### Premium Feature Architecture
 - Local storage caching of membership status
-- External API verification at `bulk-delete-chatgpt-worker.qcrao.com`
+- External API verification at bulk-delete-chatgpt-worker domain
 - Payment flow integration for bulk archive feature
 
 ## Common Issues & Debugging
 
 ### Selector Breakage
-ChatGPT frequently updates their UI, breaking selectors in `globals.js`. When functionality fails:
+ChatGPT frequently updates their UI, breaking selectors in `config.js`. When functionality fails:
 1. Inspect ChatGPT page elements in browser dev tools
-2. Update selectors in `globals.js`
+2. Update selectors in `UI_CONFIG.SELECTORS` in `config.js`
 3. Test with extension reload
 
+## Refactored Architecture (Post-2024)
+
+### Modular Structure
+- **config.js**: Centralized configuration management (API URLs, selectors, constants)
+- **globals.js**: Global state management with proper encapsulation
+- **utils.js**: Common utilities (API calls, Chrome messaging, DOM helpers)
+- **domHandler.js**: DOM manipulation and event handling utilities
+- **conversationHandler.js**: Business logic for delete/archive operations
+
+### Script Loading Order
+Scripts load in dependency order via manifest.json:
+1. `config.js` - Configuration constants
+2. `globals.js` - Global state
+3. `utils.js` - Utility functions
+4. `domHandler.js` - DOM helpers
+5. `conversationHandler.js` - Business logic
+6. Operation-specific scripts (`addCheckboxes.js`, etc.)
+
 ### Content Script Loading
-Scripts must load in order: `globals.js` and `utils.js` first, then operation-specific scripts. The `loadGlobalsThenExecute()` function in `popup.js` ensures proper loading sequence.
+Scripts now load automatically in proper order via manifest.json. No manual dependency management needed.

@@ -20,8 +20,11 @@
     {
       "matches": ["*://chat.openai.com/*", "*://chatgpt.com/*"],
       "js": [
+        "config.js",
         "globals.js",
         "utils.js",
+        "domHandler.js",
+        "conversationHandler.js",
         "addCheckboxes.js",
         "bulkDeleteConversations.js",
         "bulkArchiveConversations.js"
