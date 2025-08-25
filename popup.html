@@ -11,25 +11,32 @@
       <h1>ChatGPT Bulk Delete</h1>
     </div>
     <div class="buttons-wrapper">
-      <div class="buttons-row">
-        <div class="button-container">
-          <button id="add-checkboxes">
-            <span>Add</span><br /><span>Checkboxes</span>
+      <div class="section checkbox-section">
+        <h2 class="section-title">Checkbox Operations</h2>
+        <div class="buttons-row">
+          <div class="button-container">
+            <button id="add-checkboxes">
+              <span>Add</span><br /><span>Checkboxes</span>
+            </button>
+            <span class="tooltip-trigger" aria-label="information"
+              >i
+              <span class="tooltip-content"
+                >Hold Shift to select </br> multiple conversations.</span
+              >
+            </span>
+          </div>
+          <button id="remove-checkboxes">
+            <span>Remove</span><br /><span>Checkboxes</span>
           </button>
-          <span class="tooltip-trigger" aria-label="information"
-            >i
-            <span class="tooltip-content"
-              >Hold Shift to select </br> multiple conversations.</span
-            >
-          </span>
         </div>
-        <button id="remove-checkboxes">
-          <span>Remove</span><br /><span>Checkboxes</span>
-        </button>
+        <button id="toggle-checkboxes">Toggle Checkboxes</button>
       </div>
-      <button id="toggle-checkboxes">Toggle Checkboxes</button>
-      <button id="bulk-archive" data-progress="0"><span id="locked">🔒</span>Bulk Archive</button>
-      <button id="bulk-delete" data-progress="0">Bulk Delete</button>
+      
+      <div class="section bulk-section">
+        <h2 class="section-title">Bulk Operations</h2>
+        <button id="bulk-archive" data-progress="0"><span id="locked">🔒</span>Bulk Archive</button>
+        <button id="bulk-delete" data-progress="0">Bulk Delete</button>
+      </div>
     </div>
 
     <div class="footer">

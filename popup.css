@@ -1,58 +1,89 @@
 body {
-  width: 280px;
-  padding: 20px 20px 12px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  width: 300px;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f0f2f5;
-  color: #333;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 12px;
+  margin: 0;
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   width: 100%;
-  border-bottom: 2px solid #e1e4e8;
-  padding-bottom: 15px;
+  padding-bottom: 12px;
+  text-align: center;
 }
 
 .header h1 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   text-align: center;
   margin: 0;
-  color: #2c3e50;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .buttons-wrapper {
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 15px;
+  gap: 20px;
+}
+
+.section {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  color: rgba(255, 255, 255, 0.9);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.checkbox-section {
+  gap: 12px;
+}
+
+.bulk-section {
+  gap: 12px;
 }
 
 .buttons-row {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  gap: 10px;
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 button {
-  padding: 10px 15px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  background-color: #3498db;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: all 0.2s ease;
   outline: none;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 button::after {
@@ -70,8 +101,9 @@ button::after {
 }
 
 button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 button:hover::after {
@@ -115,30 +147,33 @@ button#bulk-archive#locked {
 }
 
 button#add-checkboxes {
-  background-color: #2ecc71;
+  background: linear-gradient(135deg, #10b981, #059669);
 }
 button#remove-checkboxes {
-  background-color: #e86354;
+  background: linear-gradient(135deg, #f87171, #dc2626);
 }
 button#toggle-checkboxes {
-  background-color: #f39c12;
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  width: 100%;
 }
 button#bulk-delete {
-  background-color: #e74c3c;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  width: 100%;
+  margin-bottom: 8px;
 }
 button#bulk-archive {
-  background-color: #9b59b6;
+  background: linear-gradient(135deg, #a855f7, #9333ea);
+  width: 100%;
 }
 
 .footer {
-  margin-top: 12px;
+  margin-top: 16px;
   width: 100%;
   padding: 12px 0 0;
-  border-top: 2px solid #e1e4e8;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .footer-button {
@@ -162,10 +197,12 @@ button#bulk-archive {
 
 /* Sponsor button styles */
 #sponsorLink {
-  background: #2d333b;
+  background: rgba(255, 255, 255, 0.15);
   color: white;
   min-width: auto;
-  padding: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
 }
 
 #sponsorLink .button-content {
@@ -187,15 +224,17 @@ button#bulk-archive {
 }
 
 #sponsorLink:hover {
-  background: linear-gradient(to right, #373e47, #545d68);
+  background: rgba(255, 255, 255, 0.25);
 }
 
 /* MyNav ad styles */
 .nav-ad {
-  background: #5046e5;
+  background: rgba(255, 255, 255, 0.15);
   color: white;
   flex-grow: 0;
   width: auto;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
 }
 
 .nav-ad .button-content {
@@ -223,14 +262,14 @@ button#bulk-archive {
 }
 
 .nav-ad:hover {
-  background: #4038cc;
+  background: rgba(255, 255, 255, 0.25);
 }
 
 .footer-separator {
-  height: 24px;
+  height: 20px;
   width: 1px;
-  background-color: #e5e7eb;
-  margin: 0 2px;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin: 0 4px;
 }
 
 @keyframes pulse {
@@ -257,35 +296,38 @@ button#bulk-archive {
 }
 
 .modal-content {
-  background-color: #fefefe;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   margin: 5% auto;
   padding: 0;
-  border-radius: 10px;
-  width: 260px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  width: 280px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   text-align: center;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(20px);
 }
 
 .modal h2 {
   margin: 0;
-  padding: 15px 0;
-  background-color: #4a4a4a;
+  padding: 20px 0;
+  background: rgba(255, 255, 255, 0.1);
   color: white;
   font-size: 18px;
   width: 100%;
+  font-weight: 600;
 }
 
 .modal p {
-  color: #666;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 14px;
-  margin: 20px 15px;
+  margin: 20px 20px;
 }
 
 .modal-separator {
   height: 1px;
-  background-color: #e0e0e0;
-  margin: 15px 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 16px 20px;
 }
 
 .modal-buttons {
@@ -305,21 +347,25 @@ button#bulk-archive {
 }
 
 .modal-button-primary {
-  background-color: #007bff;
+  background: linear-gradient(135deg, #667eea, #764ba2);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .modal-button-primary:hover {
-  background-color: #0056b3;
+  background: linear-gradient(135deg, #5a67d8, #6b46c1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 #modalCancel {
-  background-color: #f8f9fa;
-  color: #333;
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 #modalCancel:hover {
-  background-color: #e2e6ea;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* 调整 button-container 样式 */
