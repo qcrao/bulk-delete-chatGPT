@@ -242,9 +242,22 @@ function showModal() {
 //   ).innerHTML = `&copy; ${currentYear} <a href="https://github.com/qcrao/bulk-delete-chatGPT" target="_blank">qcrao@GitHub</a>`;
 // }
 
+async function loadVersion() {
+  try {
+    const manifestData = chrome.runtime.getManifest();
+    const versionBadge = document.getElementById('version-badge');
+    if (versionBadge && manifestData.version) {
+      versionBadge.textContent = `v${manifestData.version}`;
+    }
+  } catch (error) {
+    console.error('Error loading version:', error);
+  }
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   initializeButtons();
   MembershipManager.checkMembershipStatus();
+  loadVersion();
 });
 
 // 每次打开popup时检查会员状态
