@@ -1,14 +1,47 @@
 body {
   width: 300px;
   padding: 16px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+    Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #6c5ce7 100%);
+  background: rgba(40, 40, 40, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
   color: #fff;
   border-radius: 12px;
   margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.08) 25%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0.05) 75%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 .header {
@@ -24,7 +57,8 @@ body {
   text-align: center;
   margin: 0;
   color: #fff;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 0, 0, 0.9),
+    0 0 0 rgba(0, 0, 0, 1);
 }
 
 .buttons-wrapper {
@@ -35,22 +69,45 @@ body {
 }
 
 .section {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(30, 30, 30, 0.6);
   border-radius: 12px;
   padding: 16px;
-  backdrop-filter: blur(15px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 20%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.3) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
 }
 
 .section-title {
   font-size: 14px;
   font-weight: 600;
   margin: 0 0 8px 0;
-  color: rgba(255, 255, 255, 0.9);
+  color: #fff;
   text-align: center;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 0, 0, 1);
 }
 
 .checkbox-section {
@@ -78,40 +135,51 @@ button {
   font-weight: 600;
   cursor: pointer;
   color: white;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   text-align: center;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
   outline: none;
   position: relative;
   overflow: hidden;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(25px) saturate(180%);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 0, 0, 1);
 }
 
 button::after {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.5);
-  opacity: 0;
-  border-radius: 100%;
-  transform: scale(1, 1) translate(-50%);
-  transform-origin: 50% 50%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.03) 75%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  opacity: 0.6;
+  border-radius: 10px;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 button:hover::after {
-  animation: ripple 1s ease-out;
+  opacity: 0.8;
 }
 
 @keyframes ripple {
@@ -150,21 +218,21 @@ button#bulk-archive#locked {
 }
 
 button#add-checkboxes {
-  background: linear-gradient(135deg, #00b894, #00a085);
+  background: rgba(0, 184, 148, 0.6);
 }
 button#remove-checkboxes {
-  background: linear-gradient(135deg, #fd79a8, #e84393);
+  background: rgba(253, 121, 168, 0.6);
 }
 button#toggle-checkboxes {
-  background: linear-gradient(135deg, #fdcb6e, #e17055);
+  background: rgba(253, 203, 110, 0.6);
   width: 100%;
 }
 button#bulk-delete {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+  background: rgba(255, 107, 107, 0.7);
   width: 100%;
 }
 button#bulk-archive {
-  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
+  background: rgba(162, 155, 254, 0.7);
   width: 100%;
 }
 
@@ -204,7 +272,10 @@ button#bulk-archive {
   min-width: auto;
   padding: 10px;
   border-radius: 8px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(31, 38, 135, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 #sponsorLink .button-content {
@@ -227,6 +298,7 @@ button#bulk-archive {
 
 #sponsorLink:hover {
   background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* MyNav ad styles */
@@ -236,7 +308,10 @@ button#bulk-archive {
   flex-grow: 0;
   width: auto;
   border-radius: 8px;
-  backdrop-filter: blur(10px);
+  backdrop-filter: blur(15px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(31, 38, 135, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .nav-ad .button-content {
@@ -265,6 +340,7 @@ button#bulk-archive {
 
 .nav-ad:hover {
   background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .footer-separator {
@@ -298,32 +374,37 @@ button#bulk-archive {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #6c5ce7 100%);
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px) saturate(180%);
   margin: 5% auto;
   padding: 0;
   border-radius: 16px;
   width: 280px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
   text-align: center;
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
 }
 
 .modal h2 {
   margin: 0;
   padding: 20px 0;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.12);
   color: white;
   font-size: 18px;
   width: 100%;
   font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .modal p {
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.95);
   font-size: 14px;
   margin: 20px 20px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 .modal-separator {
@@ -349,24 +430,28 @@ button#bulk-archive {
 }
 
 .modal-button-primary {
-  background: linear-gradient(135deg, #74b9ff, #6c5ce7);
+  background: rgba(116, 185, 255, 0.25);
+  backdrop-filter: blur(15px);
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 .modal-button-primary:hover {
-  background: linear-gradient(135deg, #0984e3, #5f3dc4);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(116, 185, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 #modalCancel {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(15px);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 #modalCancel:hover {
-  background: rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.2);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
@@ -467,7 +552,6 @@ button#bulk-archive {
 
 button#bulk-delete,
 button#bulk-archive {
-  background-color: #e74c3c;
   color: white;
   position: relative;
   overflow: hidden;
@@ -476,7 +560,6 @@ button#bulk-archive {
   justify-content: center;
   align-items: center;
 }
-
 
 /* Progress bar styles */
 button#bulk-delete::before,
