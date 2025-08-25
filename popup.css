@@ -46,7 +46,7 @@ body {
 .section-title {
   font-size: 14px;
   font-weight: 600;
-  margin: 0 0 12px 0;
+  margin: 0 0 8px 0;
   color: rgba(255, 255, 255, 0.9);
   text-align: center;
   text-transform: uppercase;
@@ -138,7 +138,6 @@ button#toggle-checkboxes,
 button#bulk-archive {
   font-size: 16px;
   width: 100%;
-  margin-top: 5px;
   padding: 12px 15px;
   position: relative;
 }
@@ -478,9 +477,6 @@ button#bulk-archive {
   align-items: center;
 }
 
-button#bulk-archive {
-  background-color: #9b59b6;
-}
 
 /* Progress bar styles */
 button#bulk-delete::before,
