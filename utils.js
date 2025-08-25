@@ -68,10 +68,37 @@ if (typeof window.utilsLoaded === "undefined") {
       while (Date.now() - startedAt < timeout) {
         for (const strategy of strategies) {
           if (strategy === 'text-fallback') {
-            // Fallback to text matching
-            const textOptions = operation === 'DELETE' 
-              ? [UI_CONFIG.STRINGS.DELETE]
-              : [UI_CONFIG.STRINGS.ARCHIVE, UI_CONFIG.STRINGS.ARCHIVE_CN, UI_CONFIG.STRINGS.ARCHIVE_TW];
+            // Fallback to text matching with multiple languages
+            let textOptions;
+            if (operation === 'DELETE') {
+              textOptions = [
+                UI_CONFIG.STRINGS.DELETE,
+                UI_CONFIG.STRINGS.DELETE_CN,
+                UI_CONFIG.STRINGS.DELETE_TW,
+                UI_CONFIG.STRINGS.DELETE_JP,
+                UI_CONFIG.STRINGS.DELETE_KR,
+                UI_CONFIG.STRINGS.DELETE_DE,
+                UI_CONFIG.STRINGS.DELETE_FR,
+                UI_CONFIG.STRINGS.DELETE_ES,
+                UI_CONFIG.STRINGS.DELETE_PT,
+                UI_CONFIG.STRINGS.DELETE_IT,
+                UI_CONFIG.STRINGS.DELETE_RU
+              ];
+            } else {
+              textOptions = [
+                UI_CONFIG.STRINGS.ARCHIVE,
+                UI_CONFIG.STRINGS.ARCHIVE_CN,
+                UI_CONFIG.STRINGS.ARCHIVE_TW,
+                UI_CONFIG.STRINGS.ARCHIVE_JP,
+                UI_CONFIG.STRINGS.ARCHIVE_KR,
+                UI_CONFIG.STRINGS.ARCHIVE_DE,
+                UI_CONFIG.STRINGS.ARCHIVE_FR,
+                UI_CONFIG.STRINGS.ARCHIVE_ES,
+                UI_CONFIG.STRINGS.ARCHIVE_PT,
+                UI_CONFIG.STRINGS.ARCHIVE_IT,
+                UI_CONFIG.STRINGS.ARCHIVE_RU
+              ];
+            }
             
             const elements = parent.querySelectorAll('div[role="menuitem"]');
             const element = Array.from(elements).find(el => 

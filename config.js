@@ -41,9 +41,27 @@ if (typeof window.configLoaded === "undefined") {
     },
     STRINGS: {
       DELETE: "Delete",
+      DELETE_CN: "删除",
+      DELETE_TW: "刪除",
+      DELETE_JP: "削除",
+      DELETE_KR: "삭제",
+      DELETE_DE: "Löschen",
+      DELETE_FR: "Supprimer",
+      DELETE_ES: "Eliminar",
+      DELETE_PT: "Excluir",
+      DELETE_IT: "Elimina",
+      DELETE_RU: "Удалить",
       ARCHIVE: "Archive",
       ARCHIVE_CN: "归档",
-      ARCHIVE_TW: "封存"
+      ARCHIVE_TW: "封存",
+      ARCHIVE_JP: "アーカイブ",
+      ARCHIVE_KR: "보관",
+      ARCHIVE_DE: "Archivieren",
+      ARCHIVE_FR: "Archiver",
+      ARCHIVE_ES: "Archivar",
+      ARCHIVE_PT: "Arquivar",
+      ARCHIVE_IT: "Archivia",
+      ARCHIVE_RU: "Архивировать"
     },
     // Button detection strategies (order of preference)
     BUTTON_STRATEGIES: {
