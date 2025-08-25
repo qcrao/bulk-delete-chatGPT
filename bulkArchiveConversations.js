@@ -15,6 +15,13 @@
     return;
   }
 
+  // Wait for ConversationHandler module to be available
+  if (!window.ChatGPTBulkDelete.getModule('ConversationHandler')) {
+    console.error('[BulkArchive] ConversationHandler module not ready, deferring execution');
+    setTimeout(arguments.callee, 50);
+    return;
+  }
+
   const core = window.ChatGPTBulkDelete;
   const utils = core.utils;
 
