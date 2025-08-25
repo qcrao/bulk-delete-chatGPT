@@ -307,6 +307,7 @@ button#bulk-archive {
   color: white;
   flex-grow: 0;
   width: auto;
+  padding: 10px;
   border-radius: 8px;
   backdrop-filter: blur(15px) saturate(180%);
   border: 1px solid rgba(255, 255, 255, 0.2);
