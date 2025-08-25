@@ -103,22 +103,31 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       }
     },
 
-    // Wait for operation-specific button
+    // Wait for operation-specific button using improved strategies
     async waitForOperationButton(operation, parent = document, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
-      const selector = UI_CONFIG.SELECTORS.MENU_ITEM;
-      let textOptions;
+      try {
+        // Try strategy-based approach first (language-independent)
+        return await CommonUtils.waitForElementByStrategy(operation, parent, timeout);
+      } catch (error) {
+        console.warn(`Strategy-based approach failed for ${operation}:`, error);
+        
+        // Fallback to legacy text-based approach
+        const selector = UI_CONFIG.SELECTORS.MENU_ITEM;
+        let textOptions;
 
-      if (operation === 'DELETE') {
-        textOptions = [UI_CONFIG.STRINGS.DELETE];
-      } else if (operation === 'ARCHIVE') {
-        textOptions = [
-          UI_CONFIG.STRINGS.ARCHIVE,
-          UI_CONFIG.STRINGS.ARCHIVE_CN,
-          UI_CONFIG.STRINGS.ARCHIVE_TW
-        ];
+        if (operation === 'DELETE') {
+          textOptions = [UI_CONFIG.STRINGS.DELETE];
+        } else if (operation === 'ARCHIVE') {
+          textOptions = [
+            UI_CONFIG.STRINGS.ARCHIVE,
+            UI_CONFIG.STRINGS.ARCHIVE_CN,
+            UI_CONFIG.STRINGS.ARCHIVE_TW
+          ];
+        }
+
+        console.log(`Falling back to text-based approach for ${operation}`);
+        return await CommonUtils.waitForElementByText(selector, textOptions, parent, timeout);
       }
-
-      return await CommonUtils.waitForElementByText(selector, textOptions, parent, timeout);
     }
   };
 

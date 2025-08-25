@@ -34,13 +34,37 @@ if (typeof window.configLoaded === "undefined") {
       CONVERSATION_SELECTOR: "a",
       TITLE_SELECTOR: ".relative.grow.overflow-hidden.whitespace-nowrap",
       INTERACTIVE_ELEMENT_SELECTOR: "button",
-      MENU_ITEM: 'div[role="menuitem"]'
+      MENU_ITEM: 'div[role="menuitem"]',
+      // Improved selectors for language-independent detection
+      DELETE_BUTTON: 'div[role="menuitem"]:last-child, div[role="menuitem"] .text-token-text-error, div[role="menuitem"][data-testid*="delete"]',
+      ARCHIVE_BUTTON: 'div[role="menuitem"]:nth-last-child(2), div[role="menuitem"][data-testid*="archive"]'
     },
     STRINGS: {
       DELETE: "Delete",
       ARCHIVE: "Archive",
       ARCHIVE_CN: "归档",
       ARCHIVE_TW: "封存"
+    },
+    // Button detection strategies (order of preference)
+    BUTTON_STRATEGIES: {
+      DELETE: [
+        // Strategy 1: Look for error/danger styling
+        'div[role="menuitem"] .text-token-text-error',
+        // Strategy 2: Last menu item (delete is typically last)
+        'div[role="menuitem"]:last-child',
+        // Strategy 3: Data attributes
+        'div[role="menuitem"][data-testid*="delete"]',
+        // Strategy 4: Fallback to text matching
+        'text-fallback'
+      ],
+      ARCHIVE: [
+        // Strategy 1: Data attributes
+        'div[role="menuitem"][data-testid*="archive"]',
+        // Strategy 2: Second to last menu item
+        'div[role="menuitem"]:nth-last-child(2)',
+        // Strategy 3: Fallback to text matching
+        'text-fallback'
+      ]
     }
   };
 

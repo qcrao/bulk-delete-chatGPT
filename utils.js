@@ -37,7 +37,7 @@ if (typeof window.utilsLoaded === "undefined") {
       throw new Error(`Element ${selector} did not disappear within ${timeout}ms`);
     },
 
-    // Find element by text content
+    // Find element by text content (legacy method)
     async waitForElementByText(selector, textOptions, parent = document, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
       const startedAt = Date.now();
       const texts = Array.isArray(textOptions) ? textOptions : [textOptions];
@@ -53,6 +53,48 @@ if (typeof window.utilsLoaded === "undefined") {
         if (element) return element;
         await this.delay(UI_CONFIG.DELAYS.SHORT);
       }
+      return null;
+    },
+
+    // Find element using multiple strategies (language-independent)
+    async waitForElementByStrategy(operation, parent = document, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
+      const strategies = UI_CONFIG.BUTTON_STRATEGIES[operation.toUpperCase()];
+      if (!strategies) {
+        throw new Error(`No strategies defined for operation: ${operation}`);
+      }
+
+      const startedAt = Date.now();
+      
+      while (Date.now() - startedAt < timeout) {
+        for (const strategy of strategies) {
+          if (strategy === 'text-fallback') {
+            // Fallback to text matching
+            const textOptions = operation === 'DELETE' 
+              ? [UI_CONFIG.STRINGS.DELETE]
+              : [UI_CONFIG.STRINGS.ARCHIVE, UI_CONFIG.STRINGS.ARCHIVE_CN, UI_CONFIG.STRINGS.ARCHIVE_TW];
+            
+            const elements = parent.querySelectorAll('div[role="menuitem"]');
+            const element = Array.from(elements).find(el => 
+              textOptions.some(text => el.textContent.trim() === text)
+            );
+            
+            if (element) {
+              console.log(`Found ${operation} button using text fallback strategy`);
+              return element;
+            }
+          } else {
+            // Try CSS selector strategy
+            const element = parent.querySelector(strategy);
+            if (element) {
+              console.log(`Found ${operation} button using strategy: ${strategy}`);
+              return element;
+            }
+          }
+        }
+        
+        await this.delay(UI_CONFIG.DELAYS.SHORT);
+      }
+      
       return null;
     },
 
