@@ -248,6 +248,14 @@ async function loadVersion() {
     const versionBadge = document.getElementById('version-badge');
     if (versionBadge && manifestData.version) {
       versionBadge.textContent = `v${manifestData.version}`;
+      
+      // Add click handler to open Chrome Web Store page
+      versionBadge.addEventListener('click', (e) => {
+        e.preventDefault();
+        chrome.tabs.create({
+          url: 'https://chromewebstore.google.com/detail/chatgpt-bulk-delete/effkgioceefcfaegehhfafjneeiabdjg?hl=en'
+        });
+      });
     }
   } catch (error) {
     console.error('Error loading version:', error);
