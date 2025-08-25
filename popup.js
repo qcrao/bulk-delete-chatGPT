@@ -3,7 +3,7 @@ function loadGlobalsThenExecute(tabId, secondaryScript, callback) {
   chrome.scripting.executeScript(
     {
       target: { tabId: tabId },
-      files: ["config.js", "globals.js", "utils.js", "domHandler.js", "conversationHandler.js"],
+      files: ["extensionCore.js", "config.js", "globals.js", "utils.js", "domHandler.js", "conversationHandler.js", "checkboxManager.js"],
     },
     () => {
       chrome.scripting.executeScript(

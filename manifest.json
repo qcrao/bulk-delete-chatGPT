@@ -20,14 +20,13 @@
     {
       "matches": ["*://chat.openai.com/*", "*://chatgpt.com/*"],
       "js": [
+        "extensionCore.js",
         "config.js",
         "globals.js",
         "utils.js",
         "domHandler.js",
         "conversationHandler.js",
-        "addCheckboxes.js",
-        "bulkDeleteConversations.js",
-        "bulkArchiveConversations.js"
+        "checkboxManager.js"
       ],
       "run_at": "document_idle"
     }

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:developer.chrome.com)",
+      "WebFetch(domain:stackoverflow.com)",
+      "Bash(node:*)"
+    ],
+    "defaultMode": "acceptEdits"
+  }
+}
