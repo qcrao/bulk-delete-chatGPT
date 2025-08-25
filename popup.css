@@ -5,7 +5,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #6c5ce7 100%);
   color: #fff;
   border-radius: 12px;
   margin: 0;
@@ -35,11 +35,12 @@ body {
 }
 
 .section {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 16px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .section-title {
@@ -147,22 +148,22 @@ button#bulk-archive#locked {
 }
 
 button#add-checkboxes {
-  background: linear-gradient(135deg, #10b981, #059669);
+  background: linear-gradient(135deg, #00b894, #00a085);
 }
 button#remove-checkboxes {
-  background: linear-gradient(135deg, #f87171, #dc2626);
+  background: linear-gradient(135deg, #fd79a8, #e84393);
 }
 button#toggle-checkboxes {
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  background: linear-gradient(135deg, #fdcb6e, #e17055);
   width: 100%;
 }
 button#bulk-delete {
-  background: linear-gradient(135deg, #ef4444, #dc2626);
+  background: linear-gradient(135deg, #ff6b6b, #ee5a52);
   width: 100%;
   margin-bottom: 8px;
 }
 button#bulk-archive {
-  background: linear-gradient(135deg, #a855f7, #9333ea);
+  background: linear-gradient(135deg, #a29bfe, #6c5ce7);
   width: 100%;
 }
 
@@ -296,7 +297,7 @@ button#bulk-archive {
 }
 
 .modal-content {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #74b9ff 0%, #0984e3 50%, #6c5ce7 100%);
   margin: 5% auto;
   padding: 0;
   border-radius: 16px;
@@ -347,13 +348,13 @@ button#bulk-archive {
 }
 
 .modal-button-primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #74b9ff, #6c5ce7);
   color: white;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .modal-button-primary:hover {
-  background: linear-gradient(135deg, #5a67d8, #6b46c1);
+  background: linear-gradient(135deg, #0984e3, #5f3dc4);
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 

@@ -4,7 +4,8 @@
       "WebSearch",
       "WebFetch(domain:developer.chrome.com)",
       "WebFetch(domain:stackoverflow.com)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "WebFetch(domain:uigradients.com)"
     ],
     "defaultMode": "acceptEdits"
   }
