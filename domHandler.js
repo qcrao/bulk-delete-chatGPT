@@ -149,9 +149,26 @@ if (typeof window.domHandlerLoaded === "undefined") {
     }
   };
 
-  // Export to global scope
+  // Export to global scope (for backward compatibility)
   window.DOMHandler = DOMHandler;
   window.EventHandler = EventHandler;
+
+  // Register modules with the core system
+  if (window.ChatGPTBulkDelete && window.ChatGPTBulkDelete.registerModule) {
+    window.ChatGPTBulkDelete.registerModule('DOMHandler', DOMHandler);
+    window.ChatGPTBulkDelete.registerModule('EventHandler', EventHandler);
+  } else {
+    // Fallback: wait for core system to be ready
+    const registerModules = () => {
+      if (window.ChatGPTBulkDelete && window.ChatGPTBulkDelete.registerModule) {
+        window.ChatGPTBulkDelete.registerModule('DOMHandler', DOMHandler);
+        window.ChatGPTBulkDelete.registerModule('EventHandler', EventHandler);
+      } else {
+        setTimeout(registerModules, 50);
+      }
+    };
+    registerModules();
+  }
 
 } else {
   console.log("domHandler.js already loaded, skipping re-initialization");
