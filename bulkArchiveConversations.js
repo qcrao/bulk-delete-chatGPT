@@ -1,131 +1,98 @@
-console.log("bulkArchiveConversations.js loaded");
+/**
+ * ChatGPT Bulk Delete - Bulk Archive Conversations Operation
+ * 
+ * This script performs bulk archiving of selected conversations.
+ * It uses the ConversationHandler module for the actual implementation.
+ */
 
-async function bulkArchiveConversations() {
-  const selectedConversations = getSelectedConversations();
+(function() {
+  'use strict';
 
-  if (selectedConversations.length === 0) {
-    console.log("No conversations to archive.");
-    removeAllCheckboxes();
+  // Wait for core system to be ready
+  if (!window.ChatGPTBulkDelete || !window.ChatGPTBulkDelete.initialized) {
+    console.error('[BulkArchive] Core system not ready, deferring execution');
+    setTimeout(arguments.callee, 50);
     return;
   }
 
-  console.log("Selected Conversations:", selectedConversations);
+  // Wait for ConversationHandler module to be available
+  if (!window.ChatGPTBulkDelete.getModule('ConversationHandler')) {
+    console.error('[BulkArchive] ConversationHandler module not ready, deferring execution');
+    setTimeout(arguments.callee, 50);
+    return;
+  }
 
-  sendEventAsync("archive", selectedConversations.length);
+  const core = window.ChatGPTBulkDelete;
+  const utils = core.utils;
 
-  for (let i = 0; i < selectedConversations.length; i++) {
-    await archiveConversation(selectedConversations[i]);
-    const progress = Math.round(((i + 1) / selectedConversations.length) * 100);
-    chrome.runtime.sendMessage({
-      action: "updateProgress",
-      buttonId: "bulk-archive",
-      progress: progress,
+  utils.debug('BulkArchiveConversations script loaded');
+
+  /**
+   * Main function to perform bulk archiving of conversations
+   */
+  async function performBulkArchive() {
+    return core.executeOperation('bulkArchive', async () => {
+      utils.log('log', 'Starting bulk archive operation');
+      
+      // Get required modules
+      const ConversationHandler = core.getModule('ConversationHandler');
+      const CommonUtils = core.getModule('CommonUtils');
+      const ChromeUtils = core.getModule('ChromeUtils');
+      
+      if (!ConversationHandler) {
+        throw new Error('ConversationHandler module not available');
+      }
+      if (!CommonUtils) {
+        throw new Error('CommonUtils module not available');
+      }
+
+      try {
+        // Get selected conversations
+        const selectedConversations = CommonUtils.getSelectedConversations();
+        
+        if (!selectedConversations || selectedConversations.length === 0) {
+          utils.log('log', 'No conversations selected for archiving');
+          return { success: true, processed: 0, message: 'No conversations selected' };
+        }
+
+        utils.log('log', `Archiving ${selectedConversations.length} selected conversations`);
+        
+        // Perform the archive operation using ConversationHandler
+        const result = await ConversationHandler.performOperation(
+          'ARCHIVE', 
+          selectedConversations, 
+          BUTTON_IDS.BULK_ARCHIVE
+        );
+        
+        utils.log('log', 'Bulk archive operation completed');
+        return result;
+        
+      } catch (error) {
+        utils.log('error', 'Error in bulk archive operation:', error);
+        
+        // Send completion signal to popup if ChromeUtils is available
+        if (ChromeUtils && ChromeUtils.sendComplete) {
+          ChromeUtils.sendComplete(BUTTON_IDS.BULK_ARCHIVE);
+        }
+        
+        throw error;
+      }
     });
   }
 
-  chrome.runtime.sendMessage({
-    action: "operationComplete",
-    buttonId: "bulk-archive",
-  });
-}
+  // Execute the operation
+  (async () => {
+    try {
+      await performBulkArchive();
+    } catch (error) {
+      utils.log('error', 'Failed to execute bulk archive operation:', error);
+      
+      // Show user notification if possible
+      const CommonUtils = core.getModule('CommonUtils');
+      if (CommonUtils && CommonUtils.showNotification) {
+        CommonUtils.showNotification(`Bulk archive failed: ${error.message}`, 'error');
+      }
+    }
+  })();
 
-function getSelectedConversations() {
-  return [...document.querySelectorAll(Selectors.conversationsCheckbox)];
-}
-
-function removeAllCheckboxes() {
-  const allCheckboxes = document.querySelectorAll(`.${CHECKBOX_CLASS}`);
-  allCheckboxes.forEach((checkbox) => checkbox.remove());
-}
-
-async function archiveConversation(checkbox) {
-  await delay(100);
-
-  const conversationElement = checkbox.parentElement;
-  const hoverEvent = new MouseEvent("mouseover", {
-    view: window,
-    bubbles: true,
-    cancelable: true,
-  });
-
-  console.log("1. Hovering over conversation...", conversationElement);
-
-  const interactiveElement = conversationElement.querySelector(Selectors.INTERACTIVE_ELEMENT_SELECTOR);
-  if (!interactiveElement) {
-    console.log("Skipping conversation - no interactive elements found");
-    // Show notification to user
-    const title =
-      conversationElement.querySelector(Selectors.TITLE_SELECTOR)
-        ?.textContent || "this conversation";
-    alert(`Unable to archive the conversation: "${title}".`);
-    return false;
-  }
-
-  interactiveElement.dispatchEvent(hoverEvent);
-  await delay(200);
-
-  const pointerDownEvent = new PointerEvent("pointerdown", {
-    bubbles: true,
-    cancelable: true,
-    pointerType: "mouse",
-  });
-  const threeDotButton = await waitForElement(
-    Selectors.threeDotButton,
-    conversationElement.parentElement
-  );
-  console.log("2. Clicking three dot button...", threeDotButton);
-  threeDotButton.dispatchEvent(pointerDownEvent);
-  await delay(300);
-
-  const archiveButton = await waitForArchiveButton();
-
-  if (archiveButton) {
-    console.log("3. Clicking archive button...", archiveButton);
-    archiveButton.click();
-    await delay(500);
-  }
-
-  console.log("4. Archiving completed.");
-}
-
-async function waitForArchiveButton(parent = document, timeout = 2000) {
-  const selector = 'div[role="menuitem"]';
-  const textContent = "Archive";
-  const textContentSimplifiedChinese = "归档";
-  const textContentTraditionalChinese = "封存";
-
-  const startedAt = Date.now();
-
-  while (Date.now() - startedAt < timeout) {
-    const elements = parent.querySelectorAll(selector);
-    const element = Array.from(elements).find(
-      (el) =>
-        el.textContent.trim() === textContent ||
-        el.textContent.trim() === textContentSimplifiedChinese ||
-        el.textContent.trim() === textContentTraditionalChinese
-    );
-    if (element) return element;
-    await delay(100);
-  }
-
-  return null;
-}
-
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
-
-async function waitForElement(selector, parent = document, timeout = 2000) {
-  const startedAt = Date.now();
-  while (Date.now() - startedAt < timeout) {
-    const element = parent.querySelector(selector);
-    if (element) return element;
-    await delay(100);
-  }
-
-  throw new Error(
-    `Element ${selector} not found within ${timeout}ms in the specified parent`
-  );
-}
-
-bulkArchiveConversations();
+})();

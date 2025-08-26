@@ -1,81 +1,214 @@
 body {
-  width: 280px;
-  padding: 20px 20px 12px;
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  width: 300px;
+  padding: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
+    Arial, sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: #f0f2f5;
-  color: #333;
+  background: rgba(40, 40, 40, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  color: #fff;
+  border-radius: 12px;
+  margin: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.08) 25%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0.05) 75%,
+    rgba(255, 255, 255, 0.12) 100%
+  );
+  border-radius: 12px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
 }
 
 .header {
-  margin-bottom: 20px;
+  margin-bottom: 16px;
   width: 100%;
-  border-bottom: 2px solid #e1e4e8;
-  padding-bottom: 15px;
+  padding-bottom: 12px;
+  text-align: center;
 }
 
 .header h1 {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   text-align: center;
   margin: 0;
-  color: #2c3e50;
+  color: #fff;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 0, 0, 0.9),
+    0 0 0 rgba(0, 0, 0, 1);
+}
+
+.version-badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  letter-spacing: 0.5px;
+  z-index: 10;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.version-badge:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .buttons-wrapper {
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: 15px;
+  gap: 20px;
+}
+
+.section {
+  background: rgba(30, 30, 30, 0.6);
+  border-radius: 12px;
+  padding: 16px;
+  backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 2px 4px rgba(255, 255, 255, 0.15),
+    inset 0 -1px 2px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.section::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 20%,
+    rgba(255, 255, 255, 0.6) 50%,
+    rgba(255, 255, 255, 0.3) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: #fff;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 0, 0, 1);
+}
+
+.checkbox-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bulk-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .buttons-row {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  gap: 10px;
+  gap: 12px;
 }
 
 button {
-  padding: 10px 15px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 12px 16px;
+  font-size: 13px;
+  font-weight: 600;
   cursor: pointer;
-  background-color: #3498db;
   color: white;
-  border: none;
-  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
   outline: none;
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(25px) saturate(180%);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8), 0 1px 0 rgba(0, 0, 0, 1);
 }
 
 button::after {
   content: "";
   position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  background: rgba(255, 255, 255, 0.5);
-  opacity: 0;
-  border-radius: 100%;
-  transform: scale(1, 1) translate(-50%);
-  transform-origin: 50% 50%;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(255, 255, 255, 0.05) 25%,
+    transparent 50%,
+    rgba(255, 255, 255, 0.03) 75%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  opacity: 0.6;
+  border-radius: 10px;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
 }
 
 button:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 7px 14px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 button:hover::after {
-  animation: ripple 1s ease-out;
+  opacity: 0.8;
 }
 
 @keyframes ripple {
@@ -102,7 +235,6 @@ button#toggle-checkboxes,
 button#bulk-archive {
   font-size: 16px;
   width: 100%;
-  margin-top: 5px;
   padding: 12px 15px;
   position: relative;
 }
@@ -115,30 +247,32 @@ button#bulk-archive#locked {
 }
 
 button#add-checkboxes {
-  background-color: #2ecc71;
+  background: rgba(0, 184, 148, 0.6);
 }
 button#remove-checkboxes {
-  background-color: #e86354;
+  background: rgba(253, 121, 168, 0.6);
 }
 button#toggle-checkboxes {
-  background-color: #f39c12;
+  background: rgba(253, 203, 110, 0.6);
+  width: 100%;
 }
 button#bulk-delete {
-  background-color: #e74c3c;
+  background: rgba(255, 107, 107, 0.7);
+  width: 100%;
 }
 button#bulk-archive {
-  background-color: #9b59b6;
+  background: rgba(162, 155, 254, 0.7);
+  width: 100%;
 }
 
 .footer {
-  margin-top: 12px;
+  margin-top: 16px;
   width: 100%;
   padding: 12px 0 0;
-  border-top: 2px solid #e1e4e8;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .footer-button {
@@ -162,10 +296,15 @@ button#bulk-archive {
 
 /* Sponsor button styles */
 #sponsorLink {
-  background: #2d333b;
+  background: rgba(255, 255, 255, 0.15);
   color: white;
   min-width: auto;
-  padding: 8px;
+  padding: 10px;
+  border-radius: 8px;
+  backdrop-filter: blur(15px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(31, 38, 135, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 #sponsorLink .button-content {
@@ -187,15 +326,22 @@ button#bulk-archive {
 }
 
 #sponsorLink:hover {
-  background: linear-gradient(to right, #373e47, #545d68);
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* MyNav ad styles */
 .nav-ad {
-  background: #5046e5;
+  background: rgba(255, 255, 255, 0.15);
   color: white;
   flex-grow: 0;
   width: auto;
+  padding: 10px;
+  border-radius: 8px;
+  backdrop-filter: blur(15px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 8px rgba(31, 38, 135, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
 
 .nav-ad .button-content {
@@ -223,14 +369,15 @@ button#bulk-archive {
 }
 
 .nav-ad:hover {
-  background: #4038cc;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .footer-separator {
-  height: 24px;
+  height: 20px;
   width: 1px;
-  background-color: #e5e7eb;
-  margin: 0 2px;
+  background-color: rgba(255, 255, 255, 0.3);
+  margin: 0 4px;
 }
 
 @keyframes pulse {
@@ -257,35 +404,43 @@ button#bulk-archive {
 }
 
 .modal-content {
-  background-color: #fefefe;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(25px) saturate(180%);
   margin: 5% auto;
   padding: 0;
-  border-radius: 10px;
-  width: 260px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  width: 280px;
+  box-shadow: 0 8px 32px rgba(31, 38, 135, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.1);
   text-align: center;
   overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
 }
 
 .modal h2 {
   margin: 0;
-  padding: 15px 0;
-  background-color: #4a4a4a;
+  padding: 20px 0;
+  background: rgba(255, 255, 255, 0.12);
   color: white;
   font-size: 18px;
   width: 100%;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .modal p {
-  color: #666;
+  color: rgba(255, 255, 255, 0.95);
   font-size: 14px;
-  margin: 20px 15px;
+  margin: 20px 20px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 .modal-separator {
   height: 1px;
-  background-color: #e0e0e0;
-  margin: 15px 0;
+  background-color: rgba(255, 255, 255, 0.2);
+  margin: 16px 20px;
 }
 
 .modal-buttons {
@@ -305,21 +460,29 @@ button#bulk-archive {
 }
 
 .modal-button-primary {
-  background-color: #007bff;
+  background: rgba(116, 185, 255, 0.25);
+  backdrop-filter: blur(15px);
   color: white;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 .modal-button-primary:hover {
-  background-color: #0056b3;
+  background: rgba(116, 185, 255, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.35);
 }
 
 #modalCancel {
-  background-color: #f8f9fa;
-  color: #333;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(15px);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
 }
 
 #modalCancel:hover {
-  background-color: #e2e6ea;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 /* 调整 button-container 样式 */
@@ -419,7 +582,6 @@ button#bulk-archive {
 
 button#bulk-delete,
 button#bulk-archive {
-  background-color: #e74c3c;
   color: white;
   position: relative;
   overflow: hidden;
@@ -427,10 +589,6 @@ button#bulk-archive {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-button#bulk-archive {
-  background-color: #9b59b6;
 }
 
 /* Progress bar styles */
