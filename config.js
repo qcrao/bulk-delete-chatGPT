@@ -40,6 +40,7 @@ if (typeof window.configLoaded === "undefined") {
       ARCHIVE_BUTTON: 'div[role="menuitem"]:nth-last-child(2), div[role="menuitem"][data-testid*="archive"]'
     },
     STRINGS: {
+      // Delete button texts
       DELETE: "Delete",
       DELETE_CN: "删除",
       DELETE_TW: "刪除",
@@ -51,6 +52,23 @@ if (typeof window.configLoaded === "undefined") {
       DELETE_PT: "Excluir",
       DELETE_IT: "Elimina",
       DELETE_RU: "Удалить",
+      DELETE_NL: "Verwijderen",
+      DELETE_PL: "Usuń",
+      DELETE_TR: "Sil",
+      DELETE_ID: "Hapus",
+      DELETE_VI: "Xóa",
+      DELETE_TH: "ลบ",
+      DELETE_AR: "حذف",
+      DELETE_HE: "מחק",
+      DELETE_HI: "हटाएं",
+      DELETE_SV: "Ta bort",
+      DELETE_NO: "Slett",
+      DELETE_DA: "Slet",
+      DELETE_FI: "Poista",
+      DELETE_CS: "Smazat",
+      DELETE_UK: "Видалити",
+      DELETE_EL: "Διαγραφή",
+      // Archive button texts
       ARCHIVE: "Archive",
       ARCHIVE_CN: "归档",
       ARCHIVE_TW: "封存",
@@ -61,7 +79,23 @@ if (typeof window.configLoaded === "undefined") {
       ARCHIVE_ES: "Archivar",
       ARCHIVE_PT: "Arquivar",
       ARCHIVE_IT: "Archivia",
-      ARCHIVE_RU: "Архивировать"
+      ARCHIVE_RU: "Архивировать",
+      ARCHIVE_NL: "Archiveren",
+      ARCHIVE_PL: "Archiwizuj",
+      ARCHIVE_TR: "Arşivle",
+      ARCHIVE_ID: "Arsipkan",
+      ARCHIVE_VI: "Lưu trữ",
+      ARCHIVE_TH: "เก็บถาวร",
+      ARCHIVE_AR: "أرشفة",
+      ARCHIVE_HE: "העבר לארכיון",
+      ARCHIVE_HI: "संग्रह करें",
+      ARCHIVE_SV: "Arkivera",
+      ARCHIVE_NO: "Arkiver",
+      ARCHIVE_DA: "Arkivér",
+      ARCHIVE_FI: "Arkistoi",
+      ARCHIVE_CS: "Archivovat",
+      ARCHIVE_UK: "Архівувати",
+      ARCHIVE_EL: "Αρχειοθέτηση"
     },
     // Button detection strategies (order of preference)
     BUTTON_STRATEGIES: {
