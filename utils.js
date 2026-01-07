@@ -41,15 +41,17 @@ if (typeof window.utilsLoaded === "undefined") {
     async waitForElementByText(selector, textOptions, parent = document, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
       const startedAt = Date.now();
       const texts = Array.isArray(textOptions) ? textOptions : [textOptions];
-      
+
       while (Date.now() - startedAt < timeout) {
         const elements = parent.querySelectorAll(selector);
-        const element = Array.from(elements).find(el => 
-          texts.some(text => 
-            el.textContent.trim() === text || 
+        const element = Array.from(elements).find(el => {
+          const textContent = el.textContent.trim();
+          return texts.some(text =>
+            textContent === text ||
+            textContent.includes(text) ||
             (text === UI_CONFIG.STRINGS.DELETE && el.querySelector(".text-token-text-error"))
-          )
-        );
+          );
+        });
         if (element) return element;
         await this.delay(UI_CONFIG.DELAYS.SHORT);
       }
@@ -101,12 +103,15 @@ if (typeof window.utilsLoaded === "undefined") {
             }
             
             const elements = parent.querySelectorAll('div[role="menuitem"]');
-            const element = Array.from(elements).find(el => 
-              textOptions.some(text => el.textContent.trim() === text)
-            );
-            
+            const element = Array.from(elements).find(el => {
+              const textContent = el.textContent.trim();
+              return textOptions.some(text =>
+                textContent === text || textContent.includes(text)
+              );
+            });
+
             if (element) {
-              console.log(`Found ${operation} button using text fallback strategy`);
+              console.log(`Found ${operation} button using text fallback strategy, text: "${element.textContent.trim()}"`);
               return element;
             }
           } else {

@@ -66,22 +66,22 @@ if (typeof window.configLoaded === "undefined") {
     // Button detection strategies (order of preference)
     BUTTON_STRATEGIES: {
       DELETE: [
-        // Strategy 1: Look for error/danger styling
+        // Strategy 1: Text matching (most reliable)
+        'text-fallback',
+        // Strategy 2: Look for error/danger styling
         'div[role="menuitem"] .text-token-text-error',
-        // Strategy 2: Last menu item (delete is typically last)
-        'div[role="menuitem"]:last-child',
         // Strategy 3: Data attributes
         'div[role="menuitem"][data-testid*="delete"]',
-        // Strategy 4: Fallback to text matching
-        'text-fallback'
+        // Strategy 4: Last menu item (delete is typically last)
+        'div[role="menuitem"]:last-child'
       ],
       ARCHIVE: [
-        // Strategy 1: Data attributes
+        // Strategy 1: Text matching (most reliable)
+        'text-fallback',
+        // Strategy 2: Data attributes
         'div[role="menuitem"][data-testid*="archive"]',
-        // Strategy 2: Second to last menu item
-        'div[role="menuitem"]:nth-last-child(2)',
-        // Strategy 3: Fallback to text matching
-        'text-fallback'
+        // Strategy 3: Second to last menu item
+        'div[role="menuitem"]:nth-last-child(2)'
       ]
     }
   };
