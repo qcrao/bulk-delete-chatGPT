@@ -11,7 +11,7 @@
     "default_popup": "popup.html",
     "default_title": "Bulk Delete Conversations"
   },
-  "permissions": ["scripting", "activeTab"],
+  "permissions": ["scripting", "activeTab", "storage"],
   "host_permissions": ["https://bulk-delete-chatgpt-worker.qcrao.com/*"],
   "background": {
     "scripts": ["background.js"]
@@ -34,7 +34,10 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "bulk-delete-chatgpt@tkemperman",
-      "strict_min_version": "109.0"
+      "strict_min_version": "140.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
     }
   }
 }

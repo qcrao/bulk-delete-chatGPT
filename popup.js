@@ -67,23 +67,37 @@ function updateProgressBar(buttonId, progress) {
 
   if (progress === 100) {
     button.disabled = true;
-    button.innerHTML = `
-      <span class="progress-text">100%</span>
-      <span class="button-text">${actionText} Complete</span>
-    `;
+    button.textContent = "";
+    const progressSpan = document.createElement("span");
+    progressSpan.className = "progress-text";
+    progressSpan.textContent = "100%";
+    const textSpan = document.createElement("span");
+    textSpan.className = "button-text";
+    textSpan.textContent = `${actionText} Complete`;
+    button.appendChild(progressSpan);
+    button.appendChild(textSpan);
 
     // 显示 100% 一段时间后恢复原始状态
     setTimeout(() => {
       button.disabled = false;
       button.classList.remove("progress");
-      button.innerHTML = `<span class="button-text">${buttonText}</span>`;
+      button.textContent = "";
+      const btnTextSpan = document.createElement("span");
+      btnTextSpan.className = "button-text";
+      btnTextSpan.textContent = buttonText;
+      button.appendChild(btnTextSpan);
     }, 500); // 1000 毫秒 = 1 秒，您可以根据需要调整这个时间
   } else {
     button.disabled = true;
-    button.innerHTML = `
-      <span class="progress-text">${progress}%</span>
-      <span class="button-text">${actionText}...</span>
-    `;
+    button.textContent = "";
+    const progressSpan = document.createElement("span");
+    progressSpan.className = "progress-text";
+    progressSpan.textContent = `${progress}%`;
+    const textSpan = document.createElement("span");
+    textSpan.className = "button-text";
+    textSpan.textContent = `${actionText}...`;
+    button.appendChild(progressSpan);
+    button.appendChild(textSpan);
   }
 }
 
@@ -100,14 +114,14 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     button.style.backgroundColor = "";
     // Reset button text to original
     if (request.buttonId === "bulk-delete-all") {
-      button.innerHTML = "Bulk Delete All";
+      button.textContent = "Bulk Delete All";
       return; // Skip updateProgressBar for this button
     }
     updateProgressBar(request.buttonId, 100);
   } else if (request.action === "updateButtonText") {
     const button = document.getElementById(request.buttonId);
     if (button) {
-      button.innerHTML = request.text;
+      button.textContent = request.text;
     }
   } else if (request.action === "resetButton") {
     const button = document.getElementById(request.buttonId);
@@ -117,7 +131,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       // Force reset background color
       button.style.backgroundColor = "";
       if (request.buttonId === "bulk-delete-all") {
-        button.innerHTML = "Bulk Delete All";
+        button.textContent = "Bulk Delete All";
       }
     }
   }
