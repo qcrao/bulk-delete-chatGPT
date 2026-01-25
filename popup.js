@@ -22,10 +22,14 @@ function addButtonListener(buttonId, scriptName) {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
       if (tab) {
         if (buttonId === "bulk-delete") {
-          const bulkDeleteButton = document.getElementById(buttonId);
-          bulkDeleteButton.disabled = true;
-          bulkDeleteButton.classList.add("progress");
-
+          const button = document.getElementById(buttonId);
+          button.disabled = true;
+          button.classList.add("progress");
+          loadGlobalsThenExecute(tab.id, scriptName);
+        } else if (buttonId === "bulk-delete-all") {
+          // Don't disable - allow clicking again to cancel
+          const button = document.getElementById(buttonId);
+          button.classList.add("progress");
           loadGlobalsThenExecute(tab.id, scriptName);
         } else {
           loadGlobalsThenExecute(tab.id, scriptName);
@@ -42,9 +46,24 @@ function updateProgressBar(buttonId, progress) {
   button.style.setProperty("--progress", `${progress}%`);
   button.setAttribute("data-progress", progress);
 
-  const buttonText =
-    buttonId === "bulk-delete" ? "Bulk Delete" : "Bulk Archive";
-  const actionText = buttonId === "bulk-delete" ? "Deleting" : "Archiving";
+  let buttonText, actionText;
+  if (buttonId === "bulk-delete") {
+    buttonText = "Bulk Delete";
+    actionText = "Deleting";
+  } else if (buttonId === "bulk-delete-all") {
+    buttonText = "Bulk Delete All";
+    actionText = "Deleting All";
+  } else {
+    buttonText = "Bulk Archive";
+    actionText = "Archiving";
+  }
+
+  // Special handling for bulk-delete-all: keep cancel text, don't disable
+  if (buttonId === "bulk-delete-all") {
+    // Don't change the text - let the content script control it
+    // Just update the progress bar via CSS
+    return;
+  }
 
   if (progress === 100) {
     button.disabled = true;
@@ -77,13 +96,37 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const button = document.getElementById(request.buttonId);
     button.disabled = false;
     button.classList.remove("progress");
+    // Force reset background color
+    button.style.backgroundColor = "";
+    // Reset button text to original
+    if (request.buttonId === "bulk-delete-all") {
+      button.innerHTML = "Bulk Delete All";
+      return; // Skip updateProgressBar for this button
+    }
     updateProgressBar(request.buttonId, 100);
+  } else if (request.action === "updateButtonText") {
+    const button = document.getElementById(request.buttonId);
+    if (button) {
+      button.innerHTML = request.text;
+    }
+  } else if (request.action === "resetButton") {
+    const button = document.getElementById(request.buttonId);
+    if (button) {
+      button.disabled = false;
+      button.classList.remove("progress");
+      // Force reset background color
+      button.style.backgroundColor = "";
+      if (request.buttonId === "bulk-delete-all") {
+        button.innerHTML = "Bulk Delete All";
+      }
+    }
   }
 });
 
 function initializeButtons() {
   addButtonListener("add-checkboxes", "addCheckboxes.js");
   addButtonListener("bulk-delete", "bulkDeleteConversations.js");
+  addButtonListener("bulk-delete-all", "deleteAllNonProjectChats.js");
   addButtonListener("toggle-checkboxes", "toggleCheckboxes.js");
   addButtonListener("remove-checkboxes", "removeCheckboxes.js");
 
