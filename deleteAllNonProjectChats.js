@@ -242,10 +242,9 @@
 
       let totalDeleted = 0;
       let iteration = 0;
-      const maxIterations = 100; // Safety limit
 
       try {
-        while (iteration < maxIterations) {
+        while (true) {
           // Check for cancellation
           if (checkCancelled()) {
             break;

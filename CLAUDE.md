@@ -121,5 +121,4 @@ The "Auto Bulk Delete" button automatically deletes all chats that are NOT in Ch
 
 ### Safety
 - Chats in Projects are **never** deleted (they're in a separate DOM container)
-- Maximum 100 iterations as safety limit
 - Progress is shown in the popup button

@@ -8,7 +8,6 @@
   - Safely skips chats inside ChatGPT Projects
   - Handles lazy-loaded conversations by repeating until all are deleted
   - Shows progress in the popup button
-  - Maximum 100 iterations as safety limit
 
 ### Improvements
 
