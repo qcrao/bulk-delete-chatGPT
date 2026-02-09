@@ -260,7 +260,7 @@ button#bulk-delete {
   background: rgba(255, 107, 107, 0.7);
   width: 100%;
 }
-button#bulk-delete-all {
+button#auto-bulk-delete {
   background: rgba(220, 53, 69, 0.8);
   width: 100%;
   font-size: 16px;
@@ -587,7 +587,7 @@ button#bulk-archive {
 }
 
 button#bulk-delete,
-button#bulk-delete-all,
+button#auto-bulk-delete,
 button#bulk-archive {
   color: white;
   position: relative;
@@ -600,7 +600,7 @@ button#bulk-archive {
 
 /* Progress bar styles */
 button#bulk-delete::before,
-button#bulk-delete-all::before,
+button#auto-bulk-delete::before,
 button#bulk-archive::before {
   content: "";
   position: absolute;
@@ -619,13 +619,13 @@ button#bulk-archive.progress {
   background-color: #34495e;
 }
 
-button#bulk-delete-all.progress {
+button#auto-bulk-delete.progress {
   cursor: pointer;
   background-color: #34495e;
 }
 
 button#bulk-delete.progress::before,
-button#bulk-delete-all.progress::before,
+button#auto-bulk-delete.progress::before,
 button#bulk-archive.progress::before {
   transform: translateX(var(--progress, -100%));
 }
@@ -656,7 +656,7 @@ button#bulk-archive.progress::before {
 }
 
 button#bulk-delete.progress::before,
-button#bulk-delete-all.progress::before,
+button#auto-bulk-delete.progress::before,
 button#bulk-archive.progress::before {
   animation: pulse 2s infinite;
 }

@@ -39,122 +39,101 @@
     return;
   }
 
-  utils.log('log', 'DeleteAllNonProjectChats script loaded');
+  utils.log('log', 'AutoBulkDeleteConversations script loaded');
 
   /**
-   * Add checkboxes to all visible conversations
+   * Get all visible non-project conversations
    */
-  function addCheckboxes() {
-    return new Promise((resolve) => {
-      const history = utils.safeQuery(UI_CONFIG.SELECTORS.HISTORY);
-      if (!history) {
-        utils.log('log', 'History container not found');
-        resolve(0);
-        return;
-      }
-
-      const CheckboxManager = core.getModule('CheckboxManager');
-      const DOMHandler = core.getModule('DOMHandler');
-      const EventHandler = core.getModule('EventHandler');
-
-      if (!CheckboxManager || !DOMHandler) {
-        utils.log('error', 'Required modules not available');
-        resolve(0);
-        return;
-      }
-
-      const conversations = DOMHandler.getAllConversations();
-      utils.log('log', `Found ${conversations.length} conversations`);
-
-      if (conversations.length === 0) {
-        resolve(0);
-        return;
-      }
-
-      let processedCount = 0;
-      conversations.forEach((conversation, index) => {
-        try {
-          CheckboxManager.addCheckboxToConversation(conversation, index);
-          CheckboxManager.setupConversationInteraction(conversation);
-          processedCount++;
-        } catch (error) {
-          utils.log('error', `Failed to process conversation ${index}:`, error);
-        }
-      });
-
-      if (EventHandler && EventHandler.addKeyboardListeners) {
-        try {
-          EventHandler.addKeyboardListeners();
-        } catch (error) {
-          // Ignore if already added
-        }
-      }
-
-      resolve(processedCount);
-    });
+  function getVisibleConversations() {
+    const history = utils.safeQuery(UI_CONFIG.SELECTORS.HISTORY);
+    if (!history) {
+      return [];
+    }
+    return Array.from(history.querySelectorAll(UI_CONFIG.SELECTORS.CONVERSATION_SELECTOR));
   }
 
   /**
-   * Select all checkboxes
+   * Delete a single conversation by interacting with ChatGPT's UI
    */
-  function selectAllCheckboxes() {
-    const checkboxes = document.querySelectorAll(`.${CSS_CLASSES.CHECKBOX}`);
-    let selectedCount = 0;
-    checkboxes.forEach(checkbox => {
-      if (!checkbox.checked) {
-        checkbox.checked = true;
-        selectedCount++;
-      }
-    });
-    utils.log('log', `Selected ${selectedCount} checkboxes`);
-    return checkboxes.length;
-  }
-
-  /**
-   * Delete all selected conversations
-   */
-  async function deleteSelectedConversations() {
-    const ConversationHandler = core.getModule('ConversationHandler');
+  async function deleteConversation(conversationElement) {
+    const DOMHandler = core.getModule('DOMHandler');
     const CommonUtils = core.getModule('CommonUtils');
+    const ConversationHandler = core.getModule('ConversationHandler');
 
-    if (!ConversationHandler) {
-      throw new Error('ConversationHandler module not available');
+    const interactiveElement = DOMHandler.findInteractiveElement(conversationElement);
+    if (!interactiveElement) {
+      const title = DOMHandler.getConversationTitle(conversationElement);
+      utils.log('error', `Unable to delete conversation: "${title}"`);
+      return false;
     }
 
-    const selectedConversations = CommonUtils.getSelectedConversations();
+    try {
+      await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
 
-    if (!selectedConversations || selectedConversations.length === 0) {
-      utils.log('log', 'No conversations selected for deletion');
+      // Hover to reveal menu
+      DOMHandler.dispatchHoverEvent(interactiveElement);
+      await CommonUtils.delay(UI_CONFIG.DELAYS.MEDIUM);
+
+      // Find and click three-dot button
+      const threeDotButton = await CommonUtils.waitForElement(
+        UI_CONFIG.SELECTORS.threeDotButton,
+        conversationElement.parentElement,
+        UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT
+      );
+
+      DOMHandler.dispatchPointerDownEvent(threeDotButton);
+      await CommonUtils.delay(UI_CONFIG.DELAYS.LONG);
+
+      // Find and click delete button
+      const deleteButton = await ConversationHandler.waitForOperationButton('DELETE');
+      if (!deleteButton) {
+        throw new Error('Delete button not found');
+      }
+      deleteButton.click();
+
+      // Wait for confirmation and click
+      const confirmButton = await CommonUtils.waitForElement(UI_CONFIG.SELECTORS.confirmDeleteButton);
+      if (confirmButton) {
+        confirmButton.click();
+        await CommonUtils.waitForElementToDisappear(UI_CONFIG.SELECTORS.confirmDeleteButton);
+      }
+
+      return true;
+    } catch (error) {
+      utils.log('error', `Could not complete delete process:`, error);
+      return false;
+    }
+  }
+
+  /**
+   * Delete all visible conversations in a batch
+   */
+  async function deleteVisibleConversations() {
+    const conversations = getVisibleConversations();
+
+    if (conversations.length === 0) {
       return 0;
     }
 
-    utils.log('log', `Deleting ${selectedConversations.length} conversations`);
+    utils.log('log', `Deleting ${conversations.length} conversations`);
 
-    // Perform deletion without sending progress to popup (we handle our own progress)
     let processedCount = 0;
     let skippedCount = 0;
 
-    for (let i = 0; i < selectedConversations.length; i++) {
-      // Check for cancellation
+    for (let i = 0; i < conversations.length; i++) {
       if (state.isCancelled) {
         utils.log('log', 'Deletion cancelled mid-batch');
         break;
       }
 
-      try {
-        const result = await ConversationHandler.processConversation('DELETE', selectedConversations[i]);
-        if (result) {
-          processedCount++;
-        } else {
-          skippedCount++;
-        }
-      } catch (error) {
-        utils.log('error', `Error processing conversation ${i + 1}:`, error);
+      const result = await deleteConversation(conversations[i]);
+      if (result) {
+        processedCount++;
+      } else {
         skippedCount++;
       }
 
-      // Update progress
-      const progress = Math.round(((i + 1) / selectedConversations.length) * 100);
+      const progress = Math.round(((i + 1) / conversations.length) * 100);
       ChromeUtils.sendProgress(BUTTON_IDS.BULK_DELETE_ALL, progress);
     }
 
@@ -253,15 +232,14 @@
           iteration++;
           utils.log('log', `--- Iteration ${iteration} ---`);
 
-          // Step 1: Add checkboxes
-          const conversationCount = await addCheckboxes();
+          // Step 1: Find and delete visible conversations
+          const conversations = getVisibleConversations();
 
           if (checkCancelled()) break;
 
-          if (conversationCount === 0) {
+          if (conversations.length === 0) {
             utils.log('log', 'No conversations found, polling for new chats...');
 
-            // Poll every second, up to 10 times
             const hasMore = await waitForNewConversations(10);
 
             if (!hasMore || checkCancelled()) {
@@ -271,21 +249,21 @@
               break;
             }
 
-            // New conversations loaded, continue loop
             utils.log('log', 'New conversations detected, continuing...');
             continue;
           }
 
-          // Step 2: Select all checkboxes
-          selectAllCheckboxes();
-
-          if (checkCancelled()) break;
-
-          // Step 3: Delete selected conversations
-          const deletedCount = await deleteSelectedConversations();
+          // Step 2: Delete all visible conversations
+          const deletedCount = await deleteVisibleConversations();
           totalDeleted += deletedCount;
 
           if (checkCancelled()) break;
+
+          // If no conversations were deleted, stop to avoid infinite loop
+          if (deletedCount === 0) {
+            utils.log('log', 'No conversations could be deleted. Stopping.');
+            break;
+          }
 
           utils.log('log', `Iteration ${iteration} complete. Deleted ${deletedCount} chats. Total: ${totalDeleted}`);
 
@@ -301,10 +279,6 @@
           }
 
           utils.log('log', 'New conversations detected, starting next batch...');
-        }
-
-        if (iteration >= maxIterations) {
-          utils.log('log', `Reached maximum iterations (${maxIterations}). Stopping.`);
         }
 
       } finally {

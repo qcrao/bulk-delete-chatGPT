@@ -26,7 +26,7 @@ function addButtonListener(buttonId, scriptName) {
           button.disabled = true;
           button.classList.add("progress");
           loadGlobalsThenExecute(tab.id, scriptName);
-        } else if (buttonId === "bulk-delete-all") {
+        } else if (buttonId === "auto-bulk-delete") {
           // Don't disable - allow clicking again to cancel
           const button = document.getElementById(buttonId);
           button.classList.add("progress");
@@ -42,6 +42,7 @@ function addButtonListener(buttonId, scriptName) {
 function updateProgressBar(buttonId, progress) {
   console.log(`Updating progress bar for ${buttonId}:`, progress);
   const button = document.getElementById(buttonId);
+  if (!button) return;
   button.classList.add("progress");
   button.style.setProperty("--progress", `${progress}%`);
   button.setAttribute("data-progress", progress);
@@ -50,7 +51,7 @@ function updateProgressBar(buttonId, progress) {
   if (buttonId === "bulk-delete") {
     buttonText = "Bulk Delete";
     actionText = "Deleting";
-  } else if (buttonId === "bulk-delete-all") {
+  } else if (buttonId === "auto-bulk-delete") {
     buttonText = "Auto Bulk Delete";
     actionText = "Deleting All";
   } else {
@@ -58,8 +59,8 @@ function updateProgressBar(buttonId, progress) {
     actionText = "Archiving";
   }
 
-  // Special handling for bulk-delete-all: keep cancel text, don't disable
-  if (buttonId === "bulk-delete-all") {
+  // Special handling for auto-bulk-delete: keep cancel text, don't disable
+  if (buttonId === "auto-bulk-delete") {
     // Don't change the text - let the content script control it
     // Just update the progress bar via CSS
     return;
@@ -102,35 +103,45 @@ function updateProgressBar(buttonId, progress) {
 }
 
 // 在消息监听器中也添加文本重置
+// Resolve button ID, handling stale content scripts that may use old IDs
+function resolveButtonId(buttonId) {
+  const aliases = { "bulk-delete-all": "auto-bulk-delete" };
+  return aliases[buttonId] || buttonId;
+}
+
+function isAutoBulkDelete(buttonId) {
+  return buttonId === "auto-bulk-delete" || buttonId === "bulk-delete-all";
+}
+
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log("Received message:", request);
+  const buttonId = resolveButtonId(request.buttonId);
+
   if (request.action === "updateProgress") {
-    updateProgressBar(request.buttonId, request.progress);
+    updateProgressBar(buttonId, request.progress);
   } else if (request.action === "operationComplete") {
-    const button = document.getElementById(request.buttonId);
+    const button = document.getElementById(buttonId);
+    if (!button) return;
     button.disabled = false;
     button.classList.remove("progress");
-    // Force reset background color
     button.style.backgroundColor = "";
-    // Reset button text to original
-    if (request.buttonId === "bulk-delete-all") {
+    if (isAutoBulkDelete(buttonId)) {
       button.textContent = "Auto Bulk Delete";
-      return; // Skip updateProgressBar for this button
+      return;
     }
-    updateProgressBar(request.buttonId, 100);
+    updateProgressBar(buttonId, 100);
   } else if (request.action === "updateButtonText") {
-    const button = document.getElementById(request.buttonId);
+    const button = document.getElementById(buttonId);
     if (button) {
       button.textContent = request.text;
     }
   } else if (request.action === "resetButton") {
-    const button = document.getElementById(request.buttonId);
+    const button = document.getElementById(buttonId);
     if (button) {
       button.disabled = false;
       button.classList.remove("progress");
-      // Force reset background color
       button.style.backgroundColor = "";
-      if (request.buttonId === "bulk-delete-all") {
+      if (isAutoBulkDelete(buttonId)) {
         button.textContent = "Auto Bulk Delete";
       }
     }
@@ -140,7 +151,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 function initializeButtons() {
   addButtonListener("add-checkboxes", "addCheckboxes.js");
   addButtonListener("bulk-delete", "bulkDeleteConversations.js");
-  addButtonListener("bulk-delete-all", "deleteAllNonProjectChats.js");
+  addButtonListener("auto-bulk-delete", "autoBulkDeleteConversations.js");
   addButtonListener("toggle-checkboxes", "toggleCheckboxes.js");
   addButtonListener("remove-checkboxes", "removeCheckboxes.js");
 

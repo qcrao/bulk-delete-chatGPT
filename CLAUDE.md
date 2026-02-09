@@ -19,7 +19,7 @@ This is a Chrome extension called "ChatGPT Bulk Delete" that allows users to bul
   - `addCheckboxes.js`: Adds checkboxes to conversation items
   - `bulkDeleteConversations.js`: Handles bulk deletion logic
   - `bulkArchiveConversations.js`: Handles bulk archiving (premium feature)
-  - `deleteAllNonProjectChats.js`: Automatically deletes ALL non-project chats (repeats until done)
+  - `autoBulkDeleteConversations.js`: Automatically deletes ALL non-project chats (repeats until done)
   - `toggleCheckboxes.js`: Toggle all checkboxes on/off
   - `removeCheckboxes.js`: Removes all added checkboxes
 
@@ -112,7 +112,7 @@ The "Auto Bulk Delete" button automatically deletes all chats that are NOT in Ch
 
 1. The extension uses the `[id^="history"]` selector which only matches the regular chat history container
 2. Chats inside Projects live in a different DOM structure and are NOT matched by this selector
-3. The `deleteAllNonProjectChats.js` script:
+3. The `autoBulkDeleteConversations.js` script:
    - Adds checkboxes to all visible non-project chats
    - Selects all checkboxes
    - Deletes selected chats one by one
