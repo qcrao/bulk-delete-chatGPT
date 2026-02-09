@@ -105,10 +105,10 @@ Scripts load in dependency order via manifest.json:
 ### Content Script Loading
 Scripts now load automatically in proper order via manifest.json. No manual dependency management needed.
 
-## Bulk Delete All Feature
+## Auto Bulk Delete Feature
 
 ### How it works
-The "Bulk Delete All" button automatically deletes all chats that are NOT in ChatGPT Projects:
+The "Auto Bulk Delete" button automatically deletes all chats that are NOT in ChatGPT Projects:
 
 1. The extension uses the `[id^="history"]` selector which only matches the regular chat history container
 2. Chats inside Projects live in a different DOM structure and are NOT matched by this selector

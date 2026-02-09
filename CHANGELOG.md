@@ -4,7 +4,7 @@
 
 ### New Features
 
-- **Bulk Delete All**: Automatically delete all non-project chats with a single click
+- **Auto Bulk Delete**: Automatically delete all non-project chats with a single click
   - Safely skips chats inside ChatGPT Projects
   - Handles lazy-loaded conversations by repeating until all are deleted
   - Shows progress in the popup button

@@ -51,7 +51,7 @@ function updateProgressBar(buttonId, progress) {
     buttonText = "Bulk Delete";
     actionText = "Deleting";
   } else if (buttonId === "bulk-delete-all") {
-    buttonText = "Bulk Delete All";
+    buttonText = "Auto Bulk Delete";
     actionText = "Deleting All";
   } else {
     buttonText = "Bulk Archive";
@@ -114,7 +114,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     button.style.backgroundColor = "";
     // Reset button text to original
     if (request.buttonId === "bulk-delete-all") {
-      button.textContent = "Bulk Delete All";
+      button.textContent = "Auto Bulk Delete";
       return; // Skip updateProgressBar for this button
     }
     updateProgressBar(request.buttonId, 100);
@@ -131,7 +131,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
       // Force reset background color
       button.style.backgroundColor = "";
       if (request.buttonId === "bulk-delete-all") {
-        button.textContent = "Bulk Delete All";
+        button.textContent = "Auto Bulk Delete";
       }
     }
   }
