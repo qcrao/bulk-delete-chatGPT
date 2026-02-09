@@ -113,9 +113,8 @@ The "Auto Bulk Delete" button automatically deletes all chats that are NOT in Ch
 1. The extension uses the `[id^="history"]` selector which only matches the regular chat history container
 2. Chats inside Projects live in a different DOM structure and are NOT matched by this selector
 3. The `autoBulkDeleteConversations.js` script:
-   - Adds checkboxes to all visible non-project chats
-   - Selects all checkboxes
-   - Deletes selected chats one by one
+   - Finds all visible non-project chats
+   - Deletes them one by one via ChatGPT's UI (hover → menu → delete → confirm)
    - Repeats the process until no more non-project chats remain
    - Handles lazy-loading (new chats appearing as old ones are deleted)
 
