@@ -247,21 +247,21 @@ button#bulk-archive#locked {
 }
 
 button#add-checkboxes {
-  background: rgba(0, 184, 148, 0.6);
+  background: rgba(59, 130, 246, 0.55);
 }
 button#remove-checkboxes {
-  background: rgba(253, 121, 168, 0.6);
+  background: rgba(139, 92, 246, 0.55);
 }
 button#toggle-checkboxes {
-  background: rgba(253, 203, 110, 0.6);
+  background: rgba(99, 102, 241, 0.55);
   width: 100%;
 }
 button#bulk-delete {
-  background: rgba(255, 107, 107, 0.7);
+  background: rgba(239, 68, 68, 0.6);
   width: 100%;
 }
 button#bulk-archive {
-  background: rgba(162, 155, 254, 0.7);
+  background: rgba(16, 185, 129, 0.6);
   width: 100%;
 }
 
