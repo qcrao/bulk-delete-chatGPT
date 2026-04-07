@@ -20,7 +20,10 @@ if (typeof window.configLoaded === "undefined") {
       SHORT: 100,
       MEDIUM: 200,
       LONG: 300,
-      EXTENDED: 500
+      EXTENDED: 500,
+      // Throttle between consecutive delete/archive operations to avoid
+      // ChatGPT server-side rate limiting (reported by users in store reviews).
+      THROTTLE: 500
     },
     TIMEOUTS: {
       ELEMENT_WAIT: 2000,
