@@ -20,7 +20,10 @@ if (typeof window.configLoaded === "undefined") {
       SHORT: 100,
       MEDIUM: 200,
       LONG: 300,
-      EXTENDED: 500
+      EXTENDED: 500,
+      // Throttle between consecutive delete/archive operations to avoid
+      // ChatGPT server-side rate limiting (reported by users in store reviews).
+      THROTTLE: 500
     },
     TIMEOUTS: {
       ELEMENT_WAIT: 2000,
@@ -40,6 +43,7 @@ if (typeof window.configLoaded === "undefined") {
       ARCHIVE_BUTTON: 'div[role="menuitem"]:nth-last-child(2), div[role="menuitem"][data-testid*="archive"]'
     },
     STRINGS: {
+      // Delete button texts
       DELETE: "Delete",
       DELETE_CN: "删除",
       DELETE_TW: "刪除",
@@ -51,6 +55,23 @@ if (typeof window.configLoaded === "undefined") {
       DELETE_PT: "Excluir",
       DELETE_IT: "Elimina",
       DELETE_RU: "Удалить",
+      DELETE_NL: "Verwijderen",
+      DELETE_PL: "Usuń",
+      DELETE_TR: "Sil",
+      DELETE_ID: "Hapus",
+      DELETE_VI: "Xóa",
+      DELETE_TH: "ลบ",
+      DELETE_AR: "حذف",
+      DELETE_HE: "מחק",
+      DELETE_HI: "हटाएं",
+      DELETE_SV: "Ta bort",
+      DELETE_NO: "Slett",
+      DELETE_DA: "Slet",
+      DELETE_FI: "Poista",
+      DELETE_CS: "Smazat",
+      DELETE_UK: "Видалити",
+      DELETE_EL: "Διαγραφή",
+      // Archive button texts
       ARCHIVE: "Archive",
       ARCHIVE_CN: "归档",
       ARCHIVE_TW: "封存",
@@ -61,27 +82,43 @@ if (typeof window.configLoaded === "undefined") {
       ARCHIVE_ES: "Archivar",
       ARCHIVE_PT: "Arquivar",
       ARCHIVE_IT: "Archivia",
-      ARCHIVE_RU: "Архивировать"
+      ARCHIVE_RU: "Архивировать",
+      ARCHIVE_NL: "Archiveren",
+      ARCHIVE_PL: "Archiwizuj",
+      ARCHIVE_TR: "Arşivle",
+      ARCHIVE_ID: "Arsipkan",
+      ARCHIVE_VI: "Lưu trữ",
+      ARCHIVE_TH: "เก็บถาวร",
+      ARCHIVE_AR: "أرشفة",
+      ARCHIVE_HE: "העבר לארכיון",
+      ARCHIVE_HI: "संग्रह करें",
+      ARCHIVE_SV: "Arkivera",
+      ARCHIVE_NO: "Arkiver",
+      ARCHIVE_DA: "Arkivér",
+      ARCHIVE_FI: "Arkistoi",
+      ARCHIVE_CS: "Archivovat",
+      ARCHIVE_UK: "Архівувати",
+      ARCHIVE_EL: "Αρχειοθέτηση"
     },
     // Button detection strategies (order of preference)
     BUTTON_STRATEGIES: {
       DELETE: [
-        // Strategy 1: Look for error/danger styling
+        // Strategy 1: Text matching (most reliable)
+        'text-fallback',
+        // Strategy 2: Look for error/danger styling
         'div[role="menuitem"] .text-token-text-error',
-        // Strategy 2: Last menu item (delete is typically last)
-        'div[role="menuitem"]:last-child',
         // Strategy 3: Data attributes
         'div[role="menuitem"][data-testid*="delete"]',
-        // Strategy 4: Fallback to text matching
-        'text-fallback'
+        // Strategy 4: Last menu item (delete is typically last)
+        'div[role="menuitem"]:last-child'
       ],
       ARCHIVE: [
-        // Strategy 1: Data attributes
+        // Strategy 1: Text matching (most reliable)
+        'text-fallback',
+        // Strategy 2: Data attributes
         'div[role="menuitem"][data-testid*="archive"]',
-        // Strategy 2: Second to last menu item
-        'div[role="menuitem"]:nth-last-child(2)',
-        // Strategy 3: Fallback to text matching
-        'text-fallback'
+        // Strategy 3: Second to last menu item
+        'div[role="menuitem"]:nth-last-child(2)'
       ]
     }
   };

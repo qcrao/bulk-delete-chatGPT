@@ -38,6 +38,12 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         // Update progress
         const progress = Math.round(((i + 1) / selectedConversations.length) * 100);
         ChromeUtils.sendProgress(buttonId, progress);
+
+        // Throttle between operations to avoid ChatGPT rate limiting.
+        // Skip the wait after the final item.
+        if (i < selectedConversations.length - 1) {
+          await CommonUtils.delay(UI_CONFIG.DELAYS.THROTTLE);
+        }
       }
 
       console.log(`${operation} completed: ${processedCount} processed, ${skippedCount} skipped`);

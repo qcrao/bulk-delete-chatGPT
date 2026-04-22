@@ -247,21 +247,21 @@ button#bulk-archive#locked {
 }
 
 button#add-checkboxes {
-  background: rgba(0, 184, 148, 0.6);
+  background: rgba(59, 130, 246, 0.55);
 }
 button#remove-checkboxes {
-  background: rgba(253, 121, 168, 0.6);
+  background: rgba(139, 92, 246, 0.55);
 }
 button#toggle-checkboxes {
-  background: rgba(253, 203, 110, 0.6);
+  background: rgba(99, 102, 241, 0.55);
   width: 100%;
 }
 button#bulk-delete {
-  background: rgba(255, 107, 107, 0.7);
+  background: rgba(239, 68, 68, 0.6);
   width: 100%;
 }
 button#bulk-archive {
-  background: rgba(162, 155, 254, 0.7);
+  background: rgba(16, 185, 129, 0.6);
   width: 100%;
 }
 
@@ -332,16 +332,44 @@ button#bulk-archive {
 
 /* MyNav ad styles */
 .nav-ad {
-  background: rgba(255, 255, 255, 0.15);
+  position: relative;
+  overflow: visible;
+  background: linear-gradient(135deg, #ff6b9d 0%, #c850c0 50%, #4158d0 100%);
+  background-size: 200% 200%;
+  animation: nav-ad-shimmer 6s ease infinite;
   color: white;
   flex-grow: 0;
   width: auto;
-  padding: 10px;
-  border-radius: 8px;
-  backdrop-filter: blur(15px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 8px rgba(31, 38, 135, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 6px 16px rgba(200, 80, 192, 0.45),
+    0 2px 6px rgba(65, 88, 208, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.nav-ad .ads-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: #ffd54a;
+  color: #2a1a00;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  padding: 2px 5px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  line-height: 1;
+  pointer-events: none;
+}
+
+@keyframes nav-ad-shimmer {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .nav-ad .button-content {
@@ -369,8 +397,10 @@ button#bulk-archive {
 }
 
 .nav-ad:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 8px 22px rgba(200, 80, 192, 0.6),
+    0 3px 8px rgba(65, 88, 208, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 .footer-separator {

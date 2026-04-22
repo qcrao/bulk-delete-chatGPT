@@ -41,15 +41,17 @@ if (typeof window.utilsLoaded === "undefined") {
     async waitForElementByText(selector, textOptions, parent = document, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
       const startedAt = Date.now();
       const texts = Array.isArray(textOptions) ? textOptions : [textOptions];
-      
+
       while (Date.now() - startedAt < timeout) {
         const elements = parent.querySelectorAll(selector);
-        const element = Array.from(elements).find(el => 
-          texts.some(text => 
-            el.textContent.trim() === text || 
+        const element = Array.from(elements).find(el => {
+          const textContent = el.textContent.trim();
+          return texts.some(text =>
+            textContent === text ||
+            textContent.includes(text) ||
             (text === UI_CONFIG.STRINGS.DELETE && el.querySelector(".text-token-text-error"))
-          )
-        );
+          );
+        });
         if (element) return element;
         await this.delay(UI_CONFIG.DELAYS.SHORT);
       }
@@ -69,44 +71,22 @@ if (typeof window.utilsLoaded === "undefined") {
         for (const strategy of strategies) {
           if (strategy === 'text-fallback') {
             // Fallback to text matching with multiple languages
-            let textOptions;
-            if (operation === 'DELETE') {
-              textOptions = [
-                UI_CONFIG.STRINGS.DELETE,
-                UI_CONFIG.STRINGS.DELETE_CN,
-                UI_CONFIG.STRINGS.DELETE_TW,
-                UI_CONFIG.STRINGS.DELETE_JP,
-                UI_CONFIG.STRINGS.DELETE_KR,
-                UI_CONFIG.STRINGS.DELETE_DE,
-                UI_CONFIG.STRINGS.DELETE_FR,
-                UI_CONFIG.STRINGS.DELETE_ES,
-                UI_CONFIG.STRINGS.DELETE_PT,
-                UI_CONFIG.STRINGS.DELETE_IT,
-                UI_CONFIG.STRINGS.DELETE_RU
-              ];
-            } else {
-              textOptions = [
-                UI_CONFIG.STRINGS.ARCHIVE,
-                UI_CONFIG.STRINGS.ARCHIVE_CN,
-                UI_CONFIG.STRINGS.ARCHIVE_TW,
-                UI_CONFIG.STRINGS.ARCHIVE_JP,
-                UI_CONFIG.STRINGS.ARCHIVE_KR,
-                UI_CONFIG.STRINGS.ARCHIVE_DE,
-                UI_CONFIG.STRINGS.ARCHIVE_FR,
-                UI_CONFIG.STRINGS.ARCHIVE_ES,
-                UI_CONFIG.STRINGS.ARCHIVE_PT,
-                UI_CONFIG.STRINGS.ARCHIVE_IT,
-                UI_CONFIG.STRINGS.ARCHIVE_RU
-              ];
-            }
+            // Dynamically get all strings for the operation
+            const prefix = operation === 'DELETE' ? 'DELETE' : 'ARCHIVE';
+            const textOptions = Object.entries(UI_CONFIG.STRINGS)
+              .filter(([key]) => key === prefix || key.startsWith(prefix + '_'))
+              .map(([, value]) => value);
             
             const elements = parent.querySelectorAll('div[role="menuitem"]');
-            const element = Array.from(elements).find(el => 
-              textOptions.some(text => el.textContent.trim() === text)
-            );
-            
+            const element = Array.from(elements).find(el => {
+              const textContent = el.textContent.trim();
+              return textOptions.some(text =>
+                textContent === text || textContent.includes(text)
+              );
+            });
+
             if (element) {
-              console.log(`Found ${operation} button using text fallback strategy`);
+              console.log(`Found ${operation} button using text fallback strategy, text: "${element.textContent.trim()}"`);
               return element;
             }
           } else {
