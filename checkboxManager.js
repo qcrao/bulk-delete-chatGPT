@@ -71,7 +71,12 @@
       },
 
       /**
-       * Add checkbox to conversation with proper layout
+       * Add checkbox to conversation with proper layout.
+       * IMPORTANT: We must not move or wrap ChatGPT's React-managed children.
+       * Doing so confuses React's reconciler and causes `removeChild` errors
+       * that crash the sidebar (the node React expects in `conversation` is
+       * actually somewhere else). Instead, overlay the checkbox via absolute
+       * positioning so the React subtree stays untouched.
        */
       addCheckboxToConversation(conversation, index) {
         try {
@@ -82,34 +87,43 @@
           // Check for existing checkbox and preserve state
           let existingCheckbox = utils.safeQuery(`.${CSS_CLASSES.CHECKBOX}`, conversation);
           let isChecked = existingCheckbox ? existingCheckbox.checked : false;
-          
+
           if (existingCheckbox) {
             existingCheckbox.remove();
             utils.debug(`Removed existing checkbox for conversation ${index}`);
           }
 
-          // Get DOMHandler module
-          const DOMHandler = core.getModule('DOMHandler');
-          if (!DOMHandler) {
-            throw new Error('DOMHandler module not found');
-          }
-
-          // Create new layout structure
-          const flexContainer = DOMHandler.createFlexContainer();
           const checkbox = this.createCheckbox(index);
           checkbox.checked = isChecked;
-          flexContainer.appendChild(checkbox);
+          checkbox.style.cssText = `
+            position: absolute;
+            left: 6px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 10;
+            margin: 0;
+            cursor: pointer;
+          `;
 
-          // Move existing content to container
-          while (conversation.firstChild) {
-            flexContainer.appendChild(conversation.firstChild);
+          // Make sure the conversation can host an absolutely-positioned child
+          // and leave room for the checkbox so it doesn't cover the title.
+          const computed = window.getComputedStyle(conversation);
+          if (computed.position === 'static') {
+            conversation.style.position = 'relative';
           }
+          if (!conversation.dataset.bulkDeleteOriginalPadding) {
+            conversation.dataset.bulkDeleteOriginalPadding = conversation.style.paddingLeft || '';
+          }
+          conversation.style.paddingLeft = '28px';
 
-          conversation.appendChild(flexContainer);
+          // Append (don't move React's children!) — appending an extra DOM
+          // node React doesn't track is safe, but reordering its children is
+          // what triggers the removeChild crash.
+          conversation.appendChild(checkbox);
           utils.debug(`Checkbox added to conversation ${index}, checked: ${isChecked}`);
-          
+
           return checkbox;
-          
+
         } catch (error) {
           utils.log('error', `Failed to add checkbox to conversation ${index}:`, error);
           throw error;
