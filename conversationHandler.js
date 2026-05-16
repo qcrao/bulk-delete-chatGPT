@@ -54,15 +54,11 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
     async processConversation(operation, checkbox) {
       await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
 
+      // checkbox.parentElement is now the conversation <a> directly
+      // (we no longer wrap children in a custom flex container).
       const conversationElement = checkbox.parentElement;
-      const interactiveElement = DOMHandler.findInteractiveElement(conversationElement);
-      
-      if (!interactiveElement) {
-        const title = DOMHandler.getConversationTitle(conversationElement);
-        const message = `Unable to ${operation.toLowerCase()} the conversation: "${title}".`; 
-        CommonUtils.showNotification(message, 'error');
-        return false;
-      }
+      const interactiveElement = DOMHandler.findInteractiveElement(conversationElement)
+        || conversationElement;
 
       try {
         // Hover to reveal menu
@@ -70,10 +66,13 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         DOMHandler.dispatchHoverEvent(interactiveElement);
         await CommonUtils.delay(UI_CONFIG.DELAYS.MEDIUM);
 
-        // Find and click three-dot button
+        // Find and click three-dot button. Search inside the conversation
+        // first; fall back to its parent in case ChatGPT renders the trigger
+        // as a sibling element.
+        const searchRoot = conversationElement.parentElement || conversationElement;
         const threeDotButton = await CommonUtils.waitForElement(
           UI_CONFIG.SELECTORS.threeDotButton,
-          conversationElement.parentElement,
+          searchRoot,
           operation === 'DELETE' ? UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT : UI_CONFIG.TIMEOUTS.ELEMENT_WAIT
         );
 
