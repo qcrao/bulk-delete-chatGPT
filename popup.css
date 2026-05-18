@@ -203,7 +203,7 @@ button::after {
 }
 
 button:hover {
-  transform: translateY(-2px);
+  filter: brightness(1.04) saturate(1.03);
   box-shadow: 0 5px 14px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     inset 0 -1px 0 rgba(255, 255, 255, 0.1);
@@ -295,7 +295,7 @@ button#bulk-archive {
 }
 
 .footer-button:hover {
-  transform: translateY(-2px);
+  filter: brightness(1.04) saturate(1.03);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
@@ -664,9 +664,12 @@ button#bulk-archive {
 }
 
 /* 更新按钮悬停效果 */
-.button-container:hover button,
+.button-container:hover button {
+  filter: brightness(1.04) saturate(1.03);
+}
+
 .button-container:hover .tooltip-trigger {
-  transform: translateY(-3px);
+  color: #fff;
 }
 
 /* 添加悬停效果到 i 图标 */
