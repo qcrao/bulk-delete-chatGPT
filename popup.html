@@ -35,7 +35,10 @@
       
       <div class="section bulk-section">
         <h2 class="section-title">Bulk Operations</h2>
-        <button id="bulk-archive" data-progress="0"><span id="locked">🔒</span>Bulk Archive</button>
+        <button id="bulk-archive" data-progress="0">
+          <span id="locked" aria-hidden="true">🔒</span>
+          <span class="button-text">Bulk Archive</span>
+        </button>
         <button id="bulk-delete" data-progress="0">Bulk Delete</button>
       </div>
     </div>
@@ -52,23 +55,30 @@
         </div>
       </a>
       <div class="footer-separator"></div>
-      <a href="https://www.tubevocab.com/"
-         target="_blank"
-         id="myNavAd"
-         class="footer-button nav-ad">
-        <span class="ads-badge">Ad</span>
-        <div class="button-content">
-          <span class="title">TubeVocab</span>
-          <span class="emoji">🎬</span>
-        </div>
-      </a>
+      <div id="navAdContainer" class="nav-ad-container">
+        <a href="https://www.tubevocab.com/"
+           target="_blank"
+           id="myNavAd"
+           class="footer-button nav-ad">
+          <span class="ads-badge">Ad</span>
+          <div class="button-content">
+            <span class="title">TubeVocab</span>
+            <span class="emoji">🎬</span>
+          </div>
+        </a>
+        <button id="closeAdButton" class="ad-close-button" title="Remove ads" aria-label="Remove ads">
+          &times;
+        </button>
+      </div>
     </div>
 
     <div id="customModal" class="modal">
       <div class="modal-content">
-        <h2>Buy Bulk Archive</h2>
-        <p>One-time payment of $0.99 USD to purchase access.</p>
-        <p>Do you want to continue?</p>
+        <h2 id="modalTitle">Unlock Premium</h2>
+        <p id="modalDescription">
+          One-time payment of $0.99 USD unlocks Bulk Archive and removes the popup ad.
+        </p>
+        <p id="modalQuestion">Do you want to continue?</p>
         <div class="modal-separator"></div>
         <div class="modal-buttons">
           <button id="modalCancel" class="modal-button">Cancel</button>

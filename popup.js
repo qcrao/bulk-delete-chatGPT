@@ -42,8 +42,6 @@ function updateProgressBar(buttonId, progress) {
   button.style.setProperty("--progress", `${progress}%`);
   button.setAttribute("data-progress", progress);
 
-  const buttonText =
-    buttonId === "bulk-delete" ? "Bulk Delete" : "Bulk Archive";
   const actionText = buttonId === "bulk-delete" ? "Deleting" : "Archiving";
 
   if (progress === 100) {
@@ -57,7 +55,7 @@ function updateProgressBar(buttonId, progress) {
     setTimeout(() => {
       button.disabled = false;
       button.classList.remove("progress");
-      button.innerHTML = `<span class="button-text">${buttonText}</span>`;
+      button.innerHTML = getDefaultButtonContent(buttonId);
     }, 500); // 1000 毫秒 = 1 秒，您可以根据需要调整这个时间
   } else {
     button.disabled = true;
@@ -89,6 +87,11 @@ function initializeButtons() {
 
   const bulkArchiveButton = document.getElementById("bulk-archive");
   bulkArchiveButton.addEventListener("click", handleBulkArchive);
+
+  const closeAdButton = document.getElementById("closeAdButton");
+  if (closeAdButton) {
+    closeAdButton.addEventListener("click", handleCloseAd);
+  }
 }
 
 // Membership management
@@ -117,7 +120,7 @@ const MembershipManager = {
   
   async checkMembershipStatus() {
     const localIsPaid = this.getLocalStatus();
-    updateBulkArchiveButton(localIsPaid);
+    updatePaidFeatures(localIsPaid);
 
     try {
       const userInfo = await getUserInfo();
@@ -128,20 +131,68 @@ const MembershipManager = {
 
       const data = await this.checkRemoteStatus(userInfo);
       this.setLocalStatus(data.isPaid);
-      updateBulkArchiveButton(data.isPaid);
+      updatePaidFeatures(data.isPaid);
     } catch (error) {
       console.error("Error in membership status check:", error);
     }
   }
 };
 
+function updatePaidFeatures(isPaid) {
+  updateBulkArchiveButton(isPaid);
+  updateAdVisibility(isPaid);
+}
+
 function updateBulkArchiveButton(isPaid) {
   const bulkArchiveButton = document.getElementById("bulk-archive");
-  if (isPaid) {
-    bulkArchiveButton.querySelector("span").textContent = "";
-  } else {
-    bulkArchiveButton.querySelector("span").textContent = "🔒";
+  if (bulkArchiveButton && !bulkArchiveButton.classList.contains("progress")) {
+    bulkArchiveButton.innerHTML = getBulkArchiveButtonContent(isPaid);
   }
+}
+
+function getDefaultButtonContent(buttonId) {
+  if (buttonId === "bulk-archive") {
+    return getBulkArchiveButtonContent(MembershipManager.getLocalStatus());
+  }
+
+  return `<span class="button-text">Bulk Delete</span>`;
+}
+
+function getBulkArchiveButtonContent(isPaid) {
+  const lockIcon = isPaid ? "" : "🔒";
+  return `
+    <span id="locked" aria-hidden="true">${lockIcon}</span>
+    <span class="button-text">Bulk Archive</span>
+  `;
+}
+
+function updateAdVisibility(isPaid) {
+  const footer = document.querySelector(".footer");
+  const sponsorLink = document.getElementById("sponsorLink");
+  const navAdContainer = document.getElementById("navAdContainer");
+  const footerSeparator = document.querySelector(".footer-separator");
+
+  document.body.classList.toggle("paid-layout", isPaid);
+
+  if (footer) {
+    footer.hidden = isPaid;
+  }
+
+  if (sponsorLink) {
+    sponsorLink.hidden = isPaid;
+  }
+
+  if (navAdContainer) {
+    navAdContainer.hidden = isPaid;
+  }
+
+  if (footerSeparator) {
+    footerSeparator.hidden = isPaid;
+  }
+}
+
+function hideNavigationAd() {
+  updateAdVisibility(true);
 }
 
 async function handleBulkArchive() {
@@ -162,12 +213,16 @@ async function handleBulkArchive() {
 
     const data = await MembershipManager.checkRemoteStatus(userInfo);
     MembershipManager.setLocalStatus(data.isPaid);
-    updateBulkArchiveButton(data.isPaid);
+    updatePaidFeatures(data.isPaid);
 
     if (data.isPaid) {
       executeArchiveOperation();
     } else {
-      const userConfirmed = await showModal();
+      const userConfirmed = await showModal({
+        title: "Unlock Bulk Archive",
+        description:
+          "One-time payment of $0.99 USD unlocks Bulk Archive and removes the popup ad.",
+      });
       if (userConfirmed) {
         await handlePayment(userInfo);
       }
@@ -189,6 +244,57 @@ function executeArchiveOperation() {
   });
 }
 
+async function handleCloseAd(event) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const closeAdButton = document.getElementById("closeAdButton");
+
+  try {
+    if (MembershipManager.getLocalStatus()) {
+      hideNavigationAd();
+      return;
+    }
+
+    if (closeAdButton) {
+      closeAdButton.disabled = true;
+    }
+
+    const userInfo = await getUserInfo();
+    if (!userInfo) {
+      console.error("Unable to get user info");
+      alert("Unable to verify user. Please try again later.");
+      return;
+    }
+
+    const data = await MembershipManager.checkRemoteStatus(userInfo);
+    MembershipManager.setLocalStatus(data.isPaid);
+    updatePaidFeatures(data.isPaid);
+
+    if (data.isPaid) {
+      hideNavigationAd();
+      return;
+    }
+
+    const userConfirmed = await showModal({
+      title: "Remove Ads",
+      description:
+        "One-time payment of $0.99 USD removes the popup ad and automatically unlocks Bulk Archive.",
+    });
+
+    if (userConfirmed) {
+      await handlePayment(userInfo);
+    }
+  } catch (error) {
+    console.error("Error in close ad handler:", error);
+    alert("An error occurred. Please try again later.");
+  } finally {
+    if (closeAdButton) {
+      closeAdButton.disabled = false;
+    }
+  }
+}
+
 async function handlePayment(userInfo) {
   try {
     const payResponse = await fetch(
@@ -208,30 +314,51 @@ async function handlePayment(userInfo) {
   }
 }
 
-function showModal() {
+function showModal(options = {}) {
   return new Promise((resolve) => {
     const modal = document.getElementById("customModal");
+    const title = document.getElementById("modalTitle");
+    const description = document.getElementById("modalDescription");
+    const question = document.getElementById("modalQuestion");
     const okButton = document.getElementById("modalOK");
     const cancelButton = document.getElementById("modalCancel");
 
+    title.textContent = options.title || "Unlock Premium";
+    description.textContent =
+      options.description ||
+      "One-time payment of $0.99 USD unlocks Bulk Archive and removes the popup ad.";
+    question.textContent = options.question || "Do you want to continue?";
     modal.style.display = "block";
 
-    okButton.onclick = () => {
+    const cleanup = () => {
+      okButton.removeEventListener("click", handleOK);
+      cancelButton.removeEventListener("click", handleCancel);
+      window.removeEventListener("click", handleOutsideClick);
+    };
+
+    const handleOK = () => {
       modal.style.display = "none";
+      cleanup();
       resolve(true);
     };
 
-    cancelButton.onclick = () => {
+    const handleCancel = () => {
       modal.style.display = "none";
+      cleanup();
       resolve(false);
     };
 
-    window.onclick = (event) => {
+    const handleOutsideClick = (event) => {
       if (event.target == modal) {
         modal.style.display = "none";
+        cleanup();
         resolve(false);
       }
     };
+
+    okButton.addEventListener("click", handleOK);
+    cancelButton.addEventListener("click", handleCancel);
+    window.addEventListener("click", handleOutsideClick);
   });
 }
 
@@ -272,7 +399,7 @@ document.addEventListener("DOMContentLoaded", function () {
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === "popup") {
     port.onDisconnect.addListener(function () {
-      checkMembershipStatus();
+      MembershipManager.checkMembershipStatus();
     });
   }
 });

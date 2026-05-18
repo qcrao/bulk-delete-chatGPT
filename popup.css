@@ -44,6 +44,10 @@ body > * {
   z-index: 1;
 }
 
+body.paid-layout {
+  padding-bottom: 24px;
+}
+
 .header {
   margin-bottom: 16px;
   width: 100%;
@@ -265,6 +269,10 @@ button#bulk-archive {
   width: 100%;
 }
 
+#locked:empty {
+  display: none;
+}
+
 .footer {
   margin-top: 16px;
   width: 100%;
@@ -273,6 +281,10 @@ button#bulk-archive {
   justify-content: center;
   align-items: center;
   gap: 12px;
+}
+
+.footer[hidden] {
+  display: none;
 }
 
 .footer-button {
@@ -408,6 +420,60 @@ button#bulk-archive {
   width: 1px;
   background-color: rgba(255, 255, 255, 0.3);
   margin: 0 4px;
+}
+
+#sponsorLink[hidden],
+.footer-separator[hidden],
+.nav-ad-container[hidden] {
+  display: none;
+}
+
+.nav-ad-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ad-close-button {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(20, 20, 20, 0.78);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: none;
+  z-index: 3;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(12px);
+}
+
+.ad-close-button::after {
+  display: none;
+}
+
+.ad-close-button:hover {
+  transform: translateY(-1px);
+  background: rgba(239, 68, 68, 0.88);
+  border-color: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.35);
+}
+
+.ad-close-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
 }
 
 @keyframes pulse {
