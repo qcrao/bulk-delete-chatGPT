@@ -219,9 +219,9 @@ async function handleBulkArchive() {
       executeArchiveOperation();
     } else {
       const userConfirmed = await showModal({
-        title: "Unlock Bulk Archive",
+        title: "Remove Ads + Bulk Archive",
         description:
-          "One-time payment of $0.99 USD unlocks Bulk Archive and removes the popup ad.",
+          "One-time payment of $0.99 USD unlocks Bulk Archive and removes ads.",
       });
       if (userConfirmed) {
         await handlePayment(userInfo);
@@ -277,9 +277,9 @@ async function handleCloseAd(event) {
     }
 
     const userConfirmed = await showModal({
-      title: "Remove Ads",
+      title: "Remove Ads + Bulk Archive",
       description:
-        "One-time payment of $0.99 USD removes the popup ad and automatically unlocks Bulk Archive.",
+        "One-time payment of $0.99 USD removes ads and automatically unlocks Bulk Archive.",
     });
 
     if (userConfirmed) {
@@ -323,10 +323,10 @@ function showModal(options = {}) {
     const okButton = document.getElementById("modalOK");
     const cancelButton = document.getElementById("modalCancel");
 
-    title.textContent = options.title || "Unlock Premium";
+    title.textContent = options.title || "Remove Ads + Bulk Archive";
     description.textContent =
       options.description ||
-      "One-time payment of $0.99 USD unlocks Bulk Archive and removes the popup ad.";
+      "One-time payment of $0.99 USD removes ads and unlocks Bulk Archive.";
     question.textContent = options.question || "Do you want to continue?";
     modal.style.display = "block";
 
