@@ -5,6 +5,75 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
   // Conversation operation handler
   const ConversationHandler = {
+    getDelaySettings() {
+      const delayConfig = UI_CONFIG.OPERATION_DELAY;
+      const operationSettings = window.ChatGPTBulkDeleteOperationSettings || {};
+      const rawBaseDelay = Number(operationSettings.baseDelayMs);
+      const baseDelayMs = Math.min(
+        delayConfig.MAX_BASE_DELAY_MS,
+        Math.max(
+          delayConfig.MIN_BASE_DELAY_MS,
+          Number.isFinite(rawBaseDelay)
+            ? rawBaseDelay
+            : delayConfig.DEFAULT_BASE_DELAY_MS
+        )
+      );
+
+      return {
+        baseDelayMs: Math.round(baseDelayMs),
+        autoSlowdown:
+          typeof operationSettings.autoSlowdown === "boolean"
+            ? operationSettings.autoSlowdown
+            : delayConfig.DEFAULT_AUTO_SLOWDOWN
+      };
+    },
+
+    getIntraBatchDelay(settings, batchIndex) {
+      if (!settings.autoSlowdown) {
+        return settings.baseDelayMs;
+      }
+
+      const delayConfig = UI_CONFIG.OPERATION_DELAY;
+      const multiplier = 1 + batchIndex * delayConfig.INTRA_BATCH_GROWTH;
+      return Math.min(
+        delayConfig.MAX_INTRA_BATCH_DELAY_MS,
+        Math.round(settings.baseDelayMs * multiplier)
+      );
+    },
+
+    getBatchCooldownDelay(settings, completedBatchIndex) {
+      if (!settings.autoSlowdown) {
+        return settings.baseDelayMs;
+      }
+
+      const delayConfig = UI_CONFIG.OPERATION_DELAY;
+      const multiplier =
+        delayConfig.BATCH_COOLDOWN_BASE_MULTIPLIER +
+        completedBatchIndex * delayConfig.BATCH_COOLDOWN_GROWTH_MULTIPLIER;
+
+      return Math.min(
+        delayConfig.MAX_BATCH_COOLDOWN_MS,
+        Math.round(settings.baseDelayMs * multiplier)
+      );
+    },
+
+    getDelayAfterConversation(settings, currentIndex, totalCount) {
+      if (currentIndex >= totalCount - 1) {
+        return 0;
+      }
+
+      const delayConfig = UI_CONFIG.OPERATION_DELAY;
+      const currentBatchIndex = Math.floor(currentIndex / delayConfig.BATCH_SIZE);
+      const nextIndex = currentIndex + 1;
+      const startsNextBatch = nextIndex % delayConfig.BATCH_SIZE === 0;
+
+      if (startsNextBatch) {
+        return this.getBatchCooldownDelay(settings, currentBatchIndex);
+      }
+
+      return this.getIntraBatchDelay(settings, currentBatchIndex);
+    },
+
     // Base conversation operation
     async performOperation(operation, selectedConversations, buttonId) {
       if (selectedConversations.length === 0) {
@@ -21,6 +90,12 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
       let processedCount = 0;
       let skippedCount = 0;
+      const delaySettings = this.getDelaySettings();
+      console.log(
+        `${operation} delay settings:`,
+        delaySettings,
+        `batch size: ${UI_CONFIG.OPERATION_DELAY.BATCH_SIZE}`
+      );
 
       for (let i = 0; i < selectedConversations.length; i++) {
         try {
@@ -41,8 +116,13 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
         // Throttle between operations to avoid ChatGPT rate limiting.
         // Skip the wait after the final item.
-        if (i < selectedConversations.length - 1) {
-          await CommonUtils.delay(UI_CONFIG.DELAYS.THROTTLE);
+        const delayAfterConversation = this.getDelayAfterConversation(
+          delaySettings,
+          i,
+          selectedConversations.length
+        );
+        if (delayAfterConversation > 0) {
+          await CommonUtils.delay(delayAfterConversation);
         }
       }
 

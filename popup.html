@@ -7,69 +7,109 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <a href="#" class="version-badge" id="version-badge" title="Check for updates">v</a>
     <div class="header">
       <h1>ChatGPT Bulk Delete</h1>
     </div>
-    <div class="buttons-wrapper">
-      <div class="section checkbox-section">
-        <h2 class="section-title">Checkbox Operations</h2>
-        <div class="buttons-row">
-          <div class="button-container">
-            <button id="add-checkboxes">
-              <span>Add</span><br /><span>Checkboxes</span>
+    <div class="main-card">
+      <div class="buttons-wrapper">
+        <div class="section checkbox-section">
+          <h2 class="section-title">Checkbox Operations</h2>
+          <div class="buttons-row">
+            <div class="button-container">
+              <button id="add-checkboxes">
+                <span>Add</span><br /><span>Checkboxes</span>
+              </button>
+              <span class="tooltip-trigger" aria-label="information"
+                >i
+                <span class="tooltip-content"
+                  >Hold Shift to select </br> multiple conversations.</span
+                >
+              </span>
+            </div>
+            <button id="remove-checkboxes">
+              <span>Remove</span><br /><span>Checkboxes</span>
             </button>
-            <span class="tooltip-trigger" aria-label="information"
-              >i
-              <span class="tooltip-content"
-                >Hold Shift to select </br> multiple conversations.</span
-              >
-            </span>
           </div>
-          <button id="remove-checkboxes">
-            <span>Remove</span><br /><span>Checkboxes</span>
-          </button>
+          <button id="toggle-checkboxes">Toggle Checkboxes</button>
         </div>
-        <button id="toggle-checkboxes">Toggle Checkboxes</button>
-      </div>
-      
-      <div class="section bulk-section">
-        <h2 class="section-title">Bulk Operations</h2>
-        <button id="bulk-archive" data-progress="0">
-          <span id="locked" aria-hidden="true">🔒</span>
-          <span class="button-text">Bulk Archive</span>
-        </button>
-        <button id="bulk-delete" data-progress="0">Bulk Delete</button>
+
+        <div class="section bulk-section">
+          <h2 class="section-title">Bulk Operations</h2>
+          <button id="bulk-archive" data-progress="0">
+            <span id="locked" aria-hidden="true">🔒</span>
+            <span class="button-text">Bulk Archive</span>
+          </button>
+          <button id="bulk-delete" data-progress="0">Bulk Delete</button>
+        </div>
       </div>
     </div>
 
-    <div class="footer">
-      <a href="https://github.com/sponsors/qcrao" 
-         target="_blank" 
-         id="sponsorLink"
-         class="footer-button">
+    <div id="settingsPanel" class="settings-panel" hidden>
+      <div class="settings-panel-inner">
+        <div class="settings-panel-header">
+          <span class="settings-panel-title">Settings</span>
+          <button id="settingsClose" class="settings-close" type="button" aria-label="Close settings">
+            &times;
+          </button>
+        </div>
+        <div class="settings-row">
+          <label for="operationDelayInput">Delay per conversation</label>
+          <div class="delay-input-wrapper">
+            <input
+              id="operationDelayInput"
+              type="number"
+              min="300"
+              max="10000"
+              step="100"
+            />
+            <span>ms</span>
+          </div>
+        </div>
+        <label class="settings-checkbox-row" for="autoSlowdownInput">
+          <input id="autoSlowdownInput" type="checkbox" />
+          <span>Auto slow down larger batches</span>
+        </label>
+        <p id="delayPreview" class="delay-preview"></p>
+        <div class="settings-actions">
+          <button id="resetDelaySettings" type="button">Reset</button>
+          <button id="saveDelaySettings" type="button">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="navAdContainer" class="nav-ad-container" hidden>
+      <a href="https://www.tubevocab.com/"
+         target="_blank"
+         id="myNavAd"
+         class="footer-button nav-ad">
+        <span class="ads-badge">Ad</span>
         <div class="button-content">
-          <svg aria-hidden="true" viewBox="0 0 16 16" version="1.1" data-view-component="true" class="octicon octicon-heart">
-            <path d="m8 14.25.345.666a.75.75 0 0 1-.69 0l-.008-.004-.018-.01a7.152 7.152 0 0 1-.31-.17 22.055 22.055 0 0 1-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.066 22.066 0 0 1-3.744 2.584l-.018.01-.006.003h-.002Z"></path>
-          </svg>
+          <span class="title">TubeVocab</span>
+          <span class="emoji">🎬</span>
         </div>
       </a>
-      <div class="footer-separator"></div>
-      <div id="navAdContainer" class="nav-ad-container">
-        <a href="https://www.tubevocab.com/"
-           target="_blank"
-           id="myNavAd"
-           class="footer-button nav-ad">
-          <span class="ads-badge">Ad</span>
-          <div class="button-content">
-            <span class="title">TubeVocab</span>
-            <span class="emoji">🎬</span>
-          </div>
-        </a>
-        <button id="closeAdButton" class="ad-close-button" title="Remove ads" aria-label="Remove ads">
-          &times;
-        </button>
-      </div>
+      <button id="closeAdButton" class="ad-close-button" title="Remove ads" aria-label="Remove ads">
+        &times;
+      </button>
+    </div>
+
+    <div class="footer">
+      <button id="settings-button" class="settings-button" title="Settings" aria-label="Settings">
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="M19.4 13.5c.1-.5.1-1 .1-1.5s0-1-.1-1.5l2-1.5-2-3.4-2.4 1a7.7 7.7 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.6A7.7 7.7 0 0 0 7 6.6l-2.4-1-2 3.4 2 1.5c-.1.5-.1 1-.1 1.5s0 1 .1 1.5l-2 1.5 2 3.4 2.4-1a7.7 7.7 0 0 0 2.6 1.5l.4 2.6h4l.4-2.6a7.7 7.7 0 0 0 2.6-1.5l2.4 1 2-3.4-2-1.5ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/>
+        </svg>
+      </button>
+      <a href="#" class="version-badge" id="version-badge" title="Check for updates">v</a>
+      <a href="https://github.com/sponsors/qcrao"
+         target="_blank"
+         id="sponsorLink"
+         class="donate-button"
+         title="Donate"
+         aria-label="Donate">
+        <svg aria-hidden="true" viewBox="0 0 16 16">
+          <path d="m8 14.25.345.666a.75.75 0 0 1-.69 0l-.008-.004-.018-.01a7.152 7.152 0 0 1-.31-.17 22.055 22.055 0 0 1-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.066 22.066 0 0 1-3.744 2.584l-.018.01-.006.003h-.002Z"></path>
+        </svg>
+      </a>
     </div>
 
     <div id="customModal" class="modal">

@@ -1,37 +1,181 @@
-// Updated script loading with new architecture
+const CORE_SCRIPT_FILES = [
+  "extensionCore.js",
+  "config.js",
+  "globals.js",
+  "utils.js",
+  "domHandler.js",
+  "conversationHandler.js",
+  "checkboxManager.js"
+];
+
+const DELAY_SETTINGS_CONFIG = {
+  storageKey: "BulkDeleteChatGPT_delaySettings",
+  defaults: {
+    baseDelayMs: 1200,
+    autoSlowdown: true
+  },
+  minBaseDelayMs: 300,
+  maxBaseDelayMs: 10000,
+  batchSize: 10
+};
+
+function executeScriptFiles(tabId, files) {
+  return new Promise((resolve, reject) => {
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tabId },
+        files: files,
+      },
+      (results) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+          return;
+        }
+        resolve(results);
+      }
+    );
+  });
+}
+
+function executeScriptFunction(tabId, func, args = []) {
+  return new Promise((resolve, reject) => {
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tabId },
+        func: func,
+        args: args,
+      },
+      (results) => {
+        if (chrome.runtime.lastError) {
+          reject(new Error(chrome.runtime.lastError.message));
+          return;
+        }
+        resolve(results);
+      }
+    );
+  });
+}
+
+async function loadCoreScripts(tabId) {
+  await executeScriptFiles(tabId, CORE_SCRIPT_FILES);
+}
+
 function loadGlobalsThenExecute(tabId, secondaryScript, callback) {
-  chrome.scripting.executeScript(
-    {
-      target: { tabId: tabId },
-      files: ["extensionCore.js", "config.js", "globals.js", "utils.js", "domHandler.js", "conversationHandler.js", "checkboxManager.js"],
+  (async () => {
+    await loadCoreScripts(tabId);
+    await executeScriptFiles(tabId, [secondaryScript]);
+    if (callback) callback();
+  })().catch((error) => {
+    console.error(`Failed to execute ${secondaryScript}:`, error);
+    alert("Unable to run this operation on the current tab.");
+  });
+}
+
+async function setOperationDelaySettings(tabId, delaySettings) {
+  await executeScriptFunction(
+    tabId,
+    (settings) => {
+      window.ChatGPTBulkDeleteOperationSettings = settings;
+      return true;
     },
-    () => {
-      chrome.scripting.executeScript(
-        {
-          target: { tabId: tabId },
-          files: [secondaryScript],
-        },
-        callback
-      );
-    }
+    [delaySettings]
   );
 }
 
-function addButtonListener(buttonId, scriptName) {
-  document.getElementById(buttonId).addEventListener("click", () => {
+function getActiveTab() {
+  return new Promise((resolve) => {
     chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (tab) {
-        if (buttonId === "bulk-delete") {
-          const bulkDeleteButton = document.getElementById(buttonId);
-          bulkDeleteButton.disabled = true;
-          bulkDeleteButton.classList.add("progress");
-
-          loadGlobalsThenExecute(tab.id, scriptName);
-        } else {
-          loadGlobalsThenExecute(tab.id, scriptName);
-        }
-      }
+      resolve(tab);
     });
+  });
+}
+
+function resetOperationButton(buttonId) {
+  const button = document.getElementById(buttonId);
+  if (!button) return;
+
+  button.disabled = false;
+  button.classList.remove("progress");
+  button.style.removeProperty("--progress");
+  button.innerHTML = getDefaultButtonContent(buttonId);
+}
+
+const SettingsManager = {
+  sanitize(settings = {}) {
+    const rawDelay = Number(settings.baseDelayMs);
+    const baseDelayMs = Math.min(
+      DELAY_SETTINGS_CONFIG.maxBaseDelayMs,
+      Math.max(
+        DELAY_SETTINGS_CONFIG.minBaseDelayMs,
+        Number.isFinite(rawDelay)
+          ? rawDelay
+          : DELAY_SETTINGS_CONFIG.defaults.baseDelayMs
+      )
+    );
+
+    return {
+      baseDelayMs: Math.round(baseDelayMs),
+      autoSlowdown:
+        typeof settings.autoSlowdown === "boolean"
+          ? settings.autoSlowdown
+          : DELAY_SETTINGS_CONFIG.defaults.autoSlowdown
+    };
+  },
+
+  async getSettings() {
+    const rawSettings = localStorage.getItem(DELAY_SETTINGS_CONFIG.storageKey);
+    let parsedSettings = {};
+    try {
+      parsedSettings = rawSettings ? JSON.parse(rawSettings) : {};
+    } catch (error) {
+      console.warn("Invalid delay settings found in localStorage:", error);
+    }
+    return this.sanitize(parsedSettings);
+  },
+
+  async saveSettings(settings) {
+    const sanitizedSettings = this.sanitize(settings);
+    localStorage.setItem(
+      DELAY_SETTINGS_CONFIG.storageKey,
+      JSON.stringify(sanitizedSettings)
+    );
+    return sanitizedSettings;
+  },
+
+  async resetSettings() {
+    return this.saveSettings(DELAY_SETTINGS_CONFIG.defaults);
+  }
+};
+
+async function executeBulkOperation(tabId, scriptName, buttonId) {
+  const button = document.getElementById(buttonId);
+  if (button) {
+    button.disabled = true;
+    button.classList.add("progress");
+  }
+
+  try {
+    await loadCoreScripts(tabId);
+    const delaySettings = await SettingsManager.getSettings();
+    await setOperationDelaySettings(tabId, delaySettings);
+    await executeScriptFiles(tabId, [scriptName]);
+  } catch (error) {
+    console.error(`Failed to execute ${buttonId}:`, error);
+    resetOperationButton(buttonId);
+    alert("Unable to run this operation on the current tab.");
+  }
+}
+
+function addButtonListener(buttonId, scriptName) {
+  document.getElementById(buttonId).addEventListener("click", async () => {
+    const tab = await getActiveTab();
+    if (!tab) return;
+
+    if (buttonId === "bulk-delete") {
+      await executeBulkOperation(tab.id, scriptName, buttonId);
+    } else {
+      loadGlobalsThenExecute(tab.id, scriptName);
+    }
   });
 }
 
@@ -66,7 +210,6 @@ function updateProgressBar(buttonId, progress) {
   }
 }
 
-// 在消息监听器中也添加文本重置
 chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   console.log("Received message:", request);
   if (request.action === "updateProgress") {
@@ -94,7 +237,103 @@ function initializeButtons() {
   }
 }
 
-// Membership management
+async function initializeSettings() {
+  const settingsButton = document.getElementById("settings-button");
+  const settingsPanel = document.getElementById("settingsPanel");
+  const operationDelayInput = document.getElementById("operationDelayInput");
+  const autoSlowdownInput = document.getElementById("autoSlowdownInput");
+  const delayPreview = document.getElementById("delayPreview");
+  const saveButton = document.getElementById("saveDelaySettings");
+  const resetButton = document.getElementById("resetDelaySettings");
+
+  if (
+    !settingsButton ||
+    !settingsPanel ||
+    !operationDelayInput ||
+    !autoSlowdownInput ||
+    !delayPreview ||
+    !saveButton ||
+    !resetButton
+  ) {
+    return;
+  }
+
+  const applySettingsToForm = (settings) => {
+    operationDelayInput.value = settings.baseDelayMs;
+    autoSlowdownInput.checked = settings.autoSlowdown;
+    updateDelayPreview();
+  };
+
+  const readSettingsFromForm = () => {
+    return SettingsManager.sanitize({
+      baseDelayMs: operationDelayInput.value,
+      autoSlowdown: autoSlowdownInput.checked
+    });
+  };
+
+  const showSavedState = () => {
+    const originalText = saveButton.textContent;
+    saveButton.textContent = "Saved";
+    setTimeout(() => {
+      saveButton.textContent = originalText;
+    }, 900);
+  };
+
+  function updateDelayPreview() {
+    const settings = readSettingsFromForm();
+
+    if (!settings.autoSlowdown) {
+      delayPreview.textContent =
+        `Fixed ${settings.baseDelayMs} ms between conversations.`;
+      return;
+    }
+
+    const secondBatchDelay = Math.round(settings.baseDelayMs * 1.25);
+    const firstCooldown = settings.baseDelayMs * 3;
+    delayPreview.textContent =
+      `First 10: ${settings.baseDelayMs} ms each. Next batch: ${secondBatchDelay} ms each, with ${firstCooldown} ms cooldown between batches.`;
+  }
+
+  const closeSettings = () => {
+    settingsPanel.hidden = true;
+    settingsButton.classList.remove("is-active");
+  };
+
+  settingsButton.addEventListener("click", () => {
+    settingsPanel.hidden = !settingsPanel.hidden;
+    settingsButton.classList.toggle("is-active", !settingsPanel.hidden);
+  });
+
+  const settingsClose = document.getElementById("settingsClose");
+  if (settingsClose) {
+    settingsClose.addEventListener("click", closeSettings);
+  }
+
+  settingsPanel.addEventListener("click", (event) => {
+    if (event.target === settingsPanel) closeSettings();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !settingsPanel.hidden) closeSettings();
+  });
+
+  operationDelayInput.addEventListener("input", updateDelayPreview);
+  autoSlowdownInput.addEventListener("change", updateDelayPreview);
+
+  saveButton.addEventListener("click", async () => {
+    const savedSettings = await SettingsManager.saveSettings(readSettingsFromForm());
+    applySettingsToForm(savedSettings);
+    showSavedState();
+  });
+
+  resetButton.addEventListener("click", async () => {
+    const savedSettings = await SettingsManager.resetSettings();
+    applySettingsToForm(savedSettings);
+  });
+
+  applySettingsToForm(await SettingsManager.getSettings());
+}
+
 const MembershipManager = {
   storageKey: "BulkDeleteChatGPT_isPaid",
   
@@ -167,27 +406,12 @@ function getBulkArchiveButtonContent(isPaid) {
 }
 
 function updateAdVisibility(isPaid) {
-  const footer = document.querySelector(".footer");
-  const sponsorLink = document.getElementById("sponsorLink");
   const navAdContainer = document.getElementById("navAdContainer");
-  const footerSeparator = document.querySelector(".footer-separator");
 
   document.body.classList.toggle("paid-layout", isPaid);
 
-  if (footer) {
-    footer.hidden = isPaid;
-  }
-
-  if (sponsorLink) {
-    sponsorLink.hidden = isPaid;
-  }
-
   if (navAdContainer) {
     navAdContainer.hidden = isPaid;
-  }
-
-  if (footerSeparator) {
-    footerSeparator.hidden = isPaid;
   }
 }
 
@@ -234,12 +458,13 @@ async function handleBulkArchive() {
 }
 
 function executeArchiveOperation() {
-  chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+  getActiveTab().then((tab) => {
     if (tab) {
-      const bulkArchiveButton = document.getElementById("bulk-archive");
-      bulkArchiveButton.disabled = true;
-      bulkArchiveButton.classList.add("progress");
-      loadGlobalsThenExecute(tab.id, "bulkArchiveConversations.js");
+      executeBulkOperation(
+        tab.id,
+        "bulkArchiveConversations.js",
+        "bulk-archive"
+      );
     }
   });
 }
@@ -336,24 +561,16 @@ function showModal(options = {}) {
       window.removeEventListener("click", handleOutsideClick);
     };
 
-    const handleOK = () => {
+    const finish = (confirmed) => {
       modal.style.display = "none";
       cleanup();
-      resolve(true);
+      resolve(confirmed);
     };
 
-    const handleCancel = () => {
-      modal.style.display = "none";
-      cleanup();
-      resolve(false);
-    };
-
+    const handleOK = () => finish(true);
+    const handleCancel = () => finish(false);
     const handleOutsideClick = (event) => {
-      if (event.target == modal) {
-        modal.style.display = "none";
-        cleanup();
-        resolve(false);
-      }
+      if (event.target == modal) finish(false);
     };
 
     okButton.addEventListener("click", handleOK);
@@ -361,13 +578,6 @@ function showModal(options = {}) {
     window.addEventListener("click", handleOutsideClick);
   });
 }
-
-// function updateCopyrightYear() {
-//   const currentYear = new Date().getFullYear();
-//   document.getElementById(
-//     "copyright"
-//   ).innerHTML = `&copy; ${currentYear} <a href="https://github.com/qcrao/bulk-delete-chatGPT" target="_blank">qcrao@GitHub</a>`;
-// }
 
 async function loadVersion() {
   try {
@@ -391,11 +601,11 @@ async function loadVersion() {
 
 document.addEventListener("DOMContentLoaded", function () {
   initializeButtons();
+  initializeSettings();
   MembershipManager.checkMembershipStatus();
   loadVersion();
 });
 
-// 每次打开popup时检查会员状态
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === "popup") {
     port.onDisconnect.addListener(function () {

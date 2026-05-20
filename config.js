@@ -25,6 +25,19 @@ if (typeof window.configLoaded === "undefined") {
       // ChatGPT server-side rate limiting (reported by users in store reviews).
       THROTTLE: 500
     },
+    OPERATION_DELAY: {
+      STORAGE_KEY: "BulkDeleteChatGPT_delaySettings",
+      BATCH_SIZE: 10,
+      DEFAULT_BASE_DELAY_MS: 1200,
+      MIN_BASE_DELAY_MS: 300,
+      MAX_BASE_DELAY_MS: 10000,
+      DEFAULT_AUTO_SLOWDOWN: true,
+      INTRA_BATCH_GROWTH: 0.25,
+      BATCH_COOLDOWN_BASE_MULTIPLIER: 3,
+      BATCH_COOLDOWN_GROWTH_MULTIPLIER: 1,
+      MAX_INTRA_BATCH_DELAY_MS: 8000,
+      MAX_BATCH_COOLDOWN_MS: 30000
+    },
     TIMEOUTS: {
       ELEMENT_WAIT: 2000,
       ELEMENT_WAIT_SHORT: 1000

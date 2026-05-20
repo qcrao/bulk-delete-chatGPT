@@ -1,6 +1,6 @@
 body {
   width: 300px;
-  padding: 16px;
+  padding: 16px 16px 8px;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue",
     Arial, sans-serif;
   display: flex;
@@ -45,52 +45,24 @@ body > * {
 }
 
 body.paid-layout {
-  padding-bottom: 24px;
+  padding-bottom: 8px;
 }
 
 .header {
-  margin-bottom: 16px;
+  margin: 2px 0 12px;
   width: 100%;
-  padding-bottom: 12px;
+  padding: 0;
   text-align: center;
 }
 
 .header h1 {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 700;
   text-align: center;
   margin: 0;
   color: #fff;
+  letter-spacing: 0.2px;
   text-shadow: 0 2px 3px rgba(0, 0, 0, 0.55);
-}
-
-.version-badge {
-  position: absolute;
-  top: 0;
-  right: 0;
-  background: rgba(255, 255, 255, 0.15);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 10px;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
-  letter-spacing: 0.5px;
-  z-index: 10;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.version-badge:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  color: #fff;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .buttons-wrapper {
@@ -132,14 +104,14 @@ body.paid-layout {
 }
 
 .section-title {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
-  margin: 0 0 8px 0;
-  color: #fff;
+  margin: 0 0 10px 0;
+  color: rgba(255, 255, 255, 0.85);
   text-align: center;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.55);
+  letter-spacing: 0.8px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .checkbox-section {
@@ -272,20 +244,6 @@ button#bulk-archive {
   display: none;
 }
 
-.footer {
-  margin-top: 16px;
-  width: 100%;
-  padding: 12px 0 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-.footer[hidden] {
-  display: none;
-}
-
 .footer-button {
   text-decoration: none;
   border-radius: 8px;
@@ -305,43 +263,7 @@ button#bulk-archive {
   gap: 8px;
 }
 
-/* Sponsor button styles */
-#sponsorLink {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  min-width: auto;
-  padding: 10px;
-  border-radius: 8px;
-  backdrop-filter: blur(15px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 4px 8px rgba(31, 38, 135, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-}
 
-#sponsorLink .button-content {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#sponsorLink span {
-  display: none;
-}
-
-#sponsorLink svg {
-  width: 20px;
-  height: 20px;
-  fill: #ff69b4;
-  animation: pulse 2s infinite;
-  margin: 0;
-}
-
-#sponsorLink:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-/* MyNav ad styles */
 .nav-ad {
   position: relative;
   overflow: visible;
@@ -362,7 +284,7 @@ button#bulk-archive {
 .nav-ad .ads-badge {
   position: absolute;
   top: -6px;
-  right: -6px;
+  left: -6px;
   background: #ffd54a;
   color: #2a1a00;
   font-size: 9px;
@@ -414,15 +336,6 @@ button#bulk-archive {
     inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
-.footer-separator {
-  height: 20px;
-  width: 1px;
-  background-color: rgba(255, 255, 255, 0.3);
-  margin: 0 4px;
-}
-
-#sponsorLink[hidden],
-.footer-separator[hidden],
 .nav-ad-container[hidden] {
   display: none;
 }
@@ -432,6 +345,12 @@ button#bulk-archive {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  width: 100%;
+  margin-top: 28px;
+}
+
+.nav-ad-container .nav-ad {
+  flex: 1;
 }
 
 .ad-close-button {
@@ -689,7 +608,6 @@ button#bulk-archive {
   align-items: center;
 }
 
-/* Progress bar styles */
 button#bulk-delete::before,
 button#bulk-archive::before {
   content: "";
@@ -698,15 +616,15 @@ button#bulk-archive::before {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(46, 204, 113, 0.5);
+  background-color: rgba(255, 255, 255, 0.22);
   transform: translateX(-100%);
   transition: transform 0.3s ease-out;
+  pointer-events: none;
 }
 
 button#bulk-delete.progress,
 button#bulk-archive.progress {
   cursor: not-allowed;
-  background-color: #34495e;
 }
 
 button#bulk-delete.progress::before,
@@ -742,4 +660,367 @@ button#bulk-archive.progress::before {
 button#bulk-delete.progress::before,
 button#bulk-archive.progress::before {
   animation: pulse 2s infinite;
+}
+
+.main-card {
+  width: 100%;
+  padding: 0;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.main-card::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 20%,
+    rgba(255, 255, 255, 0.55) 50%,
+    rgba(255, 255, 255, 0.35) 80%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.main-card .buttons-wrapper {
+  gap: 0;
+}
+
+/* Sub-sections inside main-card: top section is flush with main-card top,
+   bottom section flush with main-card bottom; no inner border so they
+   visually merge with the outer rectangle */
+.main-card .section {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 12px 14px 14px;
+  gap: 8px;
+}
+
+.main-card .section::after { display: none; }
+
+.main-card .section + .section {
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding-top: 12px;
+}
+
+.footer {
+  position: relative;
+  width: 100%;
+  margin: 10px 0 0;
+  padding: 8px 2px 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  column-gap: 8px;
+  background: transparent;
+  border: none;
+}
+
+.footer::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -16px;
+  right: -16px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.18);
+  pointer-events: none;
+}
+
+/* When ad is hidden (paid users), give the footer more breathing room
+   so it doesn't feel cramped against the main-card */
+.nav-ad-container[hidden] + .footer {
+  margin-top: 24px;
+}
+
+.footer[hidden] {
+  display: none;
+}
+
+.settings-button {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 30px;
+  height: 28px;
+  min-width: 30px;
+  padding: 0;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: none;
+  text-shadow: none;
+  backdrop-filter: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.settings-button::after { display: none; }
+
+.settings-button:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  color: #fff;
+  box-shadow: none;
+  filter: none;
+}
+
+.settings-button.is-active {
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  color: #fff;
+}
+
+.settings-button svg {
+  width: 15px;
+  height: 15px;
+  fill: currentColor;
+  flex-shrink: 0;
+}
+
+.footer .version-badge {
+  position: static;
+  justify-self: center;
+  padding: 4px 10px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  text-decoration: none;
+  cursor: pointer;
+  box-shadow: none;
+  backdrop-filter: none;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 600;
+  text-shadow: none;
+  letter-spacing: 0.4px;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.footer .version-badge:hover {
+  background: rgba(255, 255, 255, 0.16);
+  border: none;
+  color: #fff;
+  transform: none;
+  box-shadow: none;
+}
+
+#sponsorLink.donate-button {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 28px;
+  min-width: 38px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  color: #ff69b4;
+  text-decoration: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+#sponsorLink.donate-button:hover {
+  background: rgba(255, 105, 180, 0.32);
+  border: none;
+  box-shadow: 0 2px 8px rgba(255, 105, 180, 0.25);
+  filter: none;
+  transform: translateY(-1px);
+}
+
+#sponsorLink.donate-button svg {
+  width: 14px;
+  height: 14px;
+  fill: #ff69b4;
+  animation: pulse 2s infinite;
+  margin: 0;
+}
+
+/* Settings panel — modal overlay covering the popup, doesn't reflow the layout */
+.settings-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  margin: 0;
+  padding: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(6px);
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.settings-panel[hidden] {
+  display: none;
+}
+
+.settings-panel-inner {
+  width: 100%;
+  max-width: 268px;
+  padding: 14px 14px 12px;
+  background: rgba(40, 40, 40, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 14px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px) saturate(180%);
+}
+
+.settings-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.settings-panel-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.3px;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.4);
+}
+
+.settings-close {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: none;
+  text-shadow: none;
+  backdrop-filter: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.settings-close::after { display: none; }
+
+.settings-close:hover {
+  background: rgba(255, 255, 255, 0.18);
+  color: #fff;
+  border: none;
+  box-shadow: none;
+  filter: none;
+}
+
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.settings-row label,
+.settings-checkbox-row {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 12px;
+  font-weight: 600;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.45);
+}
+
+.delay-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.65);
+  font-size: 11px;
+}
+
+#operationDelayInput {
+  width: 74px;
+  padding: 6px 8px;
+  border-radius: 7px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+#operationDelayInput:focus {
+  border-color: rgba(255, 255, 255, 0.4);
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.settings-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.settings-checkbox-row input {
+  margin: 0;
+  accent-color: rgba(16, 185, 129, 0.9);
+}
+
+.delay-preview {
+  margin: 10px 0 0;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.settings-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.settings-actions button {
+  flex: 1;
+  padding: 7px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+#saveDelaySettings {
+  background: rgba(16, 185, 129, 0.5);
+}
+
+#resetDelaySettings {
+  background: rgba(255, 255, 255, 0.1);
 }
