@@ -10,6 +10,24 @@
 (function() {
   'use strict';
 
+  function getExtensionVersion() {
+    try {
+      const runtime = typeof chrome !== 'undefined' && chrome.runtime
+        ? chrome.runtime
+        : typeof browser !== 'undefined' && browser.runtime
+          ? browser.runtime
+          : null;
+
+      if (runtime && runtime.getManifest) {
+        return runtime.getManifest().version;
+      }
+    } catch (error) {
+      console.warn('Unable to read extension version from manifest', error);
+    }
+
+    return 'unknown';
+  }
+
   // Prevent duplicate initialization
   if (window.ChatGPTBulkDelete && window.ChatGPTBulkDelete.initialized) {
     console.log("ChatGPT Bulk Delete core already initialized");
@@ -19,7 +37,7 @@
   // Core namespace
   window.ChatGPTBulkDelete = {
     // Version and metadata
-    version: '5.11',
+    version: getExtensionVersion(),
     initialized: false,
     
     // Module registry
