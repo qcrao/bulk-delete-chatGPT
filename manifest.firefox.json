@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "ChatGPT Bulk Delete",
+  "version": "6.6",
+  "description": "A Firefox extension to bulk delete ChatGPT conversations",
+  "icons": {
+    "48": "icon48.png"
+  },
+  "action": {
+    "default_icon": "icon48.png",
+    "default_popup": "popup.html",
+    "default_title": "Bulk Delete Conversations"
+  },
+  "permissions": ["scripting", "activeTab", "storage"],
+  "host_permissions": ["https://bulk-delete-chatgpt-worker.qcrao.com/*"],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "chatgpt-bulk-delete@qcrao.com",
+      "data_collection_permissions": {
+        "required": ["personallyIdentifyingInfo"]
+      }
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://chat.openai.com/*", "*://chatgpt.com/*"],
+      "js": [
+        "extensionCore.js",
+        "config.js",
+        "globals.js",
+        "utils.js",
+        "domHandler.js",
+        "conversationHandler.js",
+        "checkboxManager.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ]
+}

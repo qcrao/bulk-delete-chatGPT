@@ -53,9 +53,11 @@ This extension has no build system - files are loaded directly. Changes to any `
 - Monitor browser console for errors/logs
 
 ### Deployment
-- Update `version` in `manifest.json`
-- Package as `.zip` file for Chrome Web Store submission
-- No compilation or bundling required
+- Update `version` in both `manifest.json` and `manifest.firefox.json`
+- Run `scripts/package-extensions.sh` to generate Chrome and Firefox store-upload zips
+- Run `npx --yes web-ext lint --source-dir dist/firefox --self-hosted` before release
+- The repo-local `extension-release-packaging` skill handles simple packaging requests such as "打包"
+- `dist/` is generated output and should not be committed
 
 ## Key Technical Details
 
