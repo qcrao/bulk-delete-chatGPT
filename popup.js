@@ -97,7 +97,7 @@ function resetOperationButton(buttonId) {
   button.disabled = false;
   button.classList.remove("progress");
   button.style.removeProperty("--progress");
-  button.innerHTML = getDefaultButtonContent(buttonId);
+  setDefaultButtonContent(button, buttonId);
 }
 
 const SettingsManager = {
@@ -190,23 +190,17 @@ function updateProgressBar(buttonId, progress) {
 
   if (progress === 100) {
     button.disabled = true;
-    button.innerHTML = `
-      <span class="progress-text">100%</span>
-      <span class="button-text">${actionText} Complete</span>
-    `;
+    setProgressButtonContent(button, "100%", `${actionText} Complete`);
 
     // 显示 100% 一段时间后恢复原始状态
     setTimeout(() => {
       button.disabled = false;
       button.classList.remove("progress");
-      button.innerHTML = getDefaultButtonContent(buttonId);
+      setDefaultButtonContent(button, buttonId);
     }, 500); // 1000 毫秒 = 1 秒，您可以根据需要调整这个时间
   } else {
     button.disabled = true;
-    button.innerHTML = `
-      <span class="progress-text">${progress}%</span>
-      <span class="button-text">${actionText}...</span>
-    `;
+    setProgressButtonContent(button, `${progress}%`, `${actionText}...`);
   }
 }
 
@@ -385,24 +379,44 @@ function updatePaidFeatures(isPaid) {
 function updateBulkArchiveButton(isPaid) {
   const bulkArchiveButton = document.getElementById("bulk-archive");
   if (bulkArchiveButton && !bulkArchiveButton.classList.contains("progress")) {
-    bulkArchiveButton.innerHTML = getBulkArchiveButtonContent(isPaid);
+    setBulkArchiveButtonContent(bulkArchiveButton, isPaid);
   }
 }
 
-function getDefaultButtonContent(buttonId) {
+function createTextSpan(className, textContent) {
+  const span = document.createElement("span");
+  span.className = className;
+  span.textContent = textContent;
+  return span;
+}
+
+function setDefaultButtonContent(button, buttonId) {
   if (buttonId === "bulk-archive") {
-    return getBulkArchiveButtonContent(MembershipManager.getLocalStatus());
+    setBulkArchiveButtonContent(button, MembershipManager.getLocalStatus());
+    return;
   }
 
-  return `<span class="button-text">Bulk Delete</span>`;
+  button.replaceChildren(createTextSpan("button-text", "Bulk Delete"));
 }
 
-function getBulkArchiveButtonContent(isPaid) {
+function setBulkArchiveButtonContent(button, isPaid) {
   const lockIcon = isPaid ? "" : "🔒";
-  return `
-    <span id="locked" aria-hidden="true">${lockIcon}</span>
-    <span class="button-text">Bulk Archive</span>
-  `;
+  const locked = document.createElement("span");
+  locked.id = "locked";
+  locked.setAttribute("aria-hidden", "true");
+  locked.textContent = lockIcon;
+
+  button.replaceChildren(
+    locked,
+    createTextSpan("button-text", "Bulk Archive")
+  );
+}
+
+function setProgressButtonContent(button, progressText, buttonText) {
+  button.replaceChildren(
+    createTextSpan("progress-text", progressText),
+    createTextSpan("button-text", buttonText)
+  );
 }
 
 function updateAdVisibility(isPaid) {
