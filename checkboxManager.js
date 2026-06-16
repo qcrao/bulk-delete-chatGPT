@@ -157,9 +157,25 @@
           
           // Add click handler for checkbox toggle
           conversation.addEventListener("click", (event) => {
-            if (!event.target.classList.contains(CSS_CLASSES.CHECKBOX)) {
-              this.handleConversationClick(conversation, event);
+            const clickedElement = event.target && event.target.closest
+              ? event.target
+              : null;
+            if (!clickedElement) {
+              return;
             }
+
+            if (clickedElement.classList.contains(CSS_CLASSES.CHECKBOX)) {
+              return;
+            }
+
+            const menuButton = clickedElement.closest(
+              UI_CONFIG.SELECTORS.CONVERSATION_MENU_BUTTON
+            );
+            if (menuButton) {
+              return;
+            }
+
+            this.handleConversationClick(conversation, event);
           });
 
           // Set cursor style

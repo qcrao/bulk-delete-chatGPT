@@ -72,7 +72,11 @@
         
         // Send completion signal to popup if ChromeUtils is available
         if (ChromeUtils && ChromeUtils.sendComplete) {
-          ChromeUtils.sendComplete(BUTTON_IDS.BULK_DELETE);
+          ChromeUtils.sendComplete(BUTTON_IDS.BULK_DELETE, {
+            processedCount: 0,
+            skippedCount: 1,
+            totalCount: 1
+          });
         }
         
         throw error;

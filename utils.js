@@ -10,6 +10,15 @@ if (typeof window.utilsLoaded === "undefined") {
       return new Promise(resolve => setTimeout(resolve, ms));
     },
 
+    isElementVisible(element) {
+      if (!element || element.getClientRects().length === 0) {
+        return false;
+      }
+
+      const style = window.getComputedStyle(element);
+      return style.display !== "none" && style.visibility !== "hidden";
+    },
+
     // Generate timestamp
     generateTimestamp() {
       return new Date().toISOString().replace("T", " ").substr(0, 19);
@@ -77,8 +86,12 @@ if (typeof window.utilsLoaded === "undefined") {
               .filter(([key]) => key === prefix || key.startsWith(prefix + '_'))
               .map(([, value]) => value);
             
-            const elements = parent.querySelectorAll('div[role="menuitem"]');
+            const elements = parent.querySelectorAll(UI_CONFIG.SELECTORS.MENU_ITEM);
             const element = Array.from(elements).find(el => {
+              if (!this.isElementVisible(el)) {
+                return false;
+              }
+
               const textContent = el.textContent.trim();
               return textOptions.some(text =>
                 textContent === text || textContent.includes(text)
@@ -91,10 +104,11 @@ if (typeof window.utilsLoaded === "undefined") {
             }
           } else {
             // Try CSS selector strategy
-            const element = parent.querySelector(strategy);
+            const element = Array.from(parent.querySelectorAll(strategy))
+              .find(candidate => this.isElementVisible(candidate));
             if (element) {
               console.log(`Found ${operation} button using strategy: ${strategy}`);
-              return element;
+              return element.closest(UI_CONFIG.SELECTORS.MENU_ITEM) || element;
             }
           }
         }
@@ -152,10 +166,11 @@ if (typeof window.utilsLoaded === "undefined") {
     },
 
     // Send operation complete
-    sendComplete(buttonId) {
+    sendComplete(buttonId, result = {}) {
       chrome.runtime.sendMessage({
         action: "operationComplete",
-        buttonId: buttonId
+        buttonId: buttonId,
+        ...result
       });
     }
   };

@@ -79,11 +79,13 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       if (selectedConversations.length === 0) {
         console.log(`No conversations to ${operation.toLowerCase()}.`);
         CommonUtils.removeAllCheckboxes();
-        ChromeUtils.sendComplete(buttonId);
-        return;
+        const emptyResult = { processedCount: 0, skippedCount: 0, totalCount: 0 };
+        ChromeUtils.sendComplete(buttonId, emptyResult);
+        return emptyResult;
       }
 
       console.log(`Selected conversations for ${operation}:`, selectedConversations.length);
+      ChromeUtils.sendProgress(buttonId, 0);
       
       // Send analytics event
       await APIUtils.sendEvent(EVENTS[operation.toUpperCase()], selectedConversations.length);
@@ -111,7 +113,11 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         }
 
         // Update progress
-        const progress = Math.round(((i + 1) / selectedConversations.length) * 100);
+        // Reserve 100% for a genuinely successful completion signal.
+        const progress = Math.min(
+          99,
+          Math.round(((i + 1) / selectedConversations.length) * 100)
+        );
         ChromeUtils.sendProgress(buttonId, progress);
 
         // Throttle between operations to avoid ChatGPT rate limiting.
@@ -127,7 +133,13 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       }
 
       console.log(`${operation} completed: ${processedCount} processed, ${skippedCount} skipped`);
-      ChromeUtils.sendComplete(buttonId);
+      const result = {
+        processedCount,
+        skippedCount,
+        totalCount: selectedConversations.length
+      };
+      ChromeUtils.sendComplete(buttonId, result);
+      return result;
     },
 
     // Process individual conversation
@@ -137,6 +149,9 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       const conversationElement = DOMHandler.getConversationElementFromCheckbox
         ? DOMHandler.getConversationElementFromCheckbox(checkbox)
         : checkbox.parentElement;
+      const conversationRoute = DOMHandler.getConversationRoute
+        ? DOMHandler.getConversationRoute(conversationElement)
+        : null;
       const interactiveElement = DOMHandler.findInteractiveElement(conversationElement)
         || conversationElement;
 
@@ -152,36 +167,107 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           operation === 'DELETE' ? UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT : UI_CONFIG.TIMEOUTS.ELEMENT_WAIT
         );
 
-        console.log(`2. Clicking three-dot button...`);
-        DOMHandler.dispatchPointerDownEvent(threeDotButton);
-        await CommonUtils.delay(UI_CONFIG.DELAYS.LONG);
-
-        // Find and click operation button
-        const operationButton = await this.waitForOperationButton(operation);
+        const operationButton = await this.openConversationMenu(
+          threeDotButton,
+          operation
+        );
         if (!operationButton) {
+          this.logVisibleMenuItems();
           throw new Error(`${operation} button not found`);
         }
 
+        await CommonUtils.delay(UI_CONFIG.DELAYS.MEDIUM);
         console.log(`3. Clicking ${operation.toLowerCase()} button...`);
-        operationButton.click();
+        DOMHandler.dispatchClickSequence(operationButton);
 
         if (operation === 'DELETE') {
           // Wait for confirmation and click
           const confirmButton = await CommonUtils.waitForElement(UI_CONFIG.SELECTORS.confirmDeleteButton);
           if (confirmButton) {
+            await CommonUtils.delay(UI_CONFIG.DELAYS.MEDIUM);
             console.log(`4. Clicking confirm button...`);
-            confirmButton.click();
+            DOMHandler.dispatchClickSequence(confirmButton);
             await CommonUtils.waitForElementToDisappear(UI_CONFIG.SELECTORS.confirmDeleteButton);
           }
         } else {
           await CommonUtils.delay(UI_CONFIG.DELAYS.EXTENDED);
         }
 
-        return true;
+        return await this.verifyConversationOperation(operation, conversationRoute);
       } catch (error) {
+        if (await this.verifyConversationOperation(operation, conversationRoute)) {
+          console.log(
+            `${operation} succeeded despite an interrupted DOM interaction:`,
+            conversationRoute
+          );
+          return true;
+        }
+
         console.log(`Could not complete ${operation.toLowerCase()} process:`, error);
         return false;
       }
+    },
+
+    async verifyConversationOperation(operation, conversationRoute) {
+      if (!conversationRoute) {
+        return operation !== "DELETE";
+      }
+
+      const startedAt = Date.now();
+      while (Date.now() - startedAt < UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
+        if (!DOMHandler.isConversationRoutePresent(conversationRoute)) {
+          return true;
+        }
+        await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
+      }
+
+      return false;
+    },
+
+    async openConversationMenu(menuButton, operation) {
+      console.log(`2. Opening three-dot menu with pointerdown...`);
+      DOMHandler.dispatchPointerDownEvent(menuButton);
+
+      let operationButton = await this.waitForOperationButton(
+        operation,
+        document,
+        UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT
+      );
+      if (operationButton) {
+        return operationButton;
+      }
+
+      console.log(`2b. Pointerdown did not open menu, retrying with keyboard...`);
+      DOMHandler.dispatchEnterKey(menuButton);
+      operationButton = await this.waitForOperationButton(
+        operation,
+        document,
+        UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT
+      );
+      if (operationButton) {
+        return operationButton;
+      }
+
+      console.log(`2c. Keyboard did not open menu, retrying with click sequence...`);
+      DOMHandler.dispatchClickSequence(menuButton);
+      await CommonUtils.delay(UI_CONFIG.DELAYS.LONG);
+      operationButton = await this.waitForOperationButton(operation);
+      return operationButton;
+    },
+
+    logVisibleMenuItems() {
+      const menuItems = Array.from(
+        document.querySelectorAll(UI_CONFIG.SELECTORS.MENU_ITEM)
+      ).filter((item) => CommonUtils.isElementVisible(item));
+
+      console.log(
+        "Visible menu items after opening conversation menu:",
+        menuItems.map((item) => ({
+          text: item.textContent.trim(),
+          testId: item.dataset.testid || null,
+          role: item.getAttribute("role")
+        }))
+      );
     },
 
     async waitForConversationMenuButton(conversationElement, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {

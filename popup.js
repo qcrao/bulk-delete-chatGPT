@@ -150,8 +150,7 @@ const SettingsManager = {
 async function executeBulkOperation(tabId, scriptName, buttonId) {
   const button = document.getElementById(buttonId);
   if (button) {
-    button.disabled = true;
-    button.classList.add("progress");
+    updateProgressBar(buttonId, 0);
   }
 
   try {
@@ -183,7 +182,7 @@ function updateProgressBar(buttonId, progress) {
   console.log(`Updating progress bar for ${buttonId}:`, progress);
   const button = document.getElementById(buttonId);
   button.classList.add("progress");
-  button.style.setProperty("--progress", `${progress}%`);
+  button.style.setProperty("--progress", `${progress - 100}%`);
   button.setAttribute("data-progress", progress);
 
   const actionText = buttonId === "bulk-delete" ? "Deleting" : "Archiving";
@@ -212,6 +211,20 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
     const button = document.getElementById(request.buttonId);
     button.disabled = false;
     button.classList.remove("progress");
+
+    const processedCount = Number(request.processedCount || 0);
+    const skippedCount = Number(request.skippedCount || 0);
+    if (skippedCount > 0) {
+      button.style.removeProperty("--progress");
+      button.removeAttribute("data-progress");
+      setDefaultButtonContent(button, request.buttonId);
+      alert(
+        `${processedCount} conversation(s) processed, ${skippedCount} failed. ` +
+        "Reload the ChatGPT page and check the console for details."
+      );
+      return;
+    }
+
     updateProgressBar(request.buttonId, 100);
   }
 });

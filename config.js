@@ -44,19 +44,19 @@ if (typeof window.configLoaded === "undefined") {
     },
     SELECTORS: {
       conversationsCheckbox: ".conversation-checkbox:checked",
-      confirmDeleteButton: "button.btn.btn-danger",
+      confirmDeleteButton: 'button[data-testid="delete-conversation-confirm-button"], button.btn.btn-danger',
       threeDotButton: '[id^="radix-"]',
       HISTORY: '[id^="history"]',
-      CONVERSATION_SELECTOR: "a",
+      CONVERSATION_SELECTOR: 'a[href*="/c/"]',
       PROJECT_CONVERSATION_SELECTOR: 'main li[class*="group/project-item"]',
       PROJECT_CONVERSATION_LINK_SELECTOR: 'a[href*="/c/"]',
-      TITLE_SELECTOR: ".relative.grow.overflow-hidden.whitespace-nowrap",
-      INTERACTIVE_ELEMENT_SELECTOR: "button",
-      CONVERSATION_MENU_BUTTON: 'button[data-conversation-options-trigger], button[data-trailing-button], button[id^="radix-"][aria-haspopup="menu"], button[id^="radix-"]',
-      MENU_ITEM: 'div[role="menuitem"]',
+      TITLE_SELECTOR: '[data-testid="conversation-title"], .relative.grow.overflow-hidden.whitespace-nowrap',
+      INTERACTIVE_ELEMENT_SELECTOR: '[draggable="true"], [data-sidebar-item="true"]',
+      CONVERSATION_MENU_BUTTON: 'button[data-conversation-options-trigger], button[data-testid="conversation-options-button"], button[data-testid$="-options"][aria-haspopup="menu"], button[id^="radix-"][aria-haspopup="menu"]',
+      MENU_ITEM: '[role="menuitem"]',
       // Improved selectors for language-independent detection
-      DELETE_BUTTON: 'div[role="menuitem"]:last-child, div[role="menuitem"] .text-token-text-error, div[role="menuitem"][data-testid*="delete"]',
-      ARCHIVE_BUTTON: 'div[role="menuitem"]:nth-last-child(2), div[role="menuitem"][data-testid*="archive"]'
+      DELETE_BUTTON: '[data-testid="delete-chat-menu-item"], [role="menuitem"][data-testid*="delete"], [role="menuitem"]:last-child',
+      ARCHIVE_BUTTON: '[data-testid="archive-chat-menu-item"], [role="menuitem"][data-testid*="archive"], [role="menuitem"]:nth-last-child(2)'
     },
     STRINGS: {
       // Delete button texts
@@ -119,22 +119,24 @@ if (typeof window.configLoaded === "undefined") {
     // Button detection strategies (order of preference)
     BUTTON_STRATEGIES: {
       DELETE: [
-        // Strategy 1: Text matching (most reliable)
+        // Strategy 1: Stable ChatGPT test ID
+        '[data-testid="delete-chat-menu-item"]',
+        // Strategy 2: Text matching for localized UIs
         'text-fallback',
-        // Strategy 2: Look for error/danger styling
-        'div[role="menuitem"] .text-token-text-error',
-        // Strategy 3: Data attributes
-        'div[role="menuitem"][data-testid*="delete"]',
+        // Strategy 3: Other delete-related test IDs
+        '[role="menuitem"][data-testid*="delete"]',
         // Strategy 4: Last menu item (delete is typically last)
-        'div[role="menuitem"]:last-child'
+        '[role="menuitem"]:last-child'
       ],
       ARCHIVE: [
-        // Strategy 1: Text matching (most reliable)
+        // Strategy 1: Stable ChatGPT test ID
+        '[data-testid="archive-chat-menu-item"]',
+        // Strategy 2: Text matching for localized UIs
         'text-fallback',
-        // Strategy 2: Data attributes
-        'div[role="menuitem"][data-testid*="archive"]',
-        // Strategy 3: Second to last menu item
-        'div[role="menuitem"]:nth-last-child(2)'
+        // Strategy 3: Other archive-related test IDs
+        '[role="menuitem"][data-testid*="archive"]',
+        // Strategy 4: Second to last menu item
+        '[role="menuitem"]:nth-last-child(2)'
       ]
     }
   };
