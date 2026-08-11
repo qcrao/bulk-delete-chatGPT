@@ -35,9 +35,14 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
       const delayConfig = UI_CONFIG.OPERATION_DELAY;
       const multiplier = 1 + batchIndex * delayConfig.INTRA_BATCH_GROWTH;
-      return Math.min(
-        delayConfig.MAX_INTRA_BATCH_DELAY_MS,
-        Math.round(settings.baseDelayMs * multiplier)
+      // Auto slowdown must never drop below the user's chosen base delay,
+      // even when the growth cap is smaller than a large base delay.
+      return Math.max(
+        settings.baseDelayMs,
+        Math.min(
+          delayConfig.MAX_INTRA_BATCH_DELAY_MS,
+          Math.round(settings.baseDelayMs * multiplier)
+        )
       );
     },
 
@@ -51,9 +56,12 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         delayConfig.BATCH_COOLDOWN_BASE_MULTIPLIER +
         completedBatchIndex * delayConfig.BATCH_COOLDOWN_GROWTH_MULTIPLIER;
 
-      return Math.min(
-        delayConfig.MAX_BATCH_COOLDOWN_MS,
-        Math.round(settings.baseDelayMs * multiplier)
+      return Math.max(
+        settings.baseDelayMs,
+        Math.min(
+          delayConfig.MAX_BATCH_COOLDOWN_MS,
+          Math.round(settings.baseDelayMs * multiplier)
+        )
       );
     },
 

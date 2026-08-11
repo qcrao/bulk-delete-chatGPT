@@ -15,7 +15,7 @@ const DELAY_SETTINGS_CONFIG = {
     autoSlowdown: true
   },
   minBaseDelayMs: 300,
-  maxBaseDelayMs: 10000,
+  maxBaseDelayMs: 60000,
   batchSize: 10
 };
 
@@ -282,8 +282,16 @@ async function initializeSettings() {
       return;
     }
 
-    const secondBatchDelay = Math.round(settings.baseDelayMs * 1.25);
-    const firstCooldown = settings.baseDelayMs * 3;
+    // Mirror the clamping done in conversationHandler.js: growth is capped,
+    // but the delay never drops below the user's chosen base delay.
+    const secondBatchDelay = Math.max(
+      settings.baseDelayMs,
+      Math.min(8000, Math.round(settings.baseDelayMs * 1.25))
+    );
+    const firstCooldown = Math.max(
+      settings.baseDelayMs,
+      Math.min(30000, settings.baseDelayMs * 3)
+    );
     delayPreview.textContent =
       `First 10: ${settings.baseDelayMs} ms each. Next batch: ${secondBatchDelay} ms each, with ${firstCooldown} ms cooldown between batches.`;
   }
