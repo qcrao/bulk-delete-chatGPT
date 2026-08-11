@@ -15,7 +15,7 @@ const DELAY_SETTINGS_CONFIG = {
     autoSlowdown: true
   },
   minBaseDelayMs: 300,
-  maxBaseDelayMs: 10000,
+  maxBaseDelayMs: 60000,
   batchSize: 10
 };
 
