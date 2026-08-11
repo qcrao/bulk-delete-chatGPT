@@ -11,7 +11,7 @@ if (typeof window.configLoaded === "undefined") {
       CHECK_PAYMENT: "/check-payment-status",
       PAY_BULK_ARCHIVE: "/pay-bulk-archive"
     },
-    TIMEOUT: 10000
+    TIMEOUT: 60000
   };
 
   // UI Configuration
@@ -30,7 +30,7 @@ if (typeof window.configLoaded === "undefined") {
       BATCH_SIZE: 10,
       DEFAULT_BASE_DELAY_MS: 1200,
       MIN_BASE_DELAY_MS: 300,
-      MAX_BASE_DELAY_MS: 10000,
+      MAX_BASE_DELAY_MS: 60000,
       DEFAULT_AUTO_SLOWDOWN: true,
       INTRA_BATCH_GROWTH: 0.25,
       BATCH_COOLDOWN_BASE_MULTIPLIER: 3,
