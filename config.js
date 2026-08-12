@@ -30,7 +30,7 @@ if (typeof window.configLoaded === "undefined") {
       BATCH_SIZE: 10,
       DEFAULT_BASE_DELAY_MS: 1200,
       MIN_BASE_DELAY_MS: 300,
-      MAX_BASE_DELAY_MS: 60000,
+      MAX_BASE_DELAY_MS: 600000,
       DEFAULT_AUTO_SLOWDOWN: true,
       INTRA_BATCH_GROWTH: 0.25,
       BATCH_COOLDOWN_BASE_MULTIPLIER: 3,
