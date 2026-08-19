@@ -18,7 +18,7 @@
   },
   "browser_specific_settings": {
     "gecko": {
-      "id": "chatgpt-bulk-delete@qcrao.com",
+      "id": "BulkDeleteChatGPT-qrcao@github.com",
       "data_collection_permissions": {
         "required": ["personallyIdentifyingInfo"]
       }
