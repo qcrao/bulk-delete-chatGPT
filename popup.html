@@ -53,6 +53,13 @@
           </button>
         </div>
         <div class="settings-row">
+          <label for="deleteModeSelect">Deletion method</label>
+          <select id="deleteModeSelect" class="settings-select">
+            <option value="api">API Call</option>
+            <option value="dom">DOM Click</option>
+          </select>
+        </div>
+        <div class="settings-row" style="margin-top: 10px;">
           <label for="operationDelayInput">Delay per conversation</label>
           <div class="delay-input-wrapper">
             <input

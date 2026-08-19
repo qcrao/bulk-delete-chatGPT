@@ -12,7 +12,8 @@ const DELAY_SETTINGS_CONFIG = {
   storageKey: "BulkDeleteChatGPT_delaySettings",
   defaults: {
     baseDelayMs: 1200,
-    autoSlowdown: true
+    autoSlowdown: true,
+    deleteMode: "api"
   },
   minBaseDelayMs: 300,
   maxBaseDelayMs: 600000,
@@ -115,12 +116,17 @@ const SettingsManager = {
       )
     );
 
+    const deleteMode = ["dom", "api"].includes(settings.deleteMode)
+      ? settings.deleteMode
+      : DELAY_SETTINGS_CONFIG.defaults.deleteMode;
+
     return {
       baseDelayMs: Math.round(baseDelayMs),
       autoSlowdown:
         typeof settings.autoSlowdown === "boolean"
           ? settings.autoSlowdown
-          : DELAY_SETTINGS_CONFIG.defaults.autoSlowdown
+          : DELAY_SETTINGS_CONFIG.defaults.autoSlowdown,
+      deleteMode: deleteMode
     };
   },
 
@@ -249,6 +255,7 @@ function initializeButtons() {
 async function initializeSettings() {
   const settingsButton = document.getElementById("settings-button");
   const settingsPanel = document.getElementById("settingsPanel");
+  const deleteModeSelect = document.getElementById("deleteModeSelect");
   const operationDelayInput = document.getElementById("operationDelayInput");
   const autoSlowdownInput = document.getElementById("autoSlowdownInput");
   const delayPreview = document.getElementById("delayPreview");
@@ -268,6 +275,7 @@ async function initializeSettings() {
   }
 
   const applySettingsToForm = (settings) => {
+    if (deleteModeSelect) deleteModeSelect.value = settings.deleteMode;
     operationDelayInput.value = settings.baseDelayMs;
     autoSlowdownInput.checked = settings.autoSlowdown;
     updateDelayPreview();
@@ -276,7 +284,8 @@ async function initializeSettings() {
   const readSettingsFromForm = () => {
     return SettingsManager.sanitize({
       baseDelayMs: operationDelayInput.value,
-      autoSlowdown: autoSlowdownInput.checked
+      autoSlowdown: autoSlowdownInput.checked,
+      deleteMode: deleteModeSelect ? deleteModeSelect.value : "api"
     });
   };
 
