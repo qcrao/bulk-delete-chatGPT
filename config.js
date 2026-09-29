@@ -44,7 +44,9 @@ if (typeof window.configLoaded === "undefined") {
     },
     SELECTORS: {
       conversationsCheckbox: ".conversation-checkbox:checked",
-      confirmDeleteButton: 'button[data-testid="delete-conversation-confirm-button"], button.btn.btn-danger',
+      // Newer ChatGPT dialogs use a destructive submit button without a test ID.
+      // Exclude hidden dialogs left behind by an interrupted delete operation.
+      confirmDeleteButton: 'button[data-testid="delete-conversation-confirm-button"], button.btn.btn-danger, [role="dialog"][data-state="open"]:not([aria-hidden="true"]) form button[type="submit"].text-chart-red',
       threeDotButton: '[id^="radix-"]',
       HISTORY: '[id^="history"]',
       CONVERSATION_SELECTOR: 'a[href*="/c/"]',

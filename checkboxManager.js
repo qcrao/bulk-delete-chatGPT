@@ -95,13 +95,22 @@
 
           const checkbox = this.createCheckbox(index);
           checkbox.checked = isChecked;
+          // !important guards against ChatGPT's global resets (e.g.
+          // `appearance: none` on inputs), which render the checkbox invisible.
           checkbox.style.cssText = `
-            position: absolute;
-            left: 6px;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 10;
-            margin: 0;
+            position: absolute !important;
+            left: 6px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            z-index: 10 !important;
+            margin: 0 !important;
+            width: 16px !important;
+            height: 16px !important;
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            appearance: auto !important;
+            pointer-events: auto !important;
             cursor: pointer;
           `;
 
