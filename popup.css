@@ -267,18 +267,15 @@ button#bulk-archive {
 .nav-ad {
   position: relative;
   overflow: visible;
-  background: linear-gradient(135deg, #ff6b9d 0%, #c850c0 50%, #4158d0 100%);
-  background-size: 200% 200%;
-  animation: nav-ad-shimmer 6s ease infinite;
-  color: white;
+  background: radial-gradient(circle at 90% 20%, rgba(255, 185, 84, 0.16), transparent 50%), #302536;
+  color: #fff8e7;
   flex-grow: 0;
   width: auto;
-  padding: 10px 14px;
+  padding: 12px 14px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  box-shadow: 0 6px 16px rgba(200, 80, 192, 0.45),
-    0 2px 6px rgba(65, 88, 208, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  border: 1px solid #98735e;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.22);
+  text-shadow: none;
 }
 
 .nav-ad .ads-badge {
@@ -308,32 +305,67 @@ button#bulk-archive {
 .nav-ad .button-content {
   flex-direction: row;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   position: relative;
-  gap: 8px;
+  gap: 12px;
   width: 100%;
 }
 
+.comicory-art {
+  width: 48px;
+  height: 52px;
+  flex-shrink: 0;
+  transform: rotate(-7deg);
+  filter: drop-shadow(2px 3px 0 rgba(0, 0, 0, 0.25));
+  transition: transform 0.2s ease;
+}
+
+.comicory-copy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
 .nav-ad .title {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 19px;
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.5px;
 }
 
 .nav-ad .description {
-  display: none;
+  display: block;
+  color: #ffcf85;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1.4;
 }
 
-.nav-ad .emoji {
-  position: static;
-  transform: none;
-  font-size: 16px;
+.comicory-tagline {
+  color: #dfd1df;
+  font-size: 10px;
+  line-height: 1.4;
+  font-weight: 400;
+}
+
+.comicory-arrow {
+  margin-left: auto;
+  color: #ffcf85;
+  font-size: 22px;
 }
 
 .nav-ad:hover {
-  border-color: rgba(255, 255, 255, 0.55);
-  box-shadow: 0 8px 22px rgba(200, 80, 192, 0.6),
-    0 3px 8px rgba(65, 88, 208, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  border-color: #ffcf85;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.3);
+}
+
+.nav-ad:hover .comicory-art {
+  transform: rotate(-3deg) translateY(-1px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .comicory-art { transition: none; }
 }
 
 .nav-ad-container[hidden] {
