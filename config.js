@@ -38,6 +38,12 @@ if (typeof window.configLoaded === "undefined") {
       MAX_INTRA_BATCH_DELAY_MS: 8000,
       MAX_BATCH_COOLDOWN_MS: 30000
     },
+    DELETE_MODE: {
+      STORAGE_KEY: "BulkDeleteChatGPT_deleteMode",
+      DOM: "dom",
+      API: "api",
+      DEFAULT: "api"
+    },
     TIMEOUTS: {
       ELEMENT_WAIT: 2000,
       ELEMENT_WAIT_SHORT: 1000

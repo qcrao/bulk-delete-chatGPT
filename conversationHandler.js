@@ -150,6 +150,68 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       return result;
     },
 
+    getDeleteMode() {
+      const operationSettings = window.ChatGPTBulkDeleteOperationSettings || {};
+      if (operationSettings.deleteMode === "dom" || operationSettings.deleteMode === "api") {
+        return operationSettings.deleteMode;
+      }
+      return UI_CONFIG.DELETE_MODE ? UI_CONFIG.DELETE_MODE.DEFAULT : "api";
+    },
+
+    async getChatGPTAccessToken() {
+      if (this._cachedAccessToken) {
+        return this._cachedAccessToken;
+      }
+      try {
+        const res = await fetch('/api/auth/session');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.accessToken) {
+            this._cachedAccessToken = data.accessToken;
+            return data.accessToken;
+          }
+        }
+      } catch (e) {
+        console.warn('[BulkDelete] Failed to fetch ChatGPT session token:', e);
+      }
+      return null;
+    },
+
+    async deleteConversationViaApi(chatId) {
+      const token = await this.getChatGPTAccessToken();
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+
+      const response = await fetch(`/backend-api/conversation/id/${chatId}`, {
+        method: 'DELETE',
+        headers: headers,
+        credentials: 'include',
+        body: JSON.stringify({ is_visible: false })
+      });
+
+      if (!response.ok) {
+        throw new Error(`API Delete failed for ${chatId} with status ${response.status}`);
+      }
+      return true;
+    },
+
+    extractChatId(conversationElement, conversationRoute) {
+      if (conversationRoute) {
+        const match = conversationRoute.match(/\/c\/([^\/\?#]+)/);
+        if (match) return match[1];
+      }
+      const link = DOMHandler.getConversationLink ? DOMHandler.getConversationLink(conversationElement) : null;
+      if (link && link.href) {
+        const match = link.href.match(/\/c\/([^\/\?#]+)/);
+        if (match) return match[1];
+      }
+      return null;
+    },
+
     // Process individual conversation
     async processConversation(operation, checkbox) {
       await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
@@ -160,6 +222,28 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       const conversationRoute = DOMHandler.getConversationRoute
         ? DOMHandler.getConversationRoute(conversationElement)
         : null;
+
+      const deleteMode = this.getDeleteMode();
+
+      if (operation === 'DELETE' && deleteMode === 'api') {
+        const chatId = this.extractChatId(conversationElement, conversationRoute);
+        if (chatId) {
+          console.log(`[API Delete] Deleting conversation ${chatId} via direct API call...`);
+          try {
+            await this.deleteConversationViaApi(chatId);
+            console.log(`[API Delete] Successfully deleted ${chatId} via API.`);
+            if (conversationElement && conversationElement.remove) {
+              conversationElement.remove();
+            }
+            return true;
+          } catch (apiError) {
+            console.warn(`[API Delete] API deletion failed for ${chatId}, falling back to DOM click mode:`, apiError);
+          }
+        } else {
+          console.warn('[API Delete] Could not extract chatId, falling back to DOM click mode');
+        }
+      }
+
       const interactiveElement = DOMHandler.findInteractiveElement(conversationElement)
         || conversationElement;
 
