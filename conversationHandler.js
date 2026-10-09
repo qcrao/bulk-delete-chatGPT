@@ -92,6 +92,14 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         return emptyResult;
       }
 
+      // Free plan: the popup passes maxPerRun; only the first N selected are processed.
+      const maxPerRun = Number((window.ChatGPTBulkDeleteOperationSettings || {}).maxPerRun);
+      let limitedFrom = 0;
+      if (Number.isFinite(maxPerRun) && maxPerRun > 0 && selectedConversations.length > maxPerRun) {
+        limitedFrom = selectedConversations.length;
+        selectedConversations = selectedConversations.slice(0, maxPerRun);
+      }
+
       console.log(`Selected conversations for ${operation}:`, selectedConversations.length);
       ChromeUtils.sendProgress(buttonId, 0);
       
@@ -144,7 +152,8 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       const result = {
         processedCount,
         skippedCount,
-        totalCount: selectedConversations.length
+        totalCount: selectedConversations.length,
+        limitedFrom
       };
       ChromeUtils.sendComplete(buttonId, result);
       return result;

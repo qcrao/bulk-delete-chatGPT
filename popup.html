@@ -6,62 +6,267 @@
     <title>ChatGPT Bulk Delete</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
-  <body>
-    <div class="header">
-      <h1>ChatGPT Bulk Delete</h1>
-    </div>
-    <div class="main-card">
-      <div class="buttons-wrapper">
-        <div class="section checkbox-section">
-          <h2 class="section-title">Checkbox Operations</h2>
-          <div class="buttons-row">
-            <div class="button-container">
-              <button id="add-checkboxes">
-                <span>Add</span><br /><span>Checkboxes</span>
-              </button>
-              <span class="tooltip-trigger" aria-label="information"
-                >i
-                <span class="tooltip-content"
-                  >Hold Shift to select </br> multiple conversations.</span
-                >
-              </span>
-            </div>
-            <button id="remove-checkboxes">
-              <span>Remove</span><br /><span>Checkboxes</span>
-            </button>
-          </div>
-          <button id="toggle-checkboxes">Toggle Checkboxes</button>
-        </div>
+  <body data-view="loading">
+    <!-- Loading -->
+    <section class="view view-loading" data-view-name="loading" aria-busy="true">
+      <div class="spinner" aria-hidden="true"></div>
+    </section>
 
-        <div class="section bulk-section">
-          <h2 class="section-title">Bulk Operations</h2>
-          <button id="bulk-archive" data-progress="0">
-            <span id="locked" aria-hidden="true">🔒</span>
-            <span class="button-text">Bulk Archive</span>
-          </button>
-          <button id="bulk-delete" data-progress="0">Bulk Delete</button>
+    <!-- Sign in (required) -->
+    <section class="view view-signin" data-view-name="signin">
+      <div class="signin-body">
+        <div class="app-mark app-mark-lg" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M6 6l1 14h10l1-14"></path></svg>
+        </div>
+        <h1 class="display">Sign in to start cleaning up ChatGPT</h1>
+        <p class="muted">Free accounts get one bulk delete a day. Your plan follows your Google account to every browser.</p>
+      </div>
+      <div class="signin-actions">
+        <button id="googleSignIn" class="btn btn-google" type="button">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.6 5.4 2.7 13.3l7.9 6.1C12.5 13.6 17.8 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.1 24.6c0-1.6-.1-3.1-.4-4.6H24v9h12.4c-.5 2.9-2.2 5.3-4.6 6.9l7.4 5.7c4.3-4 6.9-9.9 6.9-17z"></path><path fill="#FBBC05" d="M10.5 28.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-7.9-6.1C1 16.6 0 20.2 0 24s1 7.4 2.7 10.7l7.8-6.1z"></path><path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.4-5.7c-2.1 1.4-4.8 2.3-8.5 2.3-6.2 0-11.5-4.1-13.4-9.8l-7.9 6.1C6.6 42.6 14.6 48 24 48z"></path></svg>
+          <span>Continue with Google</span>
+        </button>
+        <p id="signInError" class="error-text" hidden></p>
+      </div>
+      <div class="callout">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8z"></path></svg>
+        <div class="callout-body">
+          <p><strong>Paid $0.99 before?</strong> Sign in with the Google account that uses the email you paid with, and you'll be upgraded to Lifetime automatically. Forgot that email? Send your receipt to:</p>
+          <div class="copy-row">
+            <span class="copy-value" id="supportEmail">support@qcrao.com</span>
+            <button type="button" class="copy-button" id="copySupportEmail">Copy</button>
+          </div>
         </div>
       </div>
+      <p class="legal">We only read your email address. By continuing you agree to the <a href="https://bulk-delete-chatgpt.qcrao.com/terms" target="_blank">Terms</a> and <a href="https://bulk-delete-chatgpt.qcrao.com/privacy" target="_blank">Privacy Policy</a>.</p>
+    </section>
+
+    <!-- Main -->
+    <section class="view view-main" data-view-name="main">
+      <header class="topbar">
+        <div class="brand">
+          <div class="app-mark" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M6 6l1 14h10l1-14"></path></svg>
+          </div>
+          <span class="brand-name">Bulk Delete</span>
+          <span id="proBadge" class="pro-tag" hidden>PRO</span>
+        </div>
+        <button id="accountButton" class="account-chip" type="button" aria-label="Account">
+          <span id="avatar" class="avatar">?</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg>
+        </button>
+      </header>
+
+      <button id="freePlanStrip" class="plan-strip" type="button" hidden>
+        <span class="plan-strip-copy">
+          <span class="eyebrow">Free plan</span>
+          <span id="freePlanText">1 free run today · up to 10 chats</span>
+        </span>
+        <span class="plan-strip-cta">Go Pro</span>
+      </button>
+
+      <main class="card">
+        <section class="group">
+          <details class="howto" id="howto" open>
+            <summary class="group-head">
+              <h2 class="group-title">Select chats</h2>
+              <span class="howto-toggle">How it works<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></span>
+            </summary>
+            <ol class="steps">
+              <li><strong>Add</strong> puts a checkbox next to every chat in the ChatGPT sidebar.</li>
+              <li>Tick the chats you want. Shift-click to select a range.</li>
+              <li>Run a bulk action below.</li>
+            </ol>
+          </details>
+          <div class="select-row">
+            <button id="add-checkboxes" class="btn btn-blue" type="button" title="Add checkboxes to the ChatGPT sidebar">Add</button>
+            <button id="toggle-checkboxes" class="btn btn-indigo" type="button" title="Select all / unselect all checkboxes">Toggle</button>
+            <button id="remove-checkboxes" class="btn btn-ghost" type="button" title="Remove the checkboxes">Remove</button>
+          </div>
+          <div class="select-labels" aria-hidden="true">
+            <span>Show boxes</span><span>Select all / none</span><span>Hide boxes</span>
+          </div>
+        </section>
+
+        <div class="divider"></div>
+
+        <section class="group">
+          <h2 class="group-title">Bulk actions</h2>
+          <button id="bulk-archive" class="btn btn-op btn-archive" type="button" data-progress="0"></button>
+          <button id="bulk-delete" class="btn btn-op btn-delete" type="button" data-progress="0"></button>
+        </section>
+      </main>
+
+      <p id="mainNotice" class="notice" hidden></p>
+      <p id="proNote" class="pro-note" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>
+        <span id="proNoteText">Pro · unlimited conversations · no ads</span>
+      </p>
+
+      <div class="spacer"></div>
+
+      <div id="navAdContainer" class="nav-ad" hidden>
+        <span class="ads-badge">Ad</span>
+        <a href="https://comicory.com/?utm_source=chatgpt_bulk_delete&amp;utm_medium=extension&amp;utm_campaign=popup_ad"
+           target="_blank" id="myNavAd" class="nav-ad-link">
+          <svg class="comicory-art" viewBox="0 0 56 60" aria-hidden="true">
+            <rect x="3" y="3" width="49" height="54" rx="5" fill="#fff8e7" stroke="#292331" stroke-width="2.5"/>
+            <path d="M8 9h21v22H8z" fill="#ffb854" stroke="#292331" stroke-width="2"/>
+            <path d="M33 9h14v22H33z" fill="#b7a5f5" stroke="#292331" stroke-width="2"/>
+            <path d="M8 35h39v16H8z" fill="#86cfc4" stroke="#292331" stroke-width="2"/>
+            <path d="m11 48 9-10 7 7 6-5 11 8" fill="none" stroke="#292331" stroke-width="2" stroke-linejoin="round"/>
+          </svg>
+          <span class="nav-ad-copy">
+            <span class="nav-ad-title">Comicory</span>
+            <span class="nav-ad-desc">AI comic maker · Turn ideas into comics</span>
+          </span>
+        </a>
+        <button id="closeAdButton" class="link-button" type="button" title="Remove ads with Pro">Hide</button>
+      </div>
+
+      <footer class="footer">
+        <button id="settings-button" class="icon-button" type="button" title="Settings" aria-label="Settings">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"></path></svg>
+        </button>
+        <a href="#" class="version-badge" id="version-badge" title="Check for updates">v</a>
+        <a href="https://github.com/sponsors/qcrao" target="_blank" id="sponsorLink" class="icon-button donate" title="Donate" aria-label="Donate">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.5-9.3C1.2 8.5 3.4 4.5 7.2 4.5c2 0 3.5 1 4.8 2.7 1.3-1.7 2.8-2.7 4.8-2.7 3.8 0 6 4 4.7 7.2C19.5 16.4 12 21 12 21Z"></path></svg>
+        </a>
+      </footer>
+    </section>
+
+    <!-- Pricing -->
+    <section class="view view-pricing" data-view-name="pricing">
+      <header class="subbar">
+        <button class="icon-button back-button" type="button" data-back aria-label="Back">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <span class="pro-tag">PRO</span>
+      </header>
+      <div class="pricing-head">
+        <h1 class="display">Clean up ChatGPT without limits</h1>
+        <ul class="checklist">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Unlimited conversations per run</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Bulk Archive</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>No ads</li>
+        </ul>
+      </div>
+      <div class="plans" role="radiogroup" aria-label="Choose a plan">
+        <button class="plan" type="button" role="radio" data-plan="monthly" aria-checked="false">
+          <span class="radio" aria-hidden="true"></span>
+          <span class="plan-copy"><span class="plan-name">Monthly</span><span class="plan-sub">Billed monthly · cancel anytime</span></span>
+          <span class="plan-price"><b>$4.9</b><small>/mo</small></span>
+        </button>
+        <button class="plan" type="button" role="radio" data-plan="yearly" aria-checked="true">
+          <span class="radio" aria-hidden="true"></span>
+          <span class="plan-copy"><span class="plan-name">Yearly <span class="pro-tag">SAVE 66%</span></span><span class="plan-sub">$1.66 / month, billed yearly</span></span>
+          <span class="plan-price"><b>$19.9</b><small>/yr</small></span>
+        </button>
+        <button class="plan" type="button" role="radio" data-plan="lifetime" aria-checked="false">
+          <span class="radio" aria-hidden="true"></span>
+          <span class="plan-copy"><span class="plan-name">Lifetime <span class="pro-tag">BEST VALUE</span></span><span id="lifetimeSub" class="plan-sub">Pay once, yours forever</span></span>
+          <span class="plan-price"><b id="lifetimePrice">$39.9</b></span>
+        </button>
+      </div>
+      <div class="spacer"></div>
+      <div class="pricing-actions">
+        <button id="checkoutButton" class="btn btn-gold" type="button">Continue · $19.90 / year</button>
+        <p id="checkoutFine" class="fine">Renews automatically · Cancel anytime · Secure checkout by Stripe</p>
+        <p id="checkoutError" class="error-text" hidden></p>
+      </div>
+    </section>
+
+    <!-- Account -->
+    <section class="view view-account" data-view-name="account">
+      <header class="subbar">
+        <button class="icon-button back-button" type="button" data-back aria-label="Back">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 18-6-6 6-6"></path></svg>
+        </button>
+        <span class="subbar-title">Account</span>
+      </header>
+      <div class="profile">
+        <span id="accountAvatar" class="avatar avatar-lg">?</span>
+        <div class="profile-copy">
+          <span id="accountName" class="profile-name"></span>
+          <span id="accountEmail" class="muted"></span>
+        </div>
+      </div>
+      <section class="card plan-card">
+        <div class="group-head">
+          <h2 class="group-title">Plan</h2>
+          <span id="planStatus" class="status"><span class="dot"></span><span id="planStatusText">Active</span></span>
+        </div>
+        <div class="plan-line">
+          <span id="planName" class="display-sm">Free</span>
+          <span id="planPrice" class="muted"></span>
+        </div>
+        <p id="planDetail" class="muted small"></p>
+        <div id="planActions" class="two-col">
+          <button id="manageBilling" class="btn btn-ghost" type="button">Manage billing</button>
+          <button id="goLifetime" class="btn btn-gold" type="button">Go Lifetime</button>
+        </div>
+        <button id="upgradeFromAccount" class="btn btn-gold" type="button" hidden>See Pro plans</button>
+        <p id="upgradeNote" class="fine left" hidden></p>
+      </section>
+      <nav class="card list" aria-label="Account actions">
+        <a class="list-row" href="mailto:support@qcrao.com?subject=ChatGPT%20Bulk%20Delete%20-%20I%20paid%20before&amp;body=Please%20attach%20your%20%240.99%20payment%20receipt%20and%20tell%20us%20which%20Google%20account%20you%20sign%20in%20with." target="_blank">
+          <span class="list-copy"><span>I paid before</span><span class="muted small">Send your $0.99 receipt to restore Lifetime</span></span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a>
+        <a class="list-row" href="mailto:support@qcrao.com?subject=ChatGPT%20Bulk%20Delete" target="_blank">
+          <span>Contact support</span>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
+        </a>
+        <button id="signOutButton" class="list-row danger" type="button">Sign out</button>
+      </nav>
+      <div class="spacer"></div>
+      <p class="legal">Signed in with Google · <span id="accountVersion"></span></p>
+    </section>
+
+    <!-- Legacy upgrade celebration -->
+    <section class="view view-legacy" data-view-name="legacy">
+      <div class="legacy-body">
+        <div class="medal" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3 6.5 7 .8-5.2 4.8 1.4 7L12 17.6 5.8 21l1.4-7L2 9.3l7-.8z"></path></svg>
+        </div>
+        <span class="eyebrow">Thank you, early supporter</span>
+        <h1 class="display">You're on Lifetime now</h1>
+        <p class="muted">Your earlier $0.99 purchase has been upgraded to the Lifetime plan, at no extra cost.</p>
+        <ul class="checklist card">
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Unlimited Bulk Delete</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>Bulk Archive</li>
+          <li><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"></path></svg>No ads, on every browser you sign in to</li>
+        </ul>
+      </div>
+      <div class="pricing-actions">
+        <button id="legacyContinue" class="btn btn-gold" type="button">Start cleaning up</button>
+      </div>
+    </section>
+
+    <!-- Daily limit sheet -->
+    <div id="limitSheet" class="sheet-backdrop" hidden>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="limitTitle">
+        <div class="sheet-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="13" r="8"></circle><path d="M12 9v4l2.5 2"></path><path d="M9 2h6"></path></svg>
+        </div>
+        <h1 id="limitTitle" class="display-sm">Today's free run is used</h1>
+        <p id="limitText" class="muted">Go Pro to delete and archive as much as you like, right now.</p>
+        <button id="limitUpgrade" class="btn btn-gold" type="button">See Pro plans · from $4.9</button>
+        <button id="limitDismiss" class="link-button wide" type="button">Maybe tomorrow</button>
+      </section>
     </div>
 
+    <!-- Settings -->
     <div id="settingsPanel" class="settings-panel" hidden>
       <div class="settings-panel-inner">
         <div class="settings-panel-header">
           <span class="settings-panel-title">Settings</span>
-          <button id="settingsClose" class="settings-close" type="button" aria-label="Close settings">
-            &times;
-          </button>
+          <button id="settingsClose" class="settings-close" type="button" aria-label="Close settings">&times;</button>
         </div>
         <div class="settings-row">
           <label for="operationDelayInput">Delay per conversation</label>
           <div class="delay-input-wrapper">
-            <input
-              id="operationDelayInput"
-              type="number"
-              min="300"
-              max="600000"
-              step="100"
-            />
+            <input id="operationDelayInput" type="number" min="300" max="600000" step="100" />
             <span>ms</span>
           </div>
         </div>
@@ -71,78 +276,12 @@
         </label>
         <p id="delayPreview" class="delay-preview"></p>
         <div class="settings-actions">
-          <button id="resetDelaySettings" type="button">Reset</button>
-          <button id="saveDelaySettings" type="button">Save</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="navAdContainer" class="nav-ad-container" hidden>
-      <a href="https://comicory.com/?utm_source=chatgpt_bulk_delete&amp;utm_medium=extension&amp;utm_campaign=popup_ad"
-         target="_blank"
-         id="myNavAd"
-         class="footer-button nav-ad">
-        <span class="ads-badge">Ad</span>
-        <div class="button-content">
-          <svg class="comicory-art" viewBox="0 0 56 60" aria-hidden="true">
-            <rect x="3" y="3" width="49" height="54" rx="5" fill="#fff8e7" stroke="#292331" stroke-width="2.5"/>
-            <path d="M8 9h21v22H8z" fill="#ffb854" stroke="#292331" stroke-width="2"/>
-            <path d="M33 9h14v22H33z" fill="#b7a5f5" stroke="#292331" stroke-width="2"/>
-            <path d="M8 35h39v16H8z" fill="#86cfc4" stroke="#292331" stroke-width="2"/>
-            <path d="m19 12 2 5 5 1-4 4 1 5-4-3-5 3 1-5-4-4 6-1z" fill="#fff8e7"/>
-            <path d="M36 14h8v7h-3l-3 4v-4h-2z" fill="#fff8e7"/>
-            <path d="m11 48 9-10 7 7 6-5 11 8" fill="none" stroke="#292331" stroke-width="2" stroke-linejoin="round"/>
-          </svg>
-          <span class="comicory-copy">
-            <span class="title">Comicory</span>
-            <span class="description">AI Comic Maker</span>
-            <span class="comicory-tagline">Turn ideas into comics</span>
-          </span>
-          <span class="comicory-arrow" aria-hidden="true">↗</span>
-        </div>
-      </a>
-      <button id="closeAdButton" class="ad-close-button" title="Remove ads" aria-label="Remove ads">
-        &times;
-      </button>
-    </div>
-
-    <div class="footer">
-      <button id="settings-button" class="settings-button" title="Settings" aria-label="Settings">
-        <svg aria-hidden="true" viewBox="0 0 24 24">
-          <path d="M19.4 13.5c.1-.5.1-1 .1-1.5s0-1-.1-1.5l2-1.5-2-3.4-2.4 1a7.7 7.7 0 0 0-2.6-1.5L14 2.5h-4l-.4 2.6A7.7 7.7 0 0 0 7 6.6l-2.4-1-2 3.4 2 1.5c-.1.5-.1 1-.1 1.5s0 1 .1 1.5l-2 1.5 2 3.4 2.4-1a7.7 7.7 0 0 0 2.6 1.5l.4 2.6h4l.4-2.6a7.7 7.7 0 0 0 2.6-1.5l2.4 1 2-3.4-2-1.5ZM12 15.5A3.5 3.5 0 1 1 12 8a3.5 3.5 0 0 1 0 7.5Z"/>
-        </svg>
-      </button>
-      <a href="#" class="version-badge" id="version-badge" title="Check for updates">v</a>
-      <a href="https://github.com/sponsors/qcrao"
-         target="_blank"
-         id="sponsorLink"
-         class="donate-button"
-         title="Donate"
-         aria-label="Donate">
-        <svg aria-hidden="true" viewBox="0 0 16 16">
-          <path d="m8 14.25.345.666a.75.75 0 0 1-.69 0l-.008-.004-.018-.01a7.152 7.152 0 0 1-.31-.17 22.055 22.055 0 0 1-3.434-2.414C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.045 5.231-3.885 6.818a22.066 22.066 0 0 1-3.744 2.584l-.018.01-.006.003h-.002Z"></path>
-        </svg>
-      </a>
-    </div>
-
-    <div id="customModal" class="modal">
-      <div class="modal-content">
-        <h2 id="modalTitle">Remove Ads + Bulk Archive</h2>
-        <p id="modalDescription">
-          One-time payment of $0.99 USD removes ads and unlocks Bulk Archive.
-        </p>
-        <p id="modalQuestion">Do you want to continue?</p>
-        <div class="modal-separator"></div>
-        <div class="modal-buttons">
-          <button id="modalCancel" class="modal-button">Cancel</button>
-          <button id="modalOK" class="modal-button modal-button-primary">
-            OK
-          </button>
+          <button id="resetDelaySettings" class="btn btn-ghost" type="button">Reset</button>
+          <button id="saveDelaySettings" class="btn btn-blue" type="button">Save</button>
         </div>
       </div>
     </div>
 
     <script src="popup.js"></script>
-    <script src="utils.js"></script>
   </body>
 </html>

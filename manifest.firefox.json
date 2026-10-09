@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ChatGPT Bulk Delete",
-  "version": "6.11",
+  "version": "7.0",
   "description": "A Firefox extension to bulk delete ChatGPT conversations",
   "icons": {
     "48": "icon48.png"
@@ -11,7 +11,7 @@
     "default_popup": "popup.html",
     "default_title": "Bulk Delete Conversations"
   },
-  "permissions": ["scripting", "activeTab", "storage"],
+  "permissions": ["scripting", "activeTab", "storage", "identity"],
   "host_permissions": ["https://bulk-delete-chatgpt-worker.qcrao.com/*"],
   "background": {
     "scripts": ["background.js"]
