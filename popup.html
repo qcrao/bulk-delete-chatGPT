@@ -33,8 +33,8 @@
         <div class="callout-body">
           <p><strong>Paid $0.99 before?</strong> Sign in with the Google account that uses the email you paid with, and you'll be upgraded to Lifetime automatically. Forgot that email? Send your receipt to:</p>
           <div class="copy-row">
-            <span class="copy-value" id="supportEmail">support@qcrao.com</span>
-            <button type="button" class="copy-button" id="copySupportEmail">Copy</button>
+            <span class="copy-value">support@qcrao.com</span>
+            <button type="button" class="copy-button" data-copy="support@qcrao.com">Copy</button>
           </div>
         </div>
       </div>
@@ -174,6 +174,14 @@
         <p id="checkoutFine" class="fine">Renews automatically · Cancel anytime · Secure checkout by Stripe</p>
         <p id="checkoutError" class="error-text" hidden></p>
       </div>
+      <div class="maker-note">
+        <p><strong>Made by one indie developer.</strong> ChatGPT changes its interface often, and each change can break this extension. Your plan pays for the time it takes to keep it working. Thank you for the support!</p>
+        <p>Not working for you? Email me:</p>
+        <div class="copy-row">
+          <span class="copy-value">support@qcrao.com</span>
+          <button type="button" class="copy-button" data-copy="support@qcrao.com">Copy</button>
+        </div>
+      </div>
     </section>
 
     <!-- Account -->
@@ -208,15 +216,15 @@
         <button id="upgradeFromAccount" class="btn btn-gold" type="button" hidden>See Pro plans</button>
         <p id="upgradeNote" class="fine left" hidden></p>
       </section>
+      <section class="card help-card" aria-label="Help">
+        <h2 class="group-title">Need help?</h2>
+        <p>Extension not working, a billing question, or anything else? Email me and I'll help you out. Paid $0.99 before but not on Lifetime? Send your receipt and I'll restore it.</p>
+        <div class="copy-row">
+          <span class="copy-value">support@qcrao.com</span>
+          <button type="button" class="copy-button" data-copy="support@qcrao.com">Copy</button>
+        </div>
+      </section>
       <nav class="card list" aria-label="Account actions">
-        <a class="list-row" href="mailto:support@qcrao.com?subject=ChatGPT%20Bulk%20Delete%20-%20I%20paid%20before&amp;body=Please%20attach%20your%20%240.99%20payment%20receipt%20and%20tell%20us%20which%20Google%20account%20you%20sign%20in%20with." target="_blank">
-          <span class="list-copy"><span>I paid before</span><span class="muted small">Send your $0.99 receipt to restore Lifetime</span></span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
-        </a>
-        <a class="list-row" href="mailto:support@qcrao.com?subject=ChatGPT%20Bulk%20Delete" target="_blank">
-          <span>Contact support</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
-        </a>
         <button id="signOutButton" class="list-row danger" type="button">Sign out</button>
       </nav>
       <div class="spacer"></div>

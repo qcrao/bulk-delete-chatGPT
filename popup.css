@@ -348,6 +348,43 @@ body[data-view="legacy"] .view-legacy {
   min-width: 0;
 }
 
+.maker-note {
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.maker-note p {
+  margin: 0;
+}
+
+.maker-note strong {
+  color: var(--text);
+}
+
+.maker-note a {
+  color: var(--gold);
+}
+
+.help-card {
+  display: grid;
+  gap: 8px;
+  padding: 14px;
+}
+
+.help-card p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
 .copy-row {
   display: flex;
   align-items: center;

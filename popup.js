@@ -860,16 +860,17 @@ function initializeButtons() {
     } catch {}
   });
 
-  $("copySupportEmail").addEventListener("click", async (event) => {
-    const button = event.currentTarget;
-    try {
-      await navigator.clipboard.writeText($("supportEmail").textContent.trim());
-      button.textContent = "Copied";
-    } catch (error) {
-      console.warn("Copy failed:", error);
-      button.textContent = "Select & copy";
-    }
-    setTimeout(() => (button.textContent = "Copy"), 1500);
+  document.querySelectorAll(".copy-button[data-copy]").forEach((button) => {
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(button.dataset.copy);
+        button.textContent = "Copied";
+      } catch (error) {
+        console.warn("Copy failed:", error);
+        button.textContent = "Select & copy";
+      }
+      setTimeout(() => (button.textContent = "Copy"), 1500);
+    });
   });
 
   $("legacyContinue").addEventListener("click", async () => {
