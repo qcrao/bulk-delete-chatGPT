@@ -40,7 +40,9 @@ if (typeof window.configLoaded === "undefined") {
     },
     TIMEOUTS: {
       ELEMENT_WAIT: 2000,
-      ELEMENT_WAIT_SHORT: 1000
+      ELEMENT_WAIT_SHORT: 1000,
+      // The confirm dialog stays open while ChatGPT's delete request is in flight.
+      CONFIRM_DIALOG_CLOSE: 10000
     },
     SELECTORS: {
       conversationsCheckbox: ".conversation-checkbox:checked",

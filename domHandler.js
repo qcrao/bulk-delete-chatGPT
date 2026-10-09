@@ -227,6 +227,19 @@ if (typeof window.domHandlerLoaded === "undefined") {
       });
     },
 
+    dispatchEscapeKey(element) {
+      const eventOptions = {
+        key: "Escape",
+        code: "Escape",
+        keyCode: 27,
+        which: 27,
+        bubbles: true,
+        cancelable: true
+      };
+      element.dispatchEvent(new KeyboardEvent("keydown", eventOptions));
+      element.dispatchEvent(new KeyboardEvent("keyup", eventOptions));
+    },
+
     dispatchEnterKey(element) {
       element.focus();
       const eventOptions = {

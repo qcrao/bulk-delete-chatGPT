@@ -161,6 +161,8 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
     // Process individual conversation
     async processConversation(operation, checkbox) {
+      // A dialog left open by the previous item would swallow this item's clicks.
+      await this.closeLingeringDialogs();
       await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
 
       const conversationElement = DOMHandler.getConversationElementFromCheckbox
@@ -198,13 +200,21 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         DOMHandler.dispatchClickSequence(operationButton);
 
         if (operation === 'DELETE') {
-          // Wait for confirmation and click
-          const confirmButton = await CommonUtils.waitForElement(UI_CONFIG.SELECTORS.confirmDeleteButton);
-          if (confirmButton) {
-            await CommonUtils.delay(UI_CONFIG.DELAYS.MEDIUM);
-            console.log(`4. Clicking confirm button...`);
-            DOMHandler.dispatchClickSequence(confirmButton);
-            await CommonUtils.waitForElementToDisappear(UI_CONFIG.SELECTORS.confirmDeleteButton);
+          // ChatGPT can leave the previous dialog's button in the DOM, so only
+          // the visible confirm button belongs to this conversation.
+          const confirmButton = await this.waitForVisibleConfirmButton();
+          if (!confirmButton) {
+            throw new Error("Delete confirmation dialog did not appear");
+          }
+          await CommonUtils.delay(UI_CONFIG.DELAYS.MEDIUM);
+          console.log(`4. Clicking confirm button...`);
+          DOMHandler.dispatchClickSequence(confirmButton);
+          const closed = await this.waitForElementHidden(
+            confirmButton,
+            UI_CONFIG.TIMEOUTS.CONFIRM_DIALOG_CLOSE
+          );
+          if (!closed) {
+            throw new Error("Delete confirmation dialog did not close");
           }
         } else {
           await CommonUtils.delay(UI_CONFIG.DELAYS.EXTENDED);
@@ -212,7 +222,9 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
         return await this.verifyConversationOperation(operation, conversationRoute);
       } catch (error) {
-        if (await this.verifyConversationOperation(operation, conversationRoute)) {
+        const succeeded = await this.verifyConversationOperation(operation, conversationRoute);
+        await this.closeLingeringDialogs();
+        if (succeeded) {
           console.log(
             `${operation} succeeded despite an interrupted DOM interaction:`,
             conversationRoute
@@ -222,6 +234,57 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
         console.log(`Could not complete ${operation.toLowerCase()} process:`, error);
         return false;
+      }
+    },
+
+    findVisibleConfirmButton() {
+      const visible = Array.from(
+        document.querySelectorAll(UI_CONFIG.SELECTORS.confirmDeleteButton)
+      ).filter((button) => CommonUtils.isElementVisible(button));
+      // The newest dialog is rendered last.
+      return visible[visible.length - 1] || null;
+    },
+
+    async waitForVisibleConfirmButton(timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
+      const startedAt = Date.now();
+      while (Date.now() - startedAt < timeout) {
+        const button = this.findVisibleConfirmButton();
+        if (button) return button;
+        await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
+      }
+      return null;
+    },
+
+    async waitForElementHidden(element, timeout) {
+      const startedAt = Date.now();
+      while (Date.now() - startedAt < timeout) {
+        if (!element.isConnected || !CommonUtils.isElementVisible(element)) {
+          return true;
+        }
+        await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
+      }
+      return false;
+    },
+
+    // Waits for a still-open confirm dialog to finish, then dismisses it if it
+    // stays open (Escape, then its first non-confirm button, i.e. Cancel / X).
+    async closeLingeringDialogs() {
+      const button = this.findVisibleConfirmButton();
+      const dialog = button?.closest('[role="dialog"]');
+      if (!dialog) return;
+
+      if (await this.waitForElementHidden(button, UI_CONFIG.TIMEOUTS.ELEMENT_WAIT)) return;
+
+      console.log("Closing a delete dialog that is still open...");
+      DOMHandler.dispatchEscapeKey(dialog);
+      if (await this.waitForElementHidden(button, UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT)) return;
+
+      const dismiss = Array.from(dialog.querySelectorAll("button")).find(
+        (candidate) => candidate !== button && CommonUtils.isElementVisible(candidate)
+      );
+      if (dismiss) {
+        DOMHandler.dispatchClickSequence(dismiss);
+        await this.waitForElementHidden(button, UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT);
       }
     },
 
