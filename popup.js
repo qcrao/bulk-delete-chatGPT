@@ -459,14 +459,14 @@ function renderAccount() {
     $("goLifetime").textContent = "Go Lifetime";
     $("upgradeNote").textContent =
       `Your current ${PLAN_INFO[plan].price.split(" / ")[0]} payment counts toward Lifetime. ` +
-      "Your subscription ends right away, with no further charges.";
+      "Your subscription won't renew, so there are no further charges.";
     loadLifetimeQuote().then((quote) => {
       if (!quote || currentView() !== "account") return;
       $("goLifetime").textContent = `Go Lifetime · ${formatShortCents(quote.amount)}`;
       if (quote.credit !== credit) {
         $("upgradeNote").textContent = quote.credit > 0
-          ? `Your current ${formatCents(quote.credit)} payment counts toward Lifetime. Your subscription ends right away, with no further charges.`
-          : "Your subscription ends right away, with no further charges.";
+          ? `Your current ${formatCents(quote.credit)} payment counts toward Lifetime. Your subscription won't renew, so there are no further charges.`
+          : "Your subscription won't renew, so there are no further charges.";
       }
     });
   }
@@ -530,7 +530,7 @@ function renderCheckoutButton() {
   $("checkoutFine").textContent =
     plan === "lifetime"
       ? isSubscriber()
-        ? "One-time payment · Your subscription stops right away · Secure checkout by Stripe"
+        ? "One-time payment · Your subscription won't renew · Secure checkout by Stripe"
         : "One-time payment · No renewals · Secure checkout by Stripe"
       : "Renews automatically · Cancel anytime · Secure checkout by Stripe";
 }
