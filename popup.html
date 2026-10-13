@@ -218,7 +218,8 @@
       </section>
       <section class="card help-card" aria-label="Help">
         <h2 class="group-title">Need help?</h2>
-        <p>Extension not working, a billing question, or anything else? Email me and I'll help you out. Paid $0.99 before but not on Lifetime? Send your receipt and I'll restore it.</p>
+        <p>ChatGPT updates its website often, and a change can sometimes break the extension. I fix these as quickly as I can. If something stops working, please email me.</p>
+        <p>Billing question or anything else? Same address. Paid $0.99 before but not on Lifetime? Send your receipt and I'll restore it.</p>
         <div class="copy-row">
           <span class="copy-value">support@qcrao.com</span>
           <button type="button" class="copy-button" data-copy="support@qcrao.com">Copy</button>
@@ -261,6 +262,20 @@
         <p id="limitText" class="muted">Go Pro to delete and archive as much as you like, right now.</p>
         <button id="limitUpgrade" class="btn btn-gold" type="button">See Pro plans · from $4.9</button>
         <button id="limitDismiss" class="link-button wide" type="button">Maybe tomorrow</button>
+      </section>
+    </div>
+
+    <!-- Pre-checkout notice -->
+    <div id="checkoutNotice" class="sheet-backdrop" hidden>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="checkoutNoticeTitle">
+        <div class="sheet-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5h.01"></path></svg>
+        </div>
+        <h1 id="checkoutNoticeTitle" class="display-sm">Before you subscribe</h1>
+        <p class="muted">ChatGPT updates its website from time to time, and an update can stop this extension from working. I usually have it fixed within a few days.</p>
+        <p class="muted">If that would be a problem for you, please don't subscribe. If the extension stops working after you subscribe, email me at <span class="sheet-email">support@qcrao.com</span> and I'll help.</p>
+        <button id="checkoutNoticeContinue" class="btn btn-gold" type="button">I understand, continue</button>
+        <button id="checkoutNoticeDismiss" class="link-button wide" type="button">Not now</button>
       </section>
     </div>
 

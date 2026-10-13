@@ -835,7 +835,20 @@ function initializeButtons() {
       renderCheckoutButton();
     });
   });
-  $("checkoutButton").addEventListener("click", () => handleCheckout());
+  // Warn about ChatGPT UI changes before taking payment.
+  $("checkoutButton").addEventListener("click", () => {
+    $("checkoutNotice").hidden = false;
+  });
+  $("checkoutNoticeContinue").addEventListener("click", () => {
+    $("checkoutNotice").hidden = true;
+    handleCheckout();
+  });
+  $("checkoutNoticeDismiss").addEventListener("click", () => {
+    $("checkoutNotice").hidden = true;
+  });
+  $("checkoutNotice").addEventListener("click", (event) => {
+    if (event.target === $("checkoutNotice")) $("checkoutNotice").hidden = true;
+  });
   $("goLifetime").addEventListener("click", () => openPricing("lifetime"));
   $("upgradeFromAccount").addEventListener("click", () => openPricing());
   $("manageBilling").addEventListener("click", handleOpenPortal);

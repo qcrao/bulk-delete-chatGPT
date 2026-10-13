@@ -1140,6 +1140,12 @@ body[data-view="legacy"] .view-legacy {
   margin-top: 6px;
 }
 
+
+.sheet-email {
+  color: var(--gold);
+  font-weight: 600;
+}
+
 /* -------------------------------------------------------------- settings */
 
 .settings-panel {

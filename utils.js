@@ -92,10 +92,10 @@ if (typeof window.utilsLoaded === "undefined") {
                 return false;
               }
 
-              const textContent = el.textContent.trim();
-              return textOptions.some(text =>
-                textContent === text || textContent.includes(text)
-              );
+              // Exact match: short labels like "Sil" would otherwise hit
+              // other menu items. Unknown labels fall through to the
+              // structural strategies.
+              return textOptions.includes(el.textContent.trim());
             });
 
             if (element) {
