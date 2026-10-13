@@ -17,3 +17,6 @@
 
 .idea
 dist/
+
+# Playwright MCP output
+.playwright-mcp/
