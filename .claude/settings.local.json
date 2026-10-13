@@ -13,6 +13,6 @@
       "Bash(git -C /Users/qcrao/bulk-delete-chatGPT status -sb)",
       "Bash(gh issue *)"
     ],
-    "defaultMode": "acceptEdits"
+    "defaultMode": "auto"
   }
 }
