@@ -59,8 +59,8 @@ if (typeof window.configLoaded === "undefined") {
       CONVERSATION_MENU_BUTTON: 'button[data-conversation-options-trigger], button[data-testid="conversation-options-button"], button[data-testid$="-options"][aria-haspopup="menu"], button[id^="radix-"][aria-haspopup="menu"]',
       MENU_ITEM: '[role="menuitem"]',
       // Improved selectors for language-independent detection
-      DELETE_BUTTON: '[data-testid="delete-chat-menu-item"], [role="menuitem"][data-testid*="delete"], [role="menuitem"]:last-child',
-      ARCHIVE_BUTTON: '[data-testid="archive-chat-menu-item"], [role="menuitem"][data-testid*="archive"], [role="menuitem"]:nth-last-child(2)'
+      DELETE_BUTTON: '[data-testid="delete-chat-menu-item"], [role="menuitem"][data-testid*="delete"], [role="menuitem"].text-danger',
+      ARCHIVE_BUTTON: '[data-testid="archive-chat-menu-item"], [role="menuitem"][data-testid*="archive"], [role="menuitem"]:has(+ [role="menuitem"].text-danger)'
     },
     STRINGS: {
       // Delete button texts
@@ -129,8 +129,9 @@ if (typeof window.configLoaded === "undefined") {
         'text-fallback',
         // Strategy 3: Other delete-related test IDs
         '[role="menuitem"][data-testid*="delete"]',
-        // Strategy 4: Last menu item (delete is typically last)
-        '[role="menuitem"]:last-child'
+        // Strategy 4: The only destructive (red) item. ChatGPT dropped the
+        // test IDs, so this keeps non-English UIs working.
+        '[role="menuitem"].text-danger'
       ],
       ARCHIVE: [
         // Strategy 1: Stable ChatGPT test ID
@@ -139,8 +140,8 @@ if (typeof window.configLoaded === "undefined") {
         'text-fallback',
         // Strategy 3: Other archive-related test IDs
         '[role="menuitem"][data-testid*="archive"]',
-        // Strategy 4: Second to last menu item
-        '[role="menuitem"]:nth-last-child(2)'
+        // Strategy 4: The item right before Delete
+        '[role="menuitem"]:has(+ [role="menuitem"].text-danger)'
       ]
     }
   };
