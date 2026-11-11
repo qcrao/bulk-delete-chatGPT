@@ -928,7 +928,50 @@ async function initializeAccount() {
   else if (state.account === null && currentView() === "loading") showView("main");
 }
 
+// ---------------------------------------------------------------------------
+// Service notice (notices table on the worker)
+// ---------------------------------------------------------------------------
+
+const DISMISSED_NOTICE_KEY = "BulkDeleteChatGPT_dismissedNotice";
+
+function pickNoticeMessage(message) {
+  // "zh-CN" -> "zh-CN", then "zh", then English.
+  const lang = navigator.language || "en";
+  return message[lang] || message[lang.split("-")[0]] || message.en;
+}
+
+async function initializeSiteNotice() {
+  const { notice } = await sendToBackground("getNotice").catch(() => ({ notice: null }));
+  if (!notice?.id || !notice.message) return;
+
+  let dismissedId = null;
+  try {
+    dismissedId = localStorage.getItem(DISMISSED_NOTICE_KEY);
+  } catch (error) {}
+  if (dismissedId === String(notice.id)) return;
+
+  const text = pickNoticeMessage(notice.message);
+  if (typeof text !== "string" || !text.trim()) return;
+
+  $("siteNoticeText").textContent = text.trim();
+  $("siteNotice").dataset.level = notice.level === "info" ? "info" : "warn";
+  $("siteNotice").hidden = false;
+  document.body.classList.add("has-site-notice");
+  // Same reading speed (~50px/s) whatever the message length.
+  const span = $("siteNoticeText");
+  span.style.animationDuration = `${Math.max(8, span.offsetWidth / 50)}s`;
+
+  $("siteNoticeClose").addEventListener("click", () => {
+    $("siteNotice").hidden = true;
+    document.body.classList.remove("has-site-notice");
+    try {
+      localStorage.setItem(DISMISSED_NOTICE_KEY, String(notice.id));
+    } catch (error) {}
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  initializeSiteNotice();
   initializeButtons();
   initializeSettings();
   initializeAccount();

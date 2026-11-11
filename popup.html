@@ -7,6 +7,14 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body data-view="loading">
+    <!-- Service notice from the server, e.g. while a ChatGPT change is being fixed -->
+    <div id="siteNotice" class="site-notice" role="status" hidden>
+      <div class="site-notice-track"><span id="siteNoticeText"></span></div>
+      <button id="siteNoticeClose" class="site-notice-close" type="button" aria-label="Dismiss">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg>
+      </button>
+    </div>
+
     <!-- Loading -->
     <section class="view view-loading" data-view-name="loading" aria-busy="true">
       <div class="spinner" aria-hidden="true"></div>

@@ -1247,3 +1247,105 @@ body[data-view="legacy"] .view-legacy {
 .settings-actions .btn {
   min-height: 36px;
 }
+
+/* Service notice: a scrolling banner above every view */
+.site-notice {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 34px;
+  padding: 0 6px 0 12px;
+  background: var(--gold-soft);
+  border-bottom: 1px solid rgba(242, 184, 75, 0.35);
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.site-notice[data-level="info"] {
+  background: rgba(76, 125, 255, 0.14);
+  border-bottom-color: rgba(76, 125, 255, 0.35);
+  color: #9db6ff;
+}
+
+.site-notice-track {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  mask-image: linear-gradient(90deg, transparent, #000 12px, #000 calc(100% - 12px), transparent);
+}
+
+.site-notice-track span {
+  display: inline-block;
+  padding-left: 100%;
+  animation: site-notice-scroll 16s linear infinite;
+}
+
+.site-notice:hover .site-notice-track span {
+  animation-play-state: paused;
+}
+
+@keyframes site-notice-scroll {
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-notice {
+    height: auto;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    line-height: 1.35;
+  }
+
+  .site-notice-track {
+    white-space: normal;
+    mask-image: none;
+  }
+
+  .site-notice-track span {
+    padding-left: 0;
+    animation: none;
+  }
+}
+
+.site-notice-close {
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.75;
+}
+
+.site-notice-close:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.site-notice-close svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* The banner takes its height out of the view instead of growing the popup. */
+body.has-site-notice {
+  display: flex;
+  flex-direction: column;
+  min-height: 560px;
+}
+
+body.has-site-notice .view {
+  flex: 1;
+  min-height: 0;
+}

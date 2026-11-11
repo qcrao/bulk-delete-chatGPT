@@ -203,7 +203,8 @@ async function getRolloutBucket() {
   return bucket;
 }
 
-async function getUiConfig() {
+// The /ui-config response, cached; null only when it was never fetched.
+async function loadUiConfigEntry() {
   const { [UI_CONFIG_CACHE_KEY]: cached } = await storageGet([UI_CONFIG_CACHE_KEY]);
   let entry = cached;
   if (!entry || Date.now() - entry.fetchedAt > UI_CONFIG_MAX_AGE_MS) {
@@ -214,9 +215,14 @@ async function getUiConfig() {
       await storageSet({ [UI_CONFIG_CACHE_KEY]: entry });
     } catch (error) {
       console.warn("Could not fetch remote UI config:", error);
-      if (!entry) return null;
     }
   }
+  return entry || null;
+}
+
+async function getUiConfig() {
+  const entry = await loadUiConfigEntry();
+  if (!entry) return null;
 
   // Staged rollout: installs outside the percentage stay on bundled defaults.
   if (!entry.version || (await getRolloutBucket()) >= (entry.rolloutPercent ?? 100)) {
@@ -239,6 +245,8 @@ const handlers = {
     return { success: true };
   },
   getUiConfig: () => getUiConfig(),
+  // Popup banner; shown to every install, independent of the config rollout.
+  getNotice: async () => ({ notice: (await loadUiConfigEntry())?.notice || null }),
   reportFailure: async ({ report }) =>
     apiFetch("/reports/failure", {
       method: "POST",
