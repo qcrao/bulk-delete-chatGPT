@@ -35,6 +35,7 @@ FILES=(
   popup.css
   popup.html
   popup.js
+  remoteConfig.js
   removeCheckboxes.js
   toggleCheckboxes.js
   utils.js

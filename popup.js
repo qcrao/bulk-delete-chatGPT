@@ -1,6 +1,7 @@
 const CORE_SCRIPT_FILES = [
   "extensionCore.js",
   "config.js",
+  "remoteConfig.js",
   "globals.js",
   "utils.js",
   "domHandler.js",

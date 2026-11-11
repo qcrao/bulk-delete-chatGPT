@@ -8,6 +8,9 @@ const SESSION_TOKEN_KEY = "BulkDeleteChatGPT_sessionToken";
 const ACCOUNT_CACHE_KEY = "BulkDeleteChatGPT_account";
 const LEGACY_UPGRADE_KEY = "BulkDeleteChatGPT_legacyUpgraded";
 const FALLBACK_USER_INFO_KEY = "BulkDeleteChatGPT_fallbackUserInfo";
+const UI_CONFIG_CACHE_KEY = "BulkDeleteChatGPT_uiConfig";
+const ROLLOUT_BUCKET_KEY = "BulkDeleteChatGPT_rolloutBucket";
+const UI_CONFIG_MAX_AGE_MS = 15 * 60 * 1000;
 
 function storageGet(keys) {
   return chrome.storage.local.get(keys);
@@ -187,6 +190,41 @@ async function getCachedAccount() {
   };
 }
 
+// ---------------------------------------------------------------------------
+// Remote UI config: selector/label overrides served by the worker, applied by
+// remoteConfig.js. Never throws; null means "keep what you have".
+// ---------------------------------------------------------------------------
+
+async function getRolloutBucket() {
+  const { [ROLLOUT_BUCKET_KEY]: stored } = await storageGet([ROLLOUT_BUCKET_KEY]);
+  if (Number.isInteger(stored)) return stored;
+  const bucket = Math.floor(Math.random() * 100);
+  await storageSet({ [ROLLOUT_BUCKET_KEY]: bucket });
+  return bucket;
+}
+
+async function getUiConfig() {
+  const { [UI_CONFIG_CACHE_KEY]: cached } = await storageGet([UI_CONFIG_CACHE_KEY]);
+  let entry = cached;
+  if (!entry || Date.now() - entry.fetchedAt > UI_CONFIG_MAX_AGE_MS) {
+    try {
+      const version = encodeURIComponent(chrome.runtime.getManifest().version);
+      const data = await apiFetch(`/ui-config?v=${version}`, { auth: false });
+      entry = { ...data, fetchedAt: Date.now() };
+      await storageSet({ [UI_CONFIG_CACHE_KEY]: entry });
+    } catch (error) {
+      console.warn("Could not fetch remote UI config:", error);
+      if (!entry) return null;
+    }
+  }
+
+  // Staged rollout: installs outside the percentage stay on bundled defaults.
+  if (!entry.version || (await getRolloutBucket()) >= (entry.rolloutPercent ?? 100)) {
+    return { version: null };
+  }
+  return { version: entry.version, config: entry.config };
+}
+
 const handlers = {
   getUserInfo: async () => ({ userInfo: await getUserInfo() }),
   getCachedAccount: () => getCachedAccount(),
@@ -200,6 +238,7 @@ const handlers = {
     await storageSet({ [LEGACY_UPGRADE_KEY]: false });
     return { success: true };
   },
+  getUiConfig: () => getUiConfig(),
   reportFailure: async ({ report }) =>
     apiFetch("/reports/failure", {
       method: "POST",

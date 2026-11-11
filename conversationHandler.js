@@ -100,6 +100,9 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         selectedConversations = selectedConversations.slice(0, maxPerRun);
       }
 
+      // Pick up selector fixes published since the page was opened.
+      await window.RemoteConfig?.refresh();
+
       console.log(`Selected conversations for ${operation}:`, selectedConversations.length);
       ChromeUtils.sendProgress(buttonId, 0);
       
@@ -179,7 +182,8 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         stageCounts,
         errors: [...new Set(failures.map((failure) => failure.message))].slice(0, 5),
         menuItems: failures.find((failure) => failure.menuItems)?.menuItems || [],
-        uiLang: document.documentElement.lang || navigator.language || null
+        uiLang: document.documentElement.lang || navigator.language || null,
+        uiConfigVersion: window.RemoteConfig?.version || null
       };
       try {
         chrome.runtime.sendMessage({ action: "reportFailure", report }, () => {
