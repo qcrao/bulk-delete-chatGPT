@@ -108,6 +108,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
       let processedCount = 0;
       let skippedCount = 0;
+      const failures = [];
       const delaySettings = this.getDelaySettings();
       console.log(
         `${operation} delay settings:`,
@@ -118,14 +119,16 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       for (let i = 0; i < selectedConversations.length; i++) {
         try {
           const result = await this.processConversation(operation, selectedConversations[i]);
-          if (result) {
+          if (result.ok) {
             processedCount++;
           } else {
             skippedCount++;
+            failures.push(result.failure);
           }
         } catch (error) {
           console.error(`Error processing conversation ${i + 1}:`, error);
           skippedCount++;
+          failures.push({ stage: error.stage || "unknown", message: error.message });
         }
 
         // Update progress
@@ -156,7 +159,35 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         limitedFrom
       };
       ChromeUtils.sendComplete(buttonId, result);
+      if (failures.length > 0) {
+        this.reportFailures(operation, result, failures);
+      }
       return result;
+    },
+
+    // Fire-and-forget: tells us when ChatGPT's UI changed and broke a step.
+    // Only UI labels and step names are sent, never conversation titles or ids.
+    reportFailures(operation, result, failures) {
+      const stageCounts = {};
+      for (const failure of failures) {
+        stageCounts[failure.stage] = (stageCounts[failure.stage] || 0) + 1;
+      }
+      const report = {
+        operation,
+        total: result.totalCount,
+        failed: result.skippedCount,
+        stageCounts,
+        errors: [...new Set(failures.map((failure) => failure.message))].slice(0, 5),
+        menuItems: failures.find((failure) => failure.menuItems)?.menuItems || [],
+        uiLang: document.documentElement.lang || navigator.language || null
+      };
+      try {
+        chrome.runtime.sendMessage({ action: "reportFailure", report }, () => {
+          void chrome.runtime.lastError;
+        });
+      } catch (error) {
+        console.warn("Could not send failure report:", error);
+      }
     },
 
     // Process individual conversation
@@ -174,6 +205,8 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       const interactiveElement = DOMHandler.findInteractiveElement(conversationElement)
         || conversationElement;
 
+      let stage = "menu_button";
+      let menuItems = null;
       try {
         // Hover to reveal menu
         console.log(`1. Hovering over conversation...`);
@@ -186,12 +219,13 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           operation === 'DELETE' ? UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT : UI_CONFIG.TIMEOUTS.ELEMENT_WAIT
         );
 
+        stage = "operation_button";
         const operationButton = await this.openConversationMenu(
           threeDotButton,
           operation
         );
         if (!operationButton) {
-          this.logVisibleMenuItems();
+          menuItems = this.logVisibleMenuItems();
           throw new Error(`${operation} button not found`);
         }
 
@@ -202,6 +236,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         if (operation === 'DELETE') {
           // ChatGPT can leave the previous dialog's button in the DOM, so only
           // the visible confirm button belongs to this conversation.
+          stage = "confirm_dialog";
           const confirmButton = await this.waitForVisibleConfirmButton();
           if (!confirmButton) {
             throw new Error("Delete confirmation dialog did not appear");
@@ -213,6 +248,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
             confirmButton,
             UI_CONFIG.TIMEOUTS.CONFIRM_DIALOG_CLOSE
           );
+          stage = "dialog_close";
           if (!closed) {
             throw new Error("Delete confirmation dialog did not close");
           }
@@ -220,7 +256,15 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           await CommonUtils.delay(UI_CONFIG.DELAYS.EXTENDED);
         }
 
-        return await this.verifyConversationOperation(operation, conversationRoute);
+        if (await this.verifyConversationOperation(operation, conversationRoute)) {
+          return { ok: true };
+        }
+        return {
+          ok: false,
+          failure: conversationRoute
+            ? { stage: "not_removed", message: "Conversation still listed after the operation" }
+            : { stage: "no_route", message: "Could not read the conversation link to verify the result" }
+        };
       } catch (error) {
         const succeeded = await this.verifyConversationOperation(operation, conversationRoute);
         await this.closeLingeringDialogs();
@@ -229,11 +273,11 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
             `${operation} succeeded despite an interrupted DOM interaction:`,
             conversationRoute
           );
-          return true;
+          return { ok: true };
         }
 
         console.log(`Could not complete ${operation.toLowerCase()} process:`, error);
-        return false;
+        return { ok: false, failure: { stage, message: error.message, menuItems } };
       }
     },
 
@@ -348,6 +392,11 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           role: item.getAttribute("role")
         }))
       );
+      return menuItems.map((item) => ({
+        text: item.textContent.trim().slice(0, 60),
+        testId: item.dataset.testid || null,
+        role: item.getAttribute("role")
+      }));
     },
 
     async waitForConversationMenuButton(conversationElement, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {

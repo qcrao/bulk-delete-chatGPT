@@ -200,6 +200,11 @@ const handlers = {
     await storageSet({ [LEGACY_UPGRADE_KEY]: false });
     return { success: true };
   },
+  reportFailure: async ({ report }) =>
+    apiFetch("/reports/failure", {
+      method: "POST",
+      body: { ...report, extVersion: chrome.runtime.getManifest().version }
+    }),
   claimUsage: async ({ operation }) =>
     apiFetch("/usage/claim", { method: "POST", body: { action: operation } }),
   lifetimeQuote: () => apiFetch("/billing/lifetime-quote"),
