@@ -115,7 +115,39 @@ async function apiFetch(path, { method = "GET", body, auth = true } = {}) {
   return data;
 }
 
-function launchWebAuthFlow(url) {
+const AUTH_WINDOW_SIZE = { width: 520, height: 760 };
+
+// launchWebAuthFlow has no size option, and some browsers open the sign-in
+// window tiny (or full screen). Resize the first popup that opens right after
+// the call and center it on the browser window the user was in.
+async function resizeNextAuthWindow() {
+  if (!chrome.windows?.onCreated) return;
+  const anchor = await chrome.windows.getLastFocused().catch(() => null);
+
+  const onCreated = (win) => {
+    if (win.type === "normal") return;
+    stop();
+    const width = Math.min(AUTH_WINDOW_SIZE.width, anchor?.width || AUTH_WINDOW_SIZE.width);
+    const height = Math.min(AUTH_WINDOW_SIZE.height, anchor?.height || AUTH_WINDOW_SIZE.height);
+    const update = { width, height };
+    if (anchor?.left !== undefined && anchor?.width) {
+      update.left = Math.round(anchor.left + (anchor.width - width) / 2);
+      update.top = Math.round(anchor.top + (anchor.height - height) / 2);
+    }
+    chrome.windows.update(win.id, update).catch((error) => {
+      console.warn("Could not resize the sign-in window:", error);
+    });
+  };
+  const stop = () => {
+    clearTimeout(timer);
+    chrome.windows.onCreated.removeListener(onCreated);
+  };
+  const timer = setTimeout(stop, 10000);
+  chrome.windows.onCreated.addListener(onCreated);
+}
+
+async function launchWebAuthFlow(url) {
+  await resizeNextAuthWindow();
   return new Promise((resolve, reject) => {
     chrome.identity.launchWebAuthFlow({ url, interactive: true }, (redirectUrl) => {
       if (chrome.runtime.lastError || !redirectUrl) {
