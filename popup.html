@@ -273,6 +273,20 @@
       </section>
     </div>
 
+    <!-- Shown before a bulk run while a service notice is active -->
+    <div id="runWarning" class="sheet-backdrop" hidden>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="runWarningTitle">
+        <div class="sheet-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"></circle><path d="M12 8v5"></path><path d="M12 16.5h.01"></path></svg>
+        </div>
+        <h1 id="runWarningTitle" class="display-sm">This may not work right now</h1>
+        <p id="runWarningText" class="muted"></p>
+        <p class="muted">Some conversations may not be deleted or archived until the fix is out. You can try anyway, or come back once the notice is gone.</p>
+        <button id="runWarningContinue" class="btn btn-gold" type="button">Continue anyway</button>
+        <button id="runWarningDismiss" class="link-button wide" type="button">Cancel</button>
+      </section>
+    </div>
+
     <!-- Pre-checkout notice -->
     <div id="checkoutNotice" class="sheet-backdrop" hidden>
       <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="checkoutNoticeTitle">

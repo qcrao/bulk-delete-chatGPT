@@ -664,6 +664,22 @@ function hideDailyLimit() {
   $("limitSheet").hidden = true;
 }
 
+// While a "warn" notice is active (e.g. a ChatGPT change is being fixed),
+// make sure users read it before a run that is likely to fail.
+function confirmBulkOperation(operation) {
+  const skip =
+    activeNoticeLevel !== "warn" ||
+    $(operation === "delete" ? "bulk-delete" : "bulk-archive").disabled ||
+    (operation === "archive" && !isPro()); // goes straight to pricing
+  if (skip) {
+    runBulkOperation(operation);
+    return;
+  }
+  $("runWarningText").textContent = activeNoticeText;
+  $("runWarning").dataset.operation = operation;
+  $("runWarning").hidden = false;
+}
+
 async function runBulkOperation(operation) {
   const buttonId = operation === "delete" ? "bulk-delete" : "bulk-archive";
   const scriptName =
@@ -824,8 +840,18 @@ function initializeButtons() {
   addPageScriptListener("add-checkboxes", "addCheckboxes.js");
   addPageScriptListener("toggle-checkboxes", "toggleCheckboxes.js");
   addPageScriptListener("remove-checkboxes", "removeCheckboxes.js");
-  $("bulk-delete").addEventListener("click", () => runBulkOperation("delete"));
-  $("bulk-archive").addEventListener("click", () => runBulkOperation("archive"));
+  $("bulk-delete").addEventListener("click", () => confirmBulkOperation("delete"));
+  $("bulk-archive").addEventListener("click", () => confirmBulkOperation("archive"));
+  $("runWarningContinue").addEventListener("click", () => {
+    $("runWarning").hidden = true;
+    runBulkOperation($("runWarning").dataset.operation);
+  });
+  $("runWarningDismiss").addEventListener("click", () => {
+    $("runWarning").hidden = true;
+  });
+  $("runWarning").addEventListener("click", (event) => {
+    if (event.target === $("runWarning")) $("runWarning").hidden = true;
+  });
 
   document.querySelectorAll(".plan").forEach((planButton) => {
     planButton.addEventListener("click", () => {
@@ -933,6 +959,10 @@ async function initializeAccount() {
 // ---------------------------------------------------------------------------
 
 const DISMISSED_NOTICE_KEY = "BulkDeleteChatGPT_dismissedNotice";
+// The current notice text, kept even after the banner is dismissed: a "warn"
+// notice is shown again before every bulk run.
+let activeNoticeText = null;
+let activeNoticeLevel = null;
 
 function pickNoticeMessage(message) {
   // "zh-CN" -> "zh-CN", then "zh", then English.
@@ -944,17 +974,19 @@ async function initializeSiteNotice() {
   const { notice } = await sendToBackground("getNotice").catch(() => ({ notice: null }));
   if (!notice?.id || !notice.message) return;
 
+  const text = pickNoticeMessage(notice.message);
+  if (typeof text !== "string" || !text.trim()) return;
+  activeNoticeText = text.trim();
+  activeNoticeLevel = notice.level === "info" ? "info" : "warn";
+
   let dismissedId = null;
   try {
     dismissedId = localStorage.getItem(DISMISSED_NOTICE_KEY);
   } catch (error) {}
   if (dismissedId === String(notice.id)) return;
 
-  const text = pickNoticeMessage(notice.message);
-  if (typeof text !== "string" || !text.trim()) return;
-
-  $("siteNoticeText").textContent = text.trim();
-  $("siteNotice").dataset.level = notice.level === "info" ? "info" : "warn";
+  $("siteNoticeText").textContent = activeNoticeText;
+  $("siteNotice").dataset.level = activeNoticeLevel;
   $("siteNotice").hidden = false;
   document.body.classList.add("has-site-notice");
   // Same reading speed (~50px/s) whatever the message length.

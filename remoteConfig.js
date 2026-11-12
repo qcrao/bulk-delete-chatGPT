@@ -94,10 +94,10 @@ if (typeof window.remoteConfigLoaded === "undefined") {
     }
   }
 
-  function fetchRemoteConfig() {
+  function fetchRemoteConfig(fresh) {
     return new Promise((resolve) => {
       try {
-        chrome.runtime.sendMessage({ action: "getUiConfig" }, (response) => {
+        chrome.runtime.sendMessage({ action: "getUiConfig", fresh }, (response) => {
           resolve(chrome.runtime.lastError ? null : response);
         });
       } catch (error) {
@@ -106,9 +106,11 @@ if (typeof window.remoteConfigLoaded === "undefined") {
     });
   }
 
-  async function refresh() {
+  // `fresh` bypasses the background's cache so a rollback applies to the very
+  // next bulk run.
+  async function refresh({ fresh = false } = {}) {
     try {
-      const response = await fetchRemoteConfig();
+      const response = await fetchRemoteConfig(fresh);
       // No answer (offline, background asleep): keep whatever is applied now.
       if (!response) return;
       const version = response.version && response.config ? response.version : null;
@@ -131,7 +133,7 @@ if (typeof window.remoteConfigLoaded === "undefined") {
     version: null,
     rejected: [],
     sanitizeUiConfig,
-    // Re-checked before every bulk run; the background caches the fetch.
+    // Re-checked (uncached) before every bulk run.
     refresh,
     ready: null
   };

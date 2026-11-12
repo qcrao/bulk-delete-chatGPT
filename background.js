@@ -204,10 +204,12 @@ async function getRolloutBucket() {
 }
 
 // The /ui-config response, cached; null only when it was never fetched.
-async function loadUiConfigEntry() {
+// `fresh` skips the cache (used right before a bulk run) but still falls back
+// to it when the server can't be reached.
+async function loadUiConfigEntry({ fresh = false } = {}) {
   const { [UI_CONFIG_CACHE_KEY]: cached } = await storageGet([UI_CONFIG_CACHE_KEY]);
   let entry = cached;
-  if (!entry || Date.now() - entry.fetchedAt > UI_CONFIG_MAX_AGE_MS) {
+  if (fresh || !entry || Date.now() - entry.fetchedAt > UI_CONFIG_MAX_AGE_MS) {
     try {
       const version = encodeURIComponent(chrome.runtime.getManifest().version);
       const data = await apiFetch(`/ui-config?v=${version}`, { auth: false });
@@ -220,8 +222,8 @@ async function loadUiConfigEntry() {
   return entry || null;
 }
 
-async function getUiConfig() {
-  const entry = await loadUiConfigEntry();
+async function getUiConfig({ fresh = false } = {}) {
+  const entry = await loadUiConfigEntry({ fresh });
   if (!entry) return null;
 
   // Staged rollout: installs outside the percentage stay on bundled defaults.
@@ -244,9 +246,10 @@ const handlers = {
     await storageSet({ [LEGACY_UPGRADE_KEY]: false });
     return { success: true };
   },
-  getUiConfig: () => getUiConfig(),
+  getUiConfig: ({ fresh }) => getUiConfig({ fresh: Boolean(fresh) }),
   // Popup banner; shown to every install, independent of the config rollout.
-  getNotice: async () => ({ notice: (await loadUiConfigEntry())?.notice || null }),
+  // Fetched fresh on every popup open so a removed notice disappears at once.
+  getNotice: async () => ({ notice: (await loadUiConfigEntry({ fresh: true }))?.notice || null }),
   reportFailure: async ({ report }) =>
     apiFetch("/reports/failure", {
       method: "POST",

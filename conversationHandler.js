@@ -101,7 +101,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       }
 
       // Pick up selector fixes published since the page was opened.
-      await window.RemoteConfig?.refresh();
+      await window.RemoteConfig?.refresh({ fresh: true });
 
       console.log(`Selected conversations for ${operation}:`, selectedConversations.length);
       ChromeUtils.sendProgress(buttonId, 0);
@@ -319,7 +319,10 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
     async closeLingeringDialogs() {
       const button = this.findVisibleConfirmButton();
       const dialog = button?.closest('[role="dialog"]');
-      if (!dialog) return;
+      if (!dialog) {
+        await this.escapeUnrecognizedDialog();
+        return;
+      }
 
       if (await this.waitForElementHidden(button, UI_CONFIG.TIMEOUTS.ELEMENT_WAIT)) return;
 
@@ -334,6 +337,20 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         DOMHandler.dispatchClickSequence(dismiss);
         await this.waitForElementHidden(button, UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT);
       }
+    },
+
+    // The confirm selector no longer matches (ChatGPT changed the dialog), so
+    // the dialog can't be found through its button. Only press Escape: clicking
+    // an unrecognized button could be the destructive one.
+    async escapeUnrecognizedDialog() {
+      const dialog = Array.from(
+        document.querySelectorAll('[role="dialog"], [role="alertdialog"]')
+      ).filter((candidate) => CommonUtils.isElementVisible(candidate)).pop();
+      if (!dialog) return;
+
+      console.log("Closing an open dialog the extension does not recognize...");
+      DOMHandler.dispatchEscapeKey(dialog);
+      await this.waitForElementHidden(dialog, UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT);
     },
 
     async verifyConversationOperation(operation, conversationRoute) {
