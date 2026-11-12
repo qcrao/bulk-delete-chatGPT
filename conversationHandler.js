@@ -126,12 +126,12 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
             processedCount++;
           } else {
             skippedCount++;
-            failures.push(result.failure);
+            failures.push({ ...result.failure, index: i + 1 });
           }
         } catch (error) {
           console.error(`Error processing conversation ${i + 1}:`, error);
           skippedCount++;
-          failures.push({ stage: error.stage || "unknown", message: error.message });
+          failures.push({ stage: error.stage || "unknown", message: error.message, index: i + 1 });
         }
 
         // Update progress
@@ -182,6 +182,15 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         stageCounts,
         errors: [...new Set(failures.map((failure) => failure.message))].slice(0, 5),
         menuItems: failures.find((failure) => failure.menuItems)?.menuItems || [],
+        // Which item failed, how long the step waited and what was on screen,
+        // to tell a slow/unopened dialog from one the selectors don't match.
+        diagnostics: failures.slice(0, 5).map((failure) => ({
+          index: failure.index || null,
+          stage: failure.stage,
+          waitedMs: failure.waitedMs ?? null,
+          menuItemCount: failure.menuItemCount ?? null,
+          dialogs: failure.dialogs || []
+        })),
         uiLang: document.documentElement.lang || navigator.language || null,
         uiConfigVersion: window.RemoteConfig?.version || null
       };
@@ -211,6 +220,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
       let stage = "menu_button";
       let menuItems = null;
+      let stageStartedAt = Date.now();
       try {
         // Hover to reveal menu
         console.log(`1. Hovering over conversation...`);
@@ -224,6 +234,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         );
 
         stage = "operation_button";
+        stageStartedAt = Date.now();
         const operationButton = await this.openConversationMenu(
           threeDotButton,
           operation
@@ -241,6 +252,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           // ChatGPT can leave the previous dialog's button in the DOM, so only
           // the visible confirm button belongs to this conversation.
           stage = "confirm_dialog";
+          stageStartedAt = Date.now();
           const confirmButton = await this.waitForVisibleConfirmButton();
           if (!confirmButton) {
             throw new Error("Delete confirmation dialog did not appear");
@@ -248,11 +260,12 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           await CommonUtils.delay(UI_CONFIG.DELAYS.MEDIUM);
           console.log(`4. Clicking confirm button...`);
           DOMHandler.dispatchClickSequence(confirmButton);
+          stage = "dialog_close";
+          stageStartedAt = Date.now();
           const closed = await this.waitForElementHidden(
             confirmButton,
             UI_CONFIG.TIMEOUTS.CONFIRM_DIALOG_CLOSE
           );
-          stage = "dialog_close";
           if (!closed) {
             throw new Error("Delete confirmation dialog did not close");
           }
@@ -260,16 +273,20 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           await CommonUtils.delay(UI_CONFIG.DELAYS.EXTENDED);
         }
 
+        stageStartedAt = Date.now();
         if (await this.verifyConversationOperation(operation, conversationRoute)) {
           return { ok: true };
         }
+        const snapshot = this.captureFailureSnapshot(stageStartedAt);
         return {
           ok: false,
           failure: conversationRoute
-            ? { stage: "not_removed", message: "Conversation still listed after the operation" }
-            : { stage: "no_route", message: "Could not read the conversation link to verify the result" }
+            ? { stage: "not_removed", message: "Conversation still listed after the operation", ...snapshot }
+            : { stage: "no_route", message: "Could not read the conversation link to verify the result", ...snapshot }
         };
       } catch (error) {
+        // Before verifying and closing dialogs, which change what is on screen.
+        const snapshot = this.captureFailureSnapshot(stageStartedAt);
         const succeeded = await this.verifyConversationOperation(operation, conversationRoute);
         await this.closeLingeringDialogs();
         if (succeeded) {
@@ -281,8 +298,42 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         }
 
         console.log(`Could not complete ${operation.toLowerCase()} process:`, error);
-        return { ok: false, failure: { stage, message: error.message, menuItems } };
+        return { ok: false, failure: { stage, message: error.message, menuItems, ...snapshot } };
       }
+    },
+
+    // What the page showed when a step failed. Only structure and button
+    // labels of open dialogs, never conversation titles or ids.
+    captureFailureSnapshot(stageStartedAt) {
+      const snapshot = { waitedMs: Date.now() - stageStartedAt };
+      try {
+        const clip = (value, max) => String(value || "").trim().slice(0, max) || null;
+        snapshot.menuItemCount = Array.from(
+          document.querySelectorAll(UI_CONFIG.SELECTORS.MENU_ITEM)
+        ).filter((item) => CommonUtils.isElementVisible(item)).length;
+        snapshot.dialogs = Array.from(
+          document.querySelectorAll('[role="dialog"], [role="alertdialog"]')
+        )
+          .filter((dialog) => CommonUtils.isElementVisible(dialog))
+          .slice(-3)
+          .map((dialog) => ({
+            role: dialog.getAttribute("role"),
+            state: dialog.getAttribute("data-state"),
+            testId: clip(dialog.dataset.testid, 60),
+            buttons: Array.from(dialog.querySelectorAll("button"))
+              .slice(0, 6)
+              .map((button) => ({
+                text: clip(button.textContent, 30),
+                testId: clip(button.dataset.testid, 60),
+                type: button.getAttribute("type"),
+                cls: clip(button.getAttribute("class"), 160),
+                visible: CommonUtils.isElementVisible(button)
+              }))
+          }));
+      } catch (error) {
+        console.warn("Could not capture failure snapshot:", error);
+      }
+      return snapshot;
     },
 
     findVisibleConfirmButton() {
