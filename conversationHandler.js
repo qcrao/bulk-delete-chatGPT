@@ -246,7 +246,11 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
         await CommonUtils.delay(UI_CONFIG.DELAYS.MEDIUM);
         console.log(`3. Clicking ${operation.toLowerCase()} button...`);
-        DOMHandler.dispatchClickSequence(operationButton);
+        if (threeDotButton.id.startsWith("--native-popover-")) {
+          operationButton.click();
+        } else {
+          DOMHandler.dispatchClickSequence(operationButton);
+        }
 
         if (operation === 'DELETE') {
           // ChatGPT can leave the previous dialog's button in the DOM, so only

@@ -61,7 +61,13 @@ if (typeof window.configLoaded === "undefined") {
       PROJECT_CONVERSATION_LINK_SELECTOR: 'a[href*="/c/"]',
       TITLE_SELECTOR: '[data-testid="conversation-title"], .relative.grow.overflow-hidden.whitespace-nowrap',
       INTERACTIVE_ELEMENT_SELECTOR: '[draggable="true"], [data-sidebar-item="true"]',
-      CONVERSATION_MENU_BUTTON: 'button[data-conversation-options-trigger], button[data-testid="conversation-options-button"], button[data-testid$="-options"][aria-haspopup="menu"], button[id^="radix-"][aria-haspopup="menu"]',
+      CONVERSATION_MENU_BUTTON: [
+        'button[data-conversation-options-trigger]',
+        'button[data-testid="conversation-options-button"]',
+        'button[data-testid$="-options"][aria-haspopup="menu"]',
+        'button[id^="radix-"][aria-haspopup="menu"]',
+        'button[id^="--native-popover-"][id$="-menu-trigger"][aria-haspopup="menu"]'
+      ].join(", "),
       MENU_ITEM: '[role="menuitem"]',
       // Improved selectors for language-independent detection
       DELETE_BUTTON: '[data-testid="delete-chat-menu-item"], [role="menuitem"][data-testid*="delete"], [role="menuitem"].text-danger',

@@ -177,10 +177,10 @@
               return;
             }
 
-            const menuButton = clickedElement.closest(
-              UI_CONFIG.SELECTORS.CONVERSATION_MENU_BUTTON
+            const menuControl = clickedElement.closest(
+              `${UI_CONFIG.SELECTORS.CONVERSATION_MENU_BUTTON}, [role="menuitem"]`
             );
-            if (menuButton) {
+            if (menuControl) {
               return;
             }
 
