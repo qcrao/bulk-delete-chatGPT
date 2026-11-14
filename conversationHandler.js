@@ -197,6 +197,9 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           stage: failure.stage,
           waitedMs: failure.waitedMs ?? null,
           menuItemCount: failure.menuItemCount ?? null,
+          tabHidden: failure.tabHidden ?? null,
+          confirmPolls: failure.confirmPolls ?? null,
+          confirmSelectorMatches: failure.confirmSelectorMatches ?? null,
           dialogs: failure.dialogs || []
         })),
         uiLang: document.documentElement.lang || navigator.language || null,
@@ -329,7 +332,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         };
       } catch (error) {
         // Before verifying and closing dialogs, which change what is on screen.
-        const snapshot = this.captureFailureSnapshot(stageStartedAt);
+        const snapshot = this.captureFailureSnapshot(stageStartedAt, stage);
         const succeeded = await this.verifyConversationOperation(operation, conversationRoute);
         await this.closeLingeringDialogs();
         if (succeeded) {
@@ -362,13 +365,18 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
     // What the page showed when a step failed. Only structure and button
     // labels of open dialogs, never conversation titles or ids.
-    captureFailureSnapshot(stageStartedAt) {
+    captureFailureSnapshot(stageStartedAt, stage) {
       const snapshot = { waitedMs: Date.now() - stageStartedAt };
       try {
         const clip = (value, max) => String(value || "").trim().slice(0, max) || null;
         snapshot.menuItemCount = Array.from(
           document.querySelectorAll(UI_CONFIG.SELECTORS.MENU_ITEM)
         ).filter((item) => CommonUtils.isElementVisible(item)).length;
+        snapshot.tabHidden = document.visibilityState === "hidden";
+        snapshot.confirmPolls = stage === "confirm_dialog" ? this.confirmPolls ?? null : null;
+        snapshot.confirmSelectorMatches = document.querySelectorAll(
+          UI_CONFIG.SELECTORS.confirmDeleteButton
+        ).length;
         snapshot.dialogs = Array.from(
           document.querySelectorAll('[role="dialog"], [role="alertdialog"]')
         )
@@ -376,6 +384,8 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
           .slice(-3)
           .map((dialog) => ({
             role: dialog.getAttribute("role"),
+            tag: dialog.tagName.toLowerCase(),
+            ariaHidden: dialog.getAttribute("aria-hidden"),
             state: dialog.getAttribute("data-state"),
             testId: clip(dialog.dataset.testid, 60),
             buttons: Array.from(dialog.querySelectorAll("button"))
@@ -402,25 +412,21 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       return visible[visible.length - 1] || null;
     },
 
-    async waitForVisibleConfirmButton(timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
-      const startedAt = Date.now();
-      while (Date.now() - startedAt < timeout) {
-        const button = this.findVisibleConfirmButton();
-        if (button) return button;
-        await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
-      }
-      return null;
+    // Background tabs throttle timers to about one per second, both ours and
+    // ChatGPT's, so the dialog can take several seconds to show up there.
+    async waitForVisibleConfirmButton(timeout = UI_CONFIG.TIMEOUTS.CONFIRM_DIALOG_OPEN) {
+      this.confirmPolls = 0;
+      return CommonUtils.pollUntil(() => {
+        this.confirmPolls += 1;
+        return this.findVisibleConfirmButton();
+      }, timeout);
     },
 
     async waitForElementHidden(element, timeout) {
-      const startedAt = Date.now();
-      while (Date.now() - startedAt < timeout) {
-        if (!element.isConnected || !CommonUtils.isElementVisible(element)) {
-          return true;
-        }
-        await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
-      }
-      return false;
+      return Boolean(await CommonUtils.pollUntil(
+        () => !element.isConnected || !CommonUtils.isElementVisible(element),
+        timeout
+      ));
     },
 
     // Waits for a still-open confirm dialog to finish, then dismisses it if it
@@ -467,15 +473,10 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         return operation !== "DELETE";
       }
 
-      const startedAt = Date.now();
-      while (Date.now() - startedAt < UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
-        if (!DOMHandler.isConversationRoutePresent(conversationRoute)) {
-          return true;
-        }
-        await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
-      }
-
-      return false;
+      return Boolean(await CommonUtils.pollUntil(
+        () => !DOMHandler.isConversationRoutePresent(conversationRoute),
+        UI_CONFIG.TIMEOUTS.ELEMENT_WAIT
+      ));
     },
 
     async openConversationMenu(menuButton, operation) {
@@ -530,19 +531,14 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
     },
 
     async waitForConversationMenuButton(conversationElement, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
-      const startedAt = Date.now();
-
-      while (Date.now() - startedAt < timeout) {
-        const menuButton = DOMHandler.findConversationMenuButton
-          ? DOMHandler.findConversationMenuButton(conversationElement)
-          : conversationElement.querySelector(UI_CONFIG.SELECTORS.threeDotButton);
-
-        if (menuButton) {
-          return menuButton;
-        }
-
-        await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
-      }
+      const menuButton = await CommonUtils.pollUntil(
+        () =>
+          DOMHandler.findConversationMenuButton
+            ? DOMHandler.findConversationMenuButton(conversationElement)
+            : conversationElement.querySelector(UI_CONFIG.SELECTORS.threeDotButton),
+        timeout
+      );
+      if (menuButton) return menuButton;
 
       throw new Error(`Conversation menu button not found within ${timeout}ms`);
     },

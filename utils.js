@@ -24,6 +24,19 @@ if (typeof window.utilsLoaded === "undefined") {
       return new Date().toISOString().replace("T", " ").substr(0, 19);
     },
 
+    // Polls fn until it returns something truthy. A hidden tab gets one timer
+    // per second (per minute after a while), so a single delay can outlast the
+    // whole timeout: always look once more before giving up.
+    async pollUntil(fn, timeout) {
+      const startedAt = Date.now();
+      while (Date.now() - startedAt < timeout) {
+        const result = fn();
+        if (result) return result;
+        await this.delay(UI_CONFIG.DELAYS.SHORT);
+      }
+      return fn() || null;
+    },
+
     // Safe element query with timeout
     async waitForElement(selector, parent = document, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
       const startedAt = Date.now();
@@ -48,12 +61,11 @@ if (typeof window.utilsLoaded === "undefined") {
 
     // Find element by text content (legacy method)
     async waitForElementByText(selector, textOptions, parent = document, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT) {
-      const startedAt = Date.now();
       const texts = Array.isArray(textOptions) ? textOptions : [textOptions];
 
-      while (Date.now() - startedAt < timeout) {
+      return this.pollUntil(() => {
         const elements = parent.querySelectorAll(selector);
-        const element = Array.from(elements).find(el => {
+        return Array.from(elements).find(el => {
           const textContent = el.textContent.trim();
           return texts.some(text =>
             textContent === text ||
@@ -61,10 +73,7 @@ if (typeof window.utilsLoaded === "undefined") {
             (text === UI_CONFIG.STRINGS.DELETE && el.querySelector(".text-token-text-error"))
           );
         });
-        if (element) return element;
-        await this.delay(UI_CONFIG.DELAYS.SHORT);
-      }
-      return null;
+      }, timeout);
     },
 
     // Find element using multiple strategies (language-independent)
@@ -74,9 +83,7 @@ if (typeof window.utilsLoaded === "undefined") {
         throw new Error(`No strategies defined for operation: ${operation}`);
       }
 
-      const startedAt = Date.now();
-      
-      while (Date.now() - startedAt < timeout) {
+      return this.pollUntil(() => {
         for (const strategy of strategies) {
           if (strategy === 'text-fallback') {
             // Fallback to text matching with multiple languages
@@ -112,11 +119,8 @@ if (typeof window.utilsLoaded === "undefined") {
             }
           }
         }
-        
-        await this.delay(UI_CONFIG.DELAYS.SHORT);
-      }
-      
-      return null;
+        return null;
+      }, timeout);
     },
 
     // Get selected conversations
