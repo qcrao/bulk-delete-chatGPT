@@ -84,20 +84,45 @@ if (typeof window.domHandlerLoaded === "undefined") {
       }
     },
 
-    isConversationRoutePresent(route) {
+    findConversationLinksByRoute(route) {
       if (!route) {
-        return false;
+        return [];
       }
 
       return Array.from(
         document.querySelectorAll(UI_CONFIG.SELECTORS.CONVERSATION_SELECTOR)
-      ).some((link) => {
+      ).filter((link) => {
         try {
           return new URL(link.href, window.location.href).pathname === route;
         } catch (error) {
           return false;
         }
       });
+    },
+
+    // Finds a selected conversation again after ChatGPT re-rendered its row.
+    // Only a visible row that owns a menu button can be operated on; a bare
+    // link (message content, hidden nav copy) must not be returned.
+    findConversationElementByRoute(route) {
+      const menuSelector = UI_CONFIG.SELECTORS.CONVERSATION_MENU_BUTTON
+        || UI_CONFIG.SELECTORS.threeDotButton;
+      for (const link of this.findConversationLinksByRoute(route)) {
+        if (!this.isConversationLink(link) || !this.isVisibleConversationLink(link)) {
+          continue;
+        }
+        const owner = this.findConversationOwner(link);
+        if (
+          owner.querySelector(menuSelector)
+          || owner.matches(UI_CONFIG.SELECTORS.PROJECT_CONVERSATION_SELECTOR)
+        ) {
+          return owner;
+        }
+      }
+      return null;
+    },
+
+    isConversationRoutePresent(route) {
+      return this.findConversationLinksByRoute(route).length > 0;
     },
 
     isConversationLink(link) {

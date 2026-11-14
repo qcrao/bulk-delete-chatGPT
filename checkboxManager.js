@@ -95,6 +95,15 @@
 
           const checkbox = this.createCheckbox(index);
           checkbox.checked = isChecked;
+          // Lets a bulk run find this conversation again if ChatGPT re-renders
+          // the row and detaches the checkbox.
+          const domHandler = coreSystem.getModule('DOMHandler');
+          const route = domHandler && domHandler.getConversationRoute
+            ? domHandler.getConversationRoute(conversation)
+            : null;
+          if (route) {
+            checkbox.dataset.bulkDeleteRoute = route;
+          }
           // !important guards against ChatGPT's global resets (e.g.
           // `appearance: none` on inputs), which render the checkbox invisible.
           checkbox.style.cssText = `

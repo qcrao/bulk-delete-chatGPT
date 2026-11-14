@@ -52,7 +52,9 @@ if (typeof window.configLoaded === "undefined") {
         'button[data-testid="delete-conversation-confirm-button"]',
         'button.btn.btn-danger',
         '[role="dialog"][data-state="open"]:not([aria-hidden="true"]) form button[type="submit"].text-chart-red',
-        '[role="dialog"][data-state="open"]:not([aria-hidden="true"]) button[type="submit"].text-danger-soft-alpha'
+        '[role="dialog"][data-state="open"]:not([aria-hidden="true"]) button[type="submit"].text-danger-soft-alpha',
+        // Redesigned dialog (checkbox + "Delete chat"): no test id or color class.
+        '[role="dialog"][data-state="open"]:not([aria-hidden="true"]) button[type="submit"]'
       ].join(", "),
       threeDotButton: '[id^="radix-"]',
       HISTORY: '[id^="history"]',

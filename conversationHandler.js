@@ -119,9 +119,17 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         `batch size: ${UI_CONFIG.OPERATION_DELAY.BATCH_SIZE}`
       );
 
+      // Routes already handled in this run, so a conversation selected twice
+      // (sidebar and project list) is not reported as a failure the second time.
+      const handledRoutes = new Set();
+
       for (let i = 0; i < selectedConversations.length; i++) {
         try {
-          const result = await this.processConversation(operation, selectedConversations[i]);
+          const result = await this.processConversation(
+            operation,
+            selectedConversations[i],
+            handledRoutes
+          );
           if (result.ok) {
             processedCount++;
           } else {
@@ -204,17 +212,48 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
     },
 
     // Process individual conversation
-    async processConversation(operation, checkbox) {
+    async processConversation(operation, checkbox, handledRoutes = null) {
       // A dialog left open by the previous item would swallow this item's clicks.
       await this.closeLingeringDialogs();
       await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
 
-      const conversationElement = DOMHandler.getConversationElementFromCheckbox
+      // The route stored when the checkbox was created identifies what the user
+      // selected. ChatGPT re-renders sidebar rows during a long run, which can
+      // detach the checkbox or reuse its row for a different conversation.
+      const selectedRoute = checkbox.dataset.bulkDeleteRoute || null;
+      let conversationElement = checkbox.isConnected
         ? DOMHandler.getConversationElementFromCheckbox(checkbox)
-        : checkbox.parentElement;
-      const conversationRoute = DOMHandler.getConversationRoute
-        ? DOMHandler.getConversationRoute(conversationElement)
         : null;
+      if (
+        conversationElement
+        && selectedRoute
+        && DOMHandler.getConversationRoute(conversationElement) !== selectedRoute
+      ) {
+        conversationElement = null;
+      }
+      if (!conversationElement && selectedRoute) {
+        if (handledRoutes && handledRoutes.has(selectedRoute)) {
+          return { ok: true };
+        }
+        conversationElement = await this.waitForConversationElementByRoute(selectedRoute);
+      }
+      if (!conversationElement) {
+        return {
+          ok: false,
+          failure: {
+            stage: "row_detached",
+            message: selectedRoute
+              ? "Conversation row was re-rendered and could not be found again"
+              : "Conversation row was re-rendered and its link was never recorded",
+            ...this.captureFailureSnapshot(Date.now())
+          }
+        };
+      }
+      const conversationRoute = selectedRoute
+        || DOMHandler.getConversationRoute(conversationElement);
+      if (handledRoutes && conversationRoute) {
+        handledRoutes.add(conversationRoute);
+      }
       const interactiveElement = DOMHandler.findInteractiveElement(conversationElement)
         || conversationElement;
 
@@ -303,6 +342,21 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
         console.log(`Could not complete ${operation.toLowerCase()} process:`, error);
         return { ok: false, failure: { stage, message: error.message, menuItems, ...snapshot } };
+      }
+    },
+
+    // The row may be between unmount and remount right after the previous delete.
+    async waitForConversationElementByRoute(route, timeout = UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT) {
+      if (!DOMHandler.findConversationElementByRoute) {
+        return null;
+      }
+      const startedAt = Date.now();
+      while (true) {
+        const element = DOMHandler.findConversationElementByRoute(route);
+        if (element || Date.now() - startedAt >= timeout) {
+          return element;
+        }
+        await CommonUtils.delay(UI_CONFIG.DELAYS.SHORT);
       }
     },
 
