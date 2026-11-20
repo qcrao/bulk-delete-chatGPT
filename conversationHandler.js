@@ -3,6 +3,20 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
   window.conversationHandlerLoaded = true;
 
+  // Steps where ChatGPT dropped an interaction on a row that was still there,
+  // so trying the same conversation again is likely to work. Not row_detached
+  // (the row is gone from the page) or no_route (nothing to verify against).
+  const RETRYABLE_STAGES = new Set([
+    "menu_button",
+    "operation_button",
+    "confirm_dialog",
+    "dialog_close",
+    "not_removed"
+  ]);
+  // Failures cluster when ChatGPT is throttling; past this, more attempts
+  // mostly add load.
+  const MAX_RETRIES_PER_RUN = 20;
+
   // Conversation operation handler
   const ConversationHandler = {
     getDelaySettings() {
@@ -119,7 +133,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         `batch size: ${UI_CONFIG.OPERATION_DELAY.BATCH_SIZE}`
       );
 
-      // Routes already handled in this run, so a conversation selected twice
+      // Routes deleted/archived in this run, so a conversation selected twice
       // (sidebar and project list) is not reported as a failure the second time.
       const handledRoutes = new Set();
 
@@ -134,12 +148,23 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
             processedCount++;
           } else {
             skippedCount++;
-            failures.push({ ...result.failure, index: i + 1 });
+            failures.push({
+              ...result.failure,
+              index: i + 1,
+              checkbox: selectedConversations[i],
+              route: result.route || null
+            });
           }
         } catch (error) {
           console.error(`Error processing conversation ${i + 1}:`, error);
           skippedCount++;
-          failures.push({ stage: error.stage || "unknown", message: error.message, index: i + 1 });
+          failures.push({
+            stage: error.stage || "unknown",
+            message: error.message,
+            index: i + 1,
+            checkbox: selectedConversations[i],
+            route: selectedConversations[i]?.dataset?.bulkDeleteRoute || null
+          });
         }
 
         // Update progress
@@ -162,6 +187,62 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         }
       }
 
+      // ChatGPT now and then swallows a click (the menu doesn't open, or closes
+      // without opening the confirm dialog), in foreground and background tabs
+      // alike. One more pass over those items clears most of them. A route
+      // selected twice is retried once and the outcome applies to both copies.
+      const retryByRoute = new Map();
+      for (const failure of failures) {
+        if (!failure.route || !RETRYABLE_STAGES.has(failure.stage)) continue;
+        if (!retryByRoute.has(failure.route)) {
+          if (retryByRoute.size >= MAX_RETRIES_PER_RUN) continue;
+          retryByRoute.set(failure.route, []);
+        }
+        retryByRoute.get(failure.route).push(failure);
+      }
+      const lastBatchIndex = Math.floor(
+        (selectedConversations.length - 1) / UI_CONFIG.OPERATION_DELAY.BATCH_SIZE
+      );
+      let retriedCount = 0;
+      if (retryByRoute.size > 0) {
+        console.log(`Retrying ${retryByRoute.size} failed conversation(s)...`);
+        await CommonUtils.delay(this.getBatchCooldownDelay(delaySettings, lastBatchIndex));
+      }
+      for (const [route, copies] of retryByRoute) {
+        if (retriedCount > 0) {
+          await CommonUtils.delay(this.getIntraBatchDelay(delaySettings, lastBatchIndex));
+        }
+        retriedCount++;
+        // No shortcut when the row is gone: the sidebar drops rows wholesale,
+        // so absence alone doesn't prove the first attempt went through.
+        // processConversation reports row_detached then.
+        let retryFailure = null;
+        if (!handledRoutes.has(route)) {
+          try {
+            const result = await this.processConversation(
+              operation,
+              copies[0].checkbox,
+              handledRoutes
+            );
+            retryFailure = result.ok ? null : result.failure;
+          } catch (error) {
+            console.error("Error retrying conversation:", error);
+            retryFailure = { stage: error.stage || "unknown", message: error.message };
+          }
+        }
+
+        for (const failure of copies) {
+          const position = failures.indexOf(failure);
+          if (retryFailure) {
+            failures[position] = { ...retryFailure, index: failure.index, retried: true };
+          } else {
+            failures.splice(position, 1);
+            processedCount++;
+            skippedCount--;
+          }
+        }
+      }
+
       console.log(`${operation} completed: ${processedCount} processed, ${skippedCount} skipped`);
       const result = {
         processedCount,
@@ -171,14 +252,14 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       };
       ChromeUtils.sendComplete(buttonId, result);
       if (failures.length > 0) {
-        this.reportFailures(operation, result, failures);
+        this.reportFailures(operation, result, failures, retriedCount);
       }
       return result;
     },
 
     // Fire-and-forget: tells us when ChatGPT's UI changed and broke a step.
     // Only UI labels and step names are sent, never conversation titles or ids.
-    reportFailures(operation, result, failures) {
+    reportFailures(operation, result, failures, retriedCount = 0) {
       const stageCounts = {};
       for (const failure of failures) {
         stageCounts[failure.stage] = (stageCounts[failure.stage] || 0) + 1;
@@ -187,6 +268,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         operation,
         total: result.totalCount,
         failed: result.skippedCount,
+        retried: retriedCount,
         stageCounts,
         errors: [...new Set(failures.map((failure) => failure.message))].slice(0, 5),
         menuItems: failures.find((failure) => failure.menuItems)?.menuItems || [],
@@ -195,6 +277,7 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         diagnostics: failures.slice(0, 5).map((failure) => ({
           index: failure.index || null,
           stage: failure.stage,
+          retried: Boolean(failure.retried),
           waitedMs: failure.waitedMs ?? null,
           menuItemCount: failure.menuItemCount ?? null,
           tabHidden: failure.tabHidden ?? null,
@@ -254,9 +337,11 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       }
       const conversationRoute = selectedRoute
         || DOMHandler.getConversationRoute(conversationElement);
-      if (handledRoutes && conversationRoute) {
-        handledRoutes.add(conversationRoute);
-      }
+      const markHandled = () => {
+        if (handledRoutes && conversationRoute) {
+          handledRoutes.add(conversationRoute);
+        }
+      };
       const interactiveElement = DOMHandler.findInteractiveElement(conversationElement)
         || conversationElement;
 
@@ -321,11 +406,13 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
         stageStartedAt = Date.now();
         if (await this.verifyConversationOperation(operation, conversationRoute)) {
+          markHandled();
           return { ok: true };
         }
         const snapshot = this.captureFailureSnapshot(stageStartedAt);
         return {
           ok: false,
+          route: conversationRoute,
           failure: conversationRoute
             ? { stage: "not_removed", message: "Conversation still listed after the operation", ...snapshot }
             : { stage: "no_route", message: "Could not read the conversation link to verify the result", ...snapshot }
@@ -340,11 +427,16 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
             `${operation} succeeded despite an interrupted DOM interaction:`,
             conversationRoute
           );
+          markHandled();
           return { ok: true };
         }
 
         console.log(`Could not complete ${operation.toLowerCase()} process:`, error);
-        return { ok: false, failure: { stage, message: error.message, menuItems, ...snapshot } };
+        return {
+          ok: false,
+          route: conversationRoute,
+          failure: { stage, message: error.message, menuItems, ...snapshot }
+        };
       }
     },
 
