@@ -45,6 +45,10 @@
       if (CheckboxManager.startAutoAdd) {
         CheckboxManager.startAutoAdd();
       }
+      const SelectionBar = core.getModule('SelectionBar');
+      if (SelectionBar) {
+        SelectionBar.start();
+      }
 
       // Get all conversations
       const conversations = DOMHandler.getAllConversations();

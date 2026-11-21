@@ -115,6 +115,21 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         return emptyResult;
       }
 
+      // One chat can be listed twice (project folder + Recents); count and
+      // process it once, so the free cap and the "N selected" bar agree.
+      const seenRoutes = new Set();
+      selectedConversations = selectedConversations.filter((checkbox) => {
+        const route = checkbox && checkbox.dataset ? checkbox.dataset.bulkDeleteRoute : null;
+        if (!route) {
+          return true;
+        }
+        if (seenRoutes.has(route)) {
+          return false;
+        }
+        seenRoutes.add(route);
+        return true;
+      });
+
       // Free plan: the popup passes maxPerRun; only the first N selected are processed.
       const maxPerRun = Number((window.ChatGPTBulkDeleteOperationSettings || {}).maxPerRun);
       let limitedFrom = 0;

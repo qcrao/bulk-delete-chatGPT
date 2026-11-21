@@ -36,7 +36,8 @@
         "domHandler.js",
         "conversationHandler.js",
         "checkboxManager.js",
-        "conversationPreview.js"
+        "conversationPreview.js",
+        "selectionBar.js"
       ],
       "run_at": "document_idle"
     }

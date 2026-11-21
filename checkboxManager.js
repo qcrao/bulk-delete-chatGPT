@@ -401,6 +401,10 @@
       removeAllCheckboxes() {
         try {
           this.stopAutoAdd();
+          const selectionBar = coreSystem.getModule('SelectionBar');
+          if (selectionBar) {
+            selectionBar.stop();
+          }
           const preview = coreSystem.getModule('ConversationPreview');
           if (preview) {
             preview.cleanup();

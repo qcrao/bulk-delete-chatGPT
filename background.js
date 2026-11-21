@@ -330,7 +330,33 @@ chrome.runtime.onInstalled.addListener(({ reason, previousVersion }) => {
   }
 });
 
+// "Upgrade to delete all" on the ChatGPT page: open the popup on its pricing
+// view (same signed-in account); fall back to the website's account page
+// where openPopup isn't available or fails.
+const OPEN_PRICING_KEY = "BulkDeleteChatGPT_openPricing";
+const UPGRADE_FALLBACK_URL = "https://chatgpt-bulk-delete.qcrao.com/en/account";
+
+async function openUpgrade(sender) {
+  await chrome.storage.local.set({ [OPEN_PRICING_KEY]: true });
+  try {
+    if (!chrome.action.openPopup) throw new Error("openPopup unavailable");
+    await chrome.action.openPopup(sender?.tab?.windowId ? { windowId: sender.tab.windowId } : undefined);
+    return { opened: "popup" };
+  } catch (error) {
+    await chrome.storage.local.remove(OPEN_PRICING_KEY);
+    await chrome.tabs.create({ url: UPGRADE_FALLBACK_URL });
+    return { opened: "website" };
+  }
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "openUpgrade") {
+    openUpgrade(sender)
+      .then(sendResponse)
+      .catch((error) => sendResponse({ error: error.message }));
+    return true;
+  }
+
   const handler = handlers[request.action];
   if (!handler) return false;
 

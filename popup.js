@@ -7,7 +7,8 @@ const CORE_SCRIPT_FILES = [
   "domHandler.js",
   "conversationHandler.js",
   "checkboxManager.js",
-  "conversationPreview.js"
+  "conversationPreview.js",
+  "selectionBar.js"
 ];
 
 const DELAY_SETTINGS_CONFIG = {
@@ -745,6 +746,21 @@ function addPageScriptListener(buttonId, scriptName) {
     hideNotice();
     try {
       await loadCoreScripts(tab.id);
+      if (scriptName === "addCheckboxes.js") {
+        // Lets the page warn before the run when a free selection is over
+        // the per-run cap. null (Pro, or account not known yet) = no warning.
+        const freeMaxPerRun = state.account && !isPro()
+          ? state.account.usage?.freeMaxPerRun ?? null
+          : null;
+        await executeScriptFunction(
+          tab.id,
+          (value) => {
+            window.ChatGPTBulkDeleteSelectionInfo = { freeMaxPerRun: value };
+            return true;
+          },
+          [freeMaxPerRun]
+        );
+      }
       await executeScriptFiles(tab.id, [scriptName]);
     } catch (error) {
       console.error(`Failed to execute ${scriptName}:`, error);
@@ -1025,10 +1041,24 @@ async function initializeWhatsNew() {
   });
 }
 
+// The page's "Upgrade to delete all" button opens the popup on pricing.
+const OPEN_PRICING_KEY = "BulkDeleteChatGPT_openPricing";
+
+async function openPricingIfRequested() {
+  let requested = false;
+  try {
+    requested = Boolean((await chrome.storage.local.get(OPEN_PRICING_KEY))[OPEN_PRICING_KEY]);
+    if (requested) await chrome.storage.local.remove(OPEN_PRICING_KEY);
+  } catch (error) {
+    return;
+  }
+  if (requested && currentView() === "main") openPricing();
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initializeWhatsNew();
   initializeSiteNotice();
   initializeButtons();
   initializeSettings();
-  initializeAccount();
+  initializeAccount().then(openPricingIfRequested);
 });
