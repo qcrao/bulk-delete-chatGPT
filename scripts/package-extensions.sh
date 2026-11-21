@@ -28,6 +28,7 @@ FILES=(
   checkboxManager.js
   config.js
   conversationHandler.js
+  conversationPreview.js
   domHandler.js
   extensionCore.js
   globals.js

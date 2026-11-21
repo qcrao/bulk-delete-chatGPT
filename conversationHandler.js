@@ -98,6 +98,15 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
 
     // Base conversation operation
     async performOperation(operation, selectedConversations, buttonId) {
+      // The preview panel must not sit over the sidebar while rows are
+      // being deleted/archived.
+      const preview = window.ChatGPTBulkDelete && window.ChatGPTBulkDelete.getModule
+        ? window.ChatGPTBulkDelete.getModule('ConversationPreview')
+        : null;
+      if (preview && preview.closePreview) {
+        preview.closePreview();
+      }
+
       if (selectedConversations.length === 0) {
         console.log(`No conversations to ${operation.toLowerCase()}.`);
         CommonUtils.removeAllCheckboxes();

@@ -130,6 +130,14 @@ if (typeof window.utilsLoaded === "undefined") {
 
     // Remove all checkboxes
     removeAllCheckboxes() {
+      // Also stops auto-add and closes the preview, so selection mode fully ends.
+      const manager = window.ChatGPTBulkDelete && window.ChatGPTBulkDelete.getModule
+        ? window.ChatGPTBulkDelete.getModule('CheckboxManager')
+        : null;
+      if (manager && manager.removeAllCheckboxes) {
+        manager.removeAllCheckboxes();
+        return;
+      }
       const checkboxes = document.querySelectorAll(`.${CSS_CLASSES.CHECKBOX}`);
       checkboxes.forEach(checkbox => checkbox.remove());
     },

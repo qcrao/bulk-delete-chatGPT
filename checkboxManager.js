@@ -95,6 +95,14 @@
 
           const checkbox = this.createCheckbox(index);
           checkbox.checked = isChecked;
+          // Track it for auto-add, including when "Add" is clicked again and
+          // replaces existing checkboxes.
+          if (this._knownCheckboxes) {
+            if (existingCheckbox) {
+              this._knownCheckboxes.delete(existingCheckbox);
+            }
+            this._knownCheckboxes.add(checkbox);
+          }
           // Lets a bulk run find this conversation again if ChatGPT re-renders
           // the row and detaches the checkbox.
           const domHandler = coreSystem.getModule('DOMHandler');
@@ -130,7 +138,9 @@
           if (computed.position === 'static') {
             conversation.style.position = 'relative';
           }
-          if (!conversation.dataset.bulkDeleteOriginalPadding) {
+          // Keep the padding from before selection mode ('' included) so a
+          // second "Add" doesn't record our own padding as the original.
+          if (!('bulkDeleteOriginalPadding' in conversation.dataset)) {
             conversation.dataset.bulkDeleteOriginalPadding = conversation.style.paddingLeft || '';
           }
           conversation.style.paddingLeft = '28px';
@@ -140,6 +150,15 @@
           // what triggers the removeChild crash.
           conversation.appendChild(checkbox);
           utils.debug(`Checkbox added to conversation ${index}, checked: ${isChecked}`);
+
+          // Read-only preview entry; independent of the checkbox state.
+          const preview = coreSystem.getModule('ConversationPreview');
+          if (preview && route) {
+            const title = domHandler && domHandler.getConversationTitle
+              ? domHandler.getConversationTitle(conversation)
+              : '';
+            preview.addPreviewButton(conversation, route, title);
+          }
 
           return checkbox;
 
@@ -183,6 +202,11 @@
             }
 
             if (clickedElement.classList.contains(CSS_CLASSES.CHECKBOX)) {
+              return;
+            }
+
+            const preview = core.getModule('ConversationPreview');
+            if (preview && preview.isPreviewControl(clickedElement)) {
               return;
             }
 
@@ -230,10 +254,164 @@
       },
 
       /**
+       * Keep selection mode applied to rows ChatGPT renders later: expanding a
+       * project folder, loading more history, or re-rendering an existing row.
+       * A row re-rendered while selected gets its checked state back.
+       */
+      startAutoAdd() {
+        if (this._autoAddObserver) {
+          return;
+        }
+        this._autoAddTimer = null;
+        this._knownCheckboxes = new Set(this.getAllCheckboxes());
+        // route -> time until which a dropped selection may be restored.
+        this._pendingRestore = new Map();
+        const rowSelector = `a[href*="/c/"], .${CSS_CLASSES.CHECKBOX}`;
+        const relevant = (node) => node.nodeType === 1 && (
+          node.matches(rowSelector) || node.querySelector(rowSelector)
+        );
+        this._autoAddObserver = new MutationObserver((mutations) => {
+          const touchesRows = mutations.some((mutation) => {
+            if (mutation.type === 'attributes') {
+              // ChatGPT can reuse a row element for a different chat.
+              return mutation.target.matches && mutation.target.matches('a[href*="/c/"]');
+            }
+            return Array.prototype.some.call(mutation.addedNodes, relevant)
+              || Array.prototype.some.call(mutation.removedNodes, relevant);
+          });
+          if (touchesRows) {
+            this.scheduleAutoAdd(200);
+          }
+        });
+        this._autoAddObserver.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ['href']
+        });
+        utils.debug('Auto-add for new conversation rows started');
+      },
+
+      scheduleAutoAdd(delay) {
+        if (!this._autoAddObserver || this._autoAddTimer) {
+          return;
+        }
+        this._autoAddTimer = setTimeout(() => {
+          this._autoAddTimer = null;
+          this.addMissingCheckboxes();
+        }, delay);
+      },
+
+      stopAutoAdd() {
+        if (this._autoAddObserver) {
+          this._autoAddObserver.disconnect();
+          this._autoAddObserver = null;
+        }
+        if (this._autoAddTimer) {
+          clearTimeout(this._autoAddTimer);
+          this._autoAddTimer = null;
+        }
+        this._knownCheckboxes = null;
+        this._pendingRestore = null;
+      },
+
+      addMissingCheckboxes() {
+        // A bulk run works from its own snapshot and re-finds rows by route;
+        // don't churn the sidebar under it, but catch up once it's over.
+        const running = core.state && core.state.operationsInProgress;
+        if (running && (running.has('bulkDelete') || running.has('bulkArchive'))) {
+          this.scheduleAutoAdd(1000);
+          return 0;
+        }
+        const DOMHandler = coreSystem.getModule('DOMHandler');
+        if (!DOMHandler || !this._knownCheckboxes) {
+          return 0;
+        }
+
+        // A selection survives a quick re-render, but not a row that stays
+        // gone (e.g. a collapsed project folder): a bulk run only sees rows on
+        // screen, so a hidden "selected" row would silently be skipped.
+        const RESTORE_WINDOW_MS = 3000;
+        const now = Date.now();
+        const remember = (checkbox) => {
+          const route = checkbox.dataset.bulkDeleteRoute;
+          if (!route) {
+            return;
+          }
+          if (checkbox.checked) {
+            this._pendingRestore.set(route, now + RESTORE_WINDOW_MS);
+          } else {
+            this._pendingRestore.delete(route);
+          }
+        };
+        for (const checkbox of this._knownCheckboxes) {
+          if (!checkbox.isConnected) {
+            remember(checkbox);
+            this._knownCheckboxes.delete(checkbox);
+          }
+        }
+        for (const [route, until] of this._pendingRestore) {
+          if (until < now) {
+            this._pendingRestore.delete(route);
+          }
+        }
+
+        let index = this.getAllCheckboxes().length;
+        let added = 0;
+        const restored = new Set();
+        DOMHandler.getAllConversations().forEach((conversation) => {
+          // One odd row must not stop the rest of the pass.
+          try {
+            const route = DOMHandler.getConversationRoute(conversation);
+            const existing = conversation.querySelector(`.${CSS_CLASSES.CHECKBOX}`);
+            if (existing) {
+              if (existing.dataset.bulkDeleteRoute === route) {
+                return;
+              }
+              // Row element reused for another chat: its checkbox and preview
+              // icon still belong to the old one.
+              remember(existing);
+              this._knownCheckboxes.delete(existing);
+              existing.remove();
+            }
+            const checkbox = this.addCheckboxToConversation(conversation, index++);
+            this.setupConversationInteraction(conversation);
+            if (route && this._pendingRestore.has(route)) {
+              checkbox.checked = true;
+              restored.add(route);
+            }
+            added++;
+          } catch (error) {
+            utils.log('error', 'Failed to add checkbox to a new row:', error);
+          }
+        });
+        // Every copy of a route rendered in this pass got its state back
+        // (sidebar folder + Recents can show the same chat twice).
+        restored.forEach((route) => this._pendingRestore.delete(route));
+
+        if (added) {
+          utils.debug(`Auto-added checkboxes to ${added} conversation rows`);
+        }
+        return added;
+      },
+
+      /**
        * Remove all checkboxes from the page
        */
       removeAllCheckboxes() {
         try {
+          this.stopAutoAdd();
+          const preview = coreSystem.getModule('ConversationPreview');
+          if (preview) {
+            preview.cleanup();
+          }
+          // Not every exit reloads the page (e.g. a run with nothing selected).
+          document.querySelectorAll('[data-bulk-delete-conversation-owner="true"]').forEach((row) => {
+            if ('bulkDeleteOriginalPadding' in row.dataset) {
+              row.style.paddingLeft = row.dataset.bulkDeleteOriginalPadding;
+              delete row.dataset.bulkDeleteOriginalPadding;
+            }
+          });
           const checkboxes = utils.safeQueryAll(`.${CSS_CLASSES.CHECKBOX}`);
           let removedCount = 0;
           

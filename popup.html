@@ -287,6 +287,19 @@
       </section>
     </div>
 
+    <!-- One-time "what's new" after an update (flag set by background.js) -->
+    <div id="whatsNew" class="sheet-backdrop" hidden>
+      <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="whatsNewTitle">
+        <div class="sheet-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+        </div>
+        <h1 id="whatsNewTitle" class="display-sm">New: preview conversations</h1>
+        <p class="muted">After you click Add, each conversation gets an eye icon next to its checkbox. Hover it to peek at the conversation, or click it to keep the preview open.</p>
+        <p class="muted">Check what a conversation says before you delete or archive it.</p>
+        <button id="whatsNewClose" class="btn btn-gold" type="button">Close</button>
+      </section>
+    </div>
+
     <!-- Pre-checkout notice -->
     <div id="checkoutNotice" class="sheet-backdrop" hidden>
       <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="checkoutNoticeTitle">

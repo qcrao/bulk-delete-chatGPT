@@ -39,6 +39,13 @@
         throw new Error('DOMHandler module not available');
       }
 
+      // Rows rendered later (expanded project folder, more history, a
+      // sidebar opened after "Add") get checkboxes too, until selection mode
+      // is exited. Started before the empty-list return for that last case.
+      if (CheckboxManager.startAutoAdd) {
+        CheckboxManager.startAutoAdd();
+      }
+
       // Get all conversations
       const conversations = DOMHandler.getAllConversations();
       utils.log('log', `Found ${conversations.length} conversations to process`);

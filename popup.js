@@ -6,7 +6,8 @@ const CORE_SCRIPT_FILES = [
   "utils.js",
   "domHandler.js",
   "conversationHandler.js",
-  "checkboxManager.js"
+  "checkboxManager.js",
+  "conversationPreview.js"
 ];
 
 const DELAY_SETTINGS_CONFIG = {
@@ -1002,7 +1003,30 @@ async function initializeSiteNotice() {
   });
 }
 
+// ---------------------------------------------------------------------------
+// One-time "what's new" sheet after an update (flag set in background.js)
+// ---------------------------------------------------------------------------
+
+const WHATS_NEW_KEY = "BulkDeleteChatGPT_whatsNew";
+
+async function initializeWhatsNew() {
+  let pending = null;
+  try {
+    pending = (await chrome.storage.local.get(WHATS_NEW_KEY))[WHATS_NEW_KEY];
+  } catch (error) {
+    return;
+  }
+  if (pending !== "conversation-preview") return;
+
+  $("whatsNew").hidden = false;
+  $("whatsNewClose").addEventListener("click", () => {
+    $("whatsNew").hidden = true;
+    chrome.storage.local.remove(WHATS_NEW_KEY).catch(() => {});
+  });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  initializeWhatsNew();
   initializeSiteNotice();
   initializeButtons();
   initializeSettings();

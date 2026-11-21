@@ -84,6 +84,12 @@ if (typeof window.domHandlerLoaded === "undefined") {
       }
     },
 
+    // The extension's own UI (e.g. the preview panel's "Open full
+    // conversation" link) must never count as a ChatGPT conversation row.
+    isExtensionUi(element) {
+      return Boolean(element && element.closest && element.closest('[data-bulk-delete-ignore]'));
+    },
+
     findConversationLinksByRoute(route) {
       if (!route) {
         return [];
@@ -92,6 +98,9 @@ if (typeof window.domHandlerLoaded === "undefined") {
       return Array.from(
         document.querySelectorAll(UI_CONFIG.SELECTORS.CONVERSATION_SELECTOR)
       ).filter((link) => {
+        if (this.isExtensionUi(link)) {
+          return false;
+        }
         try {
           return new URL(link.href, window.location.href).pathname === route;
         } catch (error) {
@@ -127,6 +136,9 @@ if (typeof window.domHandlerLoaded === "undefined") {
 
     isConversationLink(link) {
       if (!link || !link.matches(UI_CONFIG.SELECTORS.CONVERSATION_SELECTOR)) {
+        return false;
+      }
+      if (this.isExtensionUi(link)) {
         return false;
       }
 

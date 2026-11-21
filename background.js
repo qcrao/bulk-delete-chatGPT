@@ -302,8 +302,32 @@ const handlers = {
   }
 };
 
-chrome.runtime.onInstalled.addListener(() => {
-  console.log("Extension installed");
+// "What's new" sheet shown once in the popup after an update that adds a
+// feature. Fresh installs and reloads of the same version don't trigger it.
+const WHATS_NEW_KEY = "BulkDeleteChatGPT_whatsNew";
+const WHATS_NEW = { id: "conversation-preview", sinceVersion: "7.9" };
+
+function compareVersions(a, b) {
+  const pa = String(a).split(".").map(Number);
+  const pb = String(b).split(".").map(Number);
+  for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+    const diff = (pa[i] || 0) - (pb[i] || 0);
+    if (diff) return diff;
+  }
+  return 0;
+}
+
+chrome.runtime.onInstalled.addListener(({ reason, previousVersion }) => {
+  console.log("Extension installed:", reason, previousVersion || "");
+  const currentVersion = chrome.runtime.getManifest().version;
+  if (
+    reason === "update" &&
+    previousVersion &&
+    compareVersions(previousVersion, WHATS_NEW.sinceVersion) < 0 &&
+    compareVersions(currentVersion, WHATS_NEW.sinceVersion) >= 0
+  ) {
+    chrome.storage.local.set({ [WHATS_NEW_KEY]: WHATS_NEW.id });
+  }
 });
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {

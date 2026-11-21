@@ -61,7 +61,8 @@ if (typeof window.configLoaded === "undefined") {
       threeDotButton: '[id^="radix-"]',
       HISTORY: '[id^="history"]',
       CONVERSATION_SELECTOR: 'a[href*="/c/"]',
-      PROJECT_CONVERSATION_SELECTOR: 'main li[class*="group/project-item"]',
+      // Project page rows: "group/project-chat" since 2026-11 (was "group/project-item").
+      PROJECT_CONVERSATION_SELECTOR: 'main li[class*="group/project-chat"], main li[class*="group/project-item"]',
       PROJECT_CONVERSATION_LINK_SELECTOR: 'a[href*="/c/"]',
       TITLE_SELECTOR: '[data-testid="conversation-title"], .relative.grow.overflow-hidden.whitespace-nowrap',
       INTERACTIVE_ELEMENT_SELECTOR: '[draggable="true"], [data-sidebar-item="true"]',
