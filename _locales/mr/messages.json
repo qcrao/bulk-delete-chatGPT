@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT संभाषणे एकाच वेळी हटवण्यासाठी Chrome एक्स्टेंशन"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT संभाषणे एकाच वेळी हटवण्यासाठी Firefox एक्स्टेंशन"
+  },
+  "actionTitle": {
+    "message": "संभाषणे एकाच वेळी हटवा"
+  }
+}

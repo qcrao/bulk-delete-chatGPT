@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Ekstensi Chrome untuk menghapus percakapan ChatGPT secara massal"
+  },
+  "extDescriptionFirefox": {
+    "message": "Ekstensi Firefox untuk menghapus percakapan ChatGPT secara massal"
+  },
+  "actionTitle": {
+    "message": "Hapus Percakapan Massal"
+  }
+}

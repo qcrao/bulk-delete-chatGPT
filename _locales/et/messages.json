@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Chrome'i laiendus ChatGPT vestluste hulgi kustutamiseks"
+  },
+  "extDescriptionFirefox": {
+    "message": "Firefoxi laiendus ChatGPT vestluste hulgi kustutamiseks"
+  },
+  "actionTitle": {
+    "message": "Kustuta vestlusi hulgi"
+  }
+}

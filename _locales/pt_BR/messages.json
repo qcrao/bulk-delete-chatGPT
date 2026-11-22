@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Uma extensão do Chrome para excluir conversas do ChatGPT em massa"
+  },
+  "extDescriptionFirefox": {
+    "message": "Uma extensão do Firefox para excluir conversas do ChatGPT em massa"
+  },
+  "actionTitle": {
+    "message": "Excluir conversas em massa"
+  }
+}

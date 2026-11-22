@@ -22,5 +22,6 @@ cp "$ROOT_DIR"/*.js "$DIST_DIR"/
 cp "$ROOT_DIR"/popup.html "$DIST_DIR"/
 cp "$ROOT_DIR"/popup.css "$DIST_DIR"/
 cp "$ROOT_DIR"/icon48.png "$DIST_DIR"/
+cp -R "$ROOT_DIR"/locales "$ROOT_DIR"/_locales "$DIST_DIR"/
 
 echo "Firefox extension prepared at $DIST_DIR"

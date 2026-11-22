@@ -1,4 +1,5 @@
 const CORE_SCRIPT_FILES = [
+  "i18n.js",
   "extensionCore.js",
   "config.js",
   "remoteConfig.js",
@@ -26,10 +27,13 @@ const DELAY_SETTINGS_CONFIG = {
 };
 
 const PLAN_INFO = {
-  monthly: { name: "Pro Monthly", price: "$4.90 / month", cents: 490, cta: "Continue · $4.90 / month" },
-  yearly: { name: "Pro Yearly", price: "$19.90 / year", cents: 1990, cta: "Continue · $19.90 / year" },
-  lifetime: { name: "Lifetime", price: "$39.90 once", cents: 3990, cta: "Continue · $39.90 once" }
+  monthly: { cents: 490 },
+  yearly: { cents: 1990 },
+  lifetime: { cents: 3990 }
 };
+const LEGACY_PRICE_CENTS = 99;
+
+const t = (key, params) => BDI18n.t(key, params);
 
 const STORE_URL =
   "https://chromewebstore.google.com/detail/chatgpt-bulk-delete/effkgioceefcfaegehhfafjneeiabdjg?hl=en";
@@ -43,6 +47,8 @@ class BackgroundError extends Error {
     super(response.error || "Request failed");
     this.status = response.status || 0;
     this.body = response.body || null;
+    this.code = response.code || null; // e.g. "signin_canceled"
+    this.detail = response.detail || null; // e.g. an OAuth error code
   }
 }
 
@@ -208,7 +214,7 @@ async function initializeSettings() {
 
   const showSavedState = () => {
     const originalText = saveButton.textContent;
-    saveButton.textContent = "Saved";
+    saveButton.textContent = t("settings.saved");
     setTimeout(() => {
       saveButton.textContent = originalText;
     }, 900);
@@ -218,8 +224,7 @@ async function initializeSettings() {
     const settings = readSettingsFromForm();
 
     if (!settings.autoSlowdown) {
-      delayPreview.textContent =
-        `Fixed ${settings.baseDelayMs} ms between conversations.`;
+      delayPreview.textContent = t("settings.preview.fixed", { ms: settings.baseDelayMs });
       return;
     }
 
@@ -234,8 +239,12 @@ async function initializeSettings() {
       settings.baseDelayMs,
       Math.min(DELAY_SETTINGS_CONFIG.maxBatchCooldownMs, settings.baseDelayMs * 3)
     );
-    delayPreview.textContent =
-      `First 10: ${settings.baseDelayMs} ms each. Next batch: ${secondBatchDelay} ms each, with ${firstCooldown} ms cooldown between batches.`;
+    delayPreview.textContent = t("settings.preview.auto", {
+      batch: DELAY_SETTINGS_CONFIG.batchSize,
+      first: settings.baseDelayMs,
+      second: secondBatchDelay,
+      cooldown: firstCooldown
+    });
   }
 
   const closeSettings = () => {
@@ -319,25 +328,23 @@ function isSubscriber() {
   return isPro() && (plan === "monthly" || plan === "yearly");
 }
 
+// Prices are in US dollars; BDI18n formats them for the UI language.
 function formatCents(cents) {
-  return `$${(cents / 100).toFixed(2)}`;
+  return BDI18n.formatUsd(cents);
 }
 
 function formatShortCents(cents) {
-  return cents % 100 === 0 ? `$${cents / 100}` : formatCents(cents);
+  return BDI18n.formatUsd(cents, { short: true });
 }
 
 function formatDate(unixSeconds) {
-  return new Date(unixSeconds * 1000).toLocaleDateString(undefined, {
-    year: "numeric",
-    month: "short",
-    day: "numeric"
-  });
+  return BDI18n.formatDate(unixSeconds);
 }
 
+// "in 3 hours"
 function formatResetsIn(unixSeconds) {
   const hours = Math.max(1, Math.ceil((unixSeconds * 1000 - Date.now()) / 3600000));
-  return hours === 1 ? "in 1 hour" : `in ${hours} hours`;
+  return BDI18n.formatHoursFromNow(hours);
 }
 
 function renderAvatar(element, user) {
@@ -366,15 +373,16 @@ function createTextSpan(className, textContent) {
 
 function setDefaultButtonContent(button, buttonId) {
   if (buttonId === "bulk-archive") {
-    const children = [createTextSpan("button-text", "Bulk Archive")];
+    const children = [createTextSpan("button-text", t("main.bulkArchive"))];
     if (!isPro()) children.push(createTextSpan("button-tag", "PRO"));
     button.replaceChildren(...children);
     return;
   }
 
-  const children = [createTextSpan("button-text", "Bulk Delete")];
+  const children = [createTextSpan("button-text", t("main.bulkDelete"))];
   if (state.account && !isPro()) {
-    children.push(createTextSpan("button-tag muted-tag", "max 10"));
+    const max = state.account.usage?.freeMaxPerRun ?? 10;
+    children.push(createTextSpan("button-tag muted-tag", t("main.maxPerRun", { max })));
   }
   button.replaceChildren(...children);
 }
@@ -402,15 +410,13 @@ function renderMain() {
   if (account && !pro && usage) {
     $("freePlanText").textContent =
       usage.deleteRunsLeftToday > 0
-        ? `${usage.deleteRunsLeftToday} free run today · up to ${usage.freeMaxPerRun} chats`
-        : `Free run used · resets ${formatResetsIn(usage.resetsAt)}`;
+        ? t("main.freePlan.runsLeft", { runs: usage.deleteRunsLeftToday, max: usage.freeMaxPerRun })
+        : t("main.freePlan.used", { when: formatResetsIn(usage.resetsAt) });
   }
 
   if (pro) {
     $("proNoteText").textContent =
-      entitlement().plan === "lifetime"
-        ? "Lifetime · unlimited conversations · no ads"
-        : "Pro · unlimited conversations · no ads";
+      entitlement().plan === "lifetime" ? t("main.proNote.lifetime") : t("main.proNote.pro");
   }
 
   for (const id of ["bulk-delete", "bulk-archive"]) {
@@ -428,28 +434,38 @@ function renderAccount() {
   renderAvatar($("accountAvatar"), account.user);
   $("accountName").textContent = account.user.name || account.user.email;
   $("accountEmail").textContent = account.user.email;
-  $("accountVersion").textContent = `v${chrome.runtime.getManifest().version}`;
+  $("accountSignedIn").textContent = t("account.signedInWith", {
+    version: `v${chrome.runtime.getManifest().version}`
+  });
 
   const statusText = $("planStatusText");
   $("planStatus").classList.toggle("is-warning", ent.status === "past_due" || ent.cancelAtPeriodEnd);
   $("planStatus").hidden = plan === "free";
   statusText.textContent =
-    ent.status === "past_due" ? "Payment issue" : ent.cancelAtPeriodEnd ? "Canceling" : "Active";
+    ent.status === "past_due"
+      ? t("account.status.paymentIssue")
+      : ent.cancelAtPeriodEnd
+        ? t("account.status.canceling")
+        : t("account.status.active");
 
-  $("planName").textContent = plan === "free" ? "Free" : PLAN_INFO[plan].name;
-  $("planPrice").textContent = plan === "free" || plan === "lifetime" ? "" : PLAN_INFO[plan].price;
+  $("planName").textContent = t(`account.planName.${plan}`);
+  $("planPrice").textContent =
+    plan === "free" || plan === "lifetime" ? "" : planPriceLabel(plan);
 
   let detail = "";
   if (plan === "free") {
-    detail = `${account.usage.freeDeleteRunsPerDay} bulk delete a day · up to ${account.usage.freeMaxPerRun} chats per run`;
+    detail = t("account.detail.free", {
+      runs: account.usage.freeDeleteRunsPerDay,
+      max: account.usage.freeMaxPerRun
+    });
   } else if (plan === "lifetime") {
     detail = ent.source === "legacy"
-      ? "Upgraded from your earlier $0.99 purchase. Thank you!"
-      : "Paid once. Yours forever.";
+      ? t("account.detail.legacy", { price: formatCents(LEGACY_PRICE_CENTS) })
+      : t("account.detail.lifetime");
   } else if (ent.currentPeriodEnd) {
     detail = ent.cancelAtPeriodEnd
-      ? `Ends on ${formatDate(ent.currentPeriodEnd)}`
-      : `Renews on ${formatDate(ent.currentPeriodEnd)}`;
+      ? t("account.detail.ends", { date: formatDate(ent.currentPeriodEnd) })
+      : t("account.detail.renews", { date: formatDate(ent.currentPeriodEnd) });
   }
   $("planDetail").textContent = detail;
 
@@ -460,20 +476,22 @@ function renderAccount() {
 
   if (subscriber) {
     const credit = PLAN_INFO[plan].cents;
-    $("goLifetime").textContent = "Go Lifetime";
-    $("upgradeNote").textContent =
-      `Your current ${PLAN_INFO[plan].price.split(" / ")[0]} payment counts toward Lifetime. ` +
-      "Your subscription won't renew, so there are no further charges.";
+    $("goLifetime").textContent = t("account.goLifetime");
+    $("upgradeNote").textContent = t("account.upgradeNote.credit", { price: formatCents(credit) });
     loadLifetimeQuote().then((quote) => {
       if (!quote || currentView() !== "account") return;
-      $("goLifetime").textContent = `Go Lifetime · ${formatShortCents(quote.amount)}`;
+      $("goLifetime").textContent = t("account.goLifetimePrice", { price: formatShortCents(quote.amount) });
       if (quote.credit !== credit) {
         $("upgradeNote").textContent = quote.credit > 0
-          ? `Your current ${formatCents(quote.credit)} payment counts toward Lifetime. Your subscription won't renew, so there are no further charges.`
-          : "Your subscription won't renew, so there are no further charges.";
+          ? t("account.upgradeNote.credit", { price: formatCents(quote.credit) })
+          : t("account.upgradeNote.noCredit");
       }
     });
   }
+}
+
+function planPriceLabel(plan) {
+  return t(`account.price.${plan}`, { price: formatCents(PLAN_INFO[plan].cents) });
 }
 
 async function loadLifetimeQuote() {
@@ -517,10 +535,13 @@ function renderLifetimeOption() {
   const quote = isSubscriber() ? state.lifetimeQuote : null;
   if (quote && quote.credit > 0) {
     $("lifetimePrice").textContent = formatShortCents(quote.amount);
-    $("lifetimeSub").textContent = `$39.9 minus your ${formatCents(quote.credit)} payment`;
+    $("lifetimeSub").textContent = t("pricing.lifetime.credit", {
+      full: formatShortCents(PLAN_INFO.lifetime.cents),
+      credit: formatCents(quote.credit)
+    });
   } else {
-    $("lifetimePrice").textContent = "$39.9";
-    $("lifetimeSub").textContent = "Pay once, yours forever";
+    $("lifetimePrice").textContent = formatShortCents(PLAN_INFO.lifetime.cents);
+    $("lifetimeSub").textContent = t("pricing.lifetime.sub");
   }
 }
 
@@ -529,14 +550,14 @@ function renderCheckoutButton() {
   const quote = isSubscriber() ? state.lifetimeQuote : null;
   $("checkoutButton").textContent =
     plan === "lifetime" && quote
-      ? `Upgrade · ${formatCents(quote.amount)} once`
-      : PLAN_INFO[plan].cta;
+      ? t("pricing.checkout.upgrade", { price: formatCents(quote.amount) })
+      : t(`pricing.checkout.${plan}`, { price: formatCents(PLAN_INFO[plan].cents) });
   $("checkoutFine").textContent =
     plan === "lifetime"
       ? isSubscriber()
-        ? "One-time payment · Your subscription won't renew · Secure checkout by Stripe"
-        : "One-time payment · No renewals · Secure checkout by Stripe"
-      : "Renews automatically · Cancel anytime · Secure checkout by Stripe";
+        ? t("pricing.fine.upgrade")
+        : t("pricing.fine.oneTime")
+      : t("pricing.fine.recurring");
 }
 
 function applyAccount(account) {
@@ -565,7 +586,7 @@ async function refreshAccount() {
       return null;
     }
     console.warn("Unable to refresh account:", error);
-    if (!state.account) showNotice("Can't reach the server. Check your connection and reopen the extension.");
+    if (!state.account) showNotice(t("notice.serverUnreachable"));
     return null;
   }
 }
@@ -610,8 +631,12 @@ async function handleSignIn() {
     showView(cached.legacyUpgraded ? "legacy" : "main");
   } catch (error) {
     console.warn("Sign-in failed:", error);
-    if (!/cancel|did not approve|closed/i.test(error.message)) {
-      errorText.textContent = error.message || "Sign-in failed. Please try again.";
+    // Matches Chrome's (English-only) messages for a closed/declined window.
+    const canceled = /cancel|did not approve|closed/i.test(error.message || "");
+    if (!canceled) {
+      errorText.textContent = error.detail
+        ? t("signin.error.withCode", { code: error.detail })
+        : t("signin.error.failed");
       errorText.hidden = false;
     }
   } finally {
@@ -644,22 +669,23 @@ function updateProgressBar(buttonId, progress) {
   button.style.setProperty("--progress", `${progress - 100}%`);
   button.setAttribute("data-progress", progress);
 
-  const actionText = buttonId === "bulk-delete" ? "Deleting" : "Archiving";
+  const deleting = buttonId === "bulk-delete";
+  const percent = new Intl.NumberFormat(BDI18n.locale, { style: "percent" }).format(progress / 100);
 
   if (progress === 100) {
     button.disabled = true;
-    setProgressButtonContent(button, "100%", `${actionText} Complete`);
+    setProgressButtonContent(button, percent, t(deleting ? "progress.deleteDone" : "progress.archiveDone"));
     setTimeout(() => resetOperationButton(buttonId), 500);
   } else {
     button.disabled = true;
-    setProgressButtonContent(button, `${progress}%`, `${actionText}...`);
+    setProgressButtonContent(button, percent, t(deleting ? "progress.deleting" : "progress.archiving"));
   }
 }
 
 function showDailyLimit(resetsAt) {
   $("limitText").textContent = resetsAt
-    ? `Your next free run unlocks ${formatResetsIn(resetsAt)}. Go Pro to delete and archive as much as you like, right now.`
-    : "Go Pro to delete and archive as much as you like, right now.";
+    ? t("limit.textWithTime", { when: formatResetsIn(resetsAt) })
+    : t("limit.text");
   $("limitSheet").hidden = false;
 }
 
@@ -705,7 +731,7 @@ async function runBulkOperation(operation) {
     const selectedCount = await countSelectedConversations(tab.id);
     if (selectedCount === 0) {
       resetOperationButton(buttonId);
-      showNotice("Select conversations first: click Add, then tick the ones you want.");
+      showNotice(t("notice.selectFirst"));
       return;
     }
 
@@ -725,7 +751,7 @@ async function runBulkOperation(operation) {
         openPricing();
         return;
       }
-      showNotice("Can't reach the server right now. Please try again.");
+      showNotice(t("notice.serverRetry"));
       return;
     }
 
@@ -736,7 +762,7 @@ async function runBulkOperation(operation) {
   } catch (error) {
     console.error(`Failed to run ${operation}:`, error);
     resetOperationButton(buttonId);
-    showNotice("Unable to run this on the current tab. Open chatgpt.com and try again.");
+    showNotice(t("notice.wrongTab"));
   }
 }
 
@@ -765,7 +791,7 @@ function addPageScriptListener(buttonId, scriptName) {
       await executeScriptFiles(tab.id, [scriptName]);
     } catch (error) {
       console.error(`Failed to execute ${scriptName}:`, error);
-      showNotice("Unable to run this on the current tab. Open chatgpt.com and try again.");
+      showNotice(t("notice.wrongTab"));
     }
   });
 }
@@ -783,23 +809,20 @@ chrome.runtime.onMessage.addListener((request) => {
 
   if (skippedCount > 0) {
     resetOperationButton(request.buttonId);
-    showNotice(
-      `${processedCount} conversation(s) processed, ${skippedCount} failed. ` +
-      "Reload the ChatGPT page and check the console for details."
-    );
+    showNotice(t("notice.partialFailure", { processed: processedCount, failed: skippedCount }));
   } else {
     updateProgressBar(request.buttonId, 100);
   }
 
   // The failure notice takes priority; it already says to reload the page.
   if (request.pageReload && skippedCount === 0) {
-    showNotice("Refreshing the ChatGPT page to update the sidebar.");
+    showNotice(t("notice.refreshing"));
   }
 
   if (limitedFrom > 0) {
     showNotice(
-      `Free plan: deleted the first ${processedCount} of ${limitedFrom} selected.`,
-      { action: { label: "Delete all with Pro", onClick: () => openPricing() } }
+      t("notice.freeLimited", { processed: processedCount, selected: limitedFrom }),
+      { action: { label: t("notice.deleteAllPro"), onClick: () => openPricing() } }
     );
   }
 
@@ -821,10 +844,10 @@ async function handleCheckout(plan = state.selectedPlan, button = $("checkoutBut
     const code = error.body?.error;
     errorText.textContent =
       code === "already_lifetime"
-        ? "You already have Lifetime."
+        ? t("pricing.error.alreadyLifetime")
         : code === "already_subscribed"
-          ? "You're already subscribed. Use Manage billing to switch plans."
-          : "Couldn't start checkout. Please try again.";
+          ? t("pricing.error.alreadySubscribed")
+          : t("pricing.error.failed");
     errorText.hidden = false;
     if (code) refreshAccount();
   } finally {
@@ -839,7 +862,7 @@ async function handleOpenPortal() {
     await sendToBackground("openPortal");
   } catch (error) {
     if (error.status === 401) return handleAuthLost();
-    $("upgradeNote").textContent = "Couldn't open billing. Please try again.";
+    $("upgradeNote").textContent = t("account.billingError");
     $("upgradeNote").hidden = false;
   } finally {
     button.disabled = false;
@@ -927,12 +950,12 @@ function initializeButtons() {
     button.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(button.dataset.copy);
-        button.textContent = "Copied";
+        button.textContent = t("common.copied");
       } catch (error) {
         console.warn("Copy failed:", error);
-        button.textContent = "Select & copy";
+        button.textContent = t("common.selectAndCopy");
       }
-      setTimeout(() => (button.textContent = "Copy"), 1500);
+      setTimeout(() => (button.textContent = t("common.copy")), 1500);
     });
   });
 
@@ -987,10 +1010,15 @@ const DISMISSED_NOTICE_KEY = "BulkDeleteChatGPT_dismissedNotice";
 let activeNoticeText = null;
 let activeNoticeLevel = null;
 
+// Notices are keyed by language: the UI language ("zh-CN", then "zh"),
+// then the browser language, then English.
 function pickNoticeMessage(message) {
-  // "zh-CN" -> "zh-CN", then "zh", then English.
-  const lang = navigator.language || "en";
-  return message[lang] || message[lang.split("-")[0]] || message.en;
+  const candidates = [BDI18n.locale, navigator.language || ""];
+  for (const lang of candidates) {
+    const text = message[lang] || message[lang.split("-")[0]];
+    if (text) return text;
+  }
+  return message.en;
 }
 
 async function initializeSiteNotice() {
@@ -1061,7 +1089,177 @@ async function openPricingIfRequested() {
   if (requested && currentView() === "main") openPricing();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+// ---------------------------------------------------------------------------
+// Language
+// ---------------------------------------------------------------------------
+
+// <html lang> of the active tab when it's ChatGPT (activeTab grants access
+// while the popup is open). Other tabs fall back to the language the content
+// script last saw on ChatGPT.
+async function readActiveTabLanguage() {
+  try {
+    const tab = await getActiveTab();
+    if (!tab?.id || !/^https:\/\/(chatgpt\.com|chat\.openai\.com)\//.test(tab.url || "")) return null;
+    const [result] = await Promise.race([
+      executeScriptFunction(tab.id, () => document.documentElement.lang),
+      new Promise((resolve) => setTimeout(() => resolve([]), 500))
+    ]);
+    return result?.result || null;
+  } catch (error) {
+    return null;
+  }
+}
+
+function renderStaticPrices() {
+  document.querySelectorAll("[data-price-usd]").forEach((element) => {
+    element.textContent = formatShortCents(Number(element.dataset.priceUsd));
+  });
+  const savings = 1 - PLAN_INFO.yearly.cents / (PLAN_INFO.monthly.cents * 12);
+  $("yearlySave").textContent = t("pricing.save", {
+    percent: new Intl.NumberFormat(BDI18n.locale, { style: "percent" }).format(Math.floor(savings * 100) / 100)
+  });
+}
+
+// Language menu, opened from the footer chip or the Settings row. A custom
+// list (not a native <select>) so it stays inside the popup: about 70 entries
+// would otherwise fill the whole screen. Order: "Same as ChatGPT", the user's
+// own languages (ChatGPT page, browser) and English, then the rest.
+async function initializeLanguageSelect(pageLang) {
+  const override = await BDI18n.getOverride();
+  const autoLocale = await BDI18n.detectAutoLocale(pageLang);
+  const suggested = [];
+  for (const tag of [override, autoLocale, chrome.i18n?.getUILanguage?.(), ...(navigator.languages || []), "en"]) {
+    const code = BDI18n.resolveLocale(tag);
+    if (code && !suggested.includes(code)) suggested.push(code);
+  }
+  const collator = new Intl.Collator(BDI18n.locale);
+  const rest = BDI18n.LOCALES
+    .filter((code) => !suggested.includes(code))
+    .sort((a, b) => collator.compare(BDI18n.nativeName(a), BDI18n.nativeName(b)));
+  const current = override || "auto";
+
+  const menu = $("languageMenu");
+  const item = (value, label, lang) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "language-menu-item";
+    button.setAttribute("role", "option");
+    button.dataset.value = value;
+    button.setAttribute("aria-selected", String(value === current));
+    if (lang) {
+      button.lang = lang;
+      button.dir = BDI18n.isRtl(lang) ? "rtl" : "ltr";
+    }
+    button.textContent = label;
+    return button;
+  };
+  const separator = document.createElement("div");
+  separator.className = "language-menu-separator";
+  separator.setAttribute("role", "separator");
+  menu.replaceChildren(
+    item("auto", `${t("settings.languageAuto")} · ${BDI18n.nativeName(autoLocale)}`),
+    ...suggested.map((code) => item(code, BDI18n.nativeName(code), code)),
+    separator,
+    ...rest.map((code) => item(code, BDI18n.nativeName(code), code))
+  );
+
+  const items = () => [...menu.querySelectorAll(".language-menu-item")];
+  let trigger = null;
+
+  const close = (refocus) => {
+    if (menu.hidden) return;
+    menu.hidden = true;
+    trigger?.setAttribute("aria-expanded", "false");
+    if (refocus) trigger?.focus();
+    trigger = null;
+  };
+
+  const open = (button) => {
+    trigger = button;
+    menu.hidden = false;
+    button.setAttribute("aria-expanded", "true");
+    // Above or below the trigger, whichever has more room; never off-screen.
+    const rect = button.getBoundingClientRect();
+    const margin = 8;
+    const viewport = document.documentElement.clientHeight;
+    const above = rect.top - margin;
+    const below = viewport - rect.bottom - margin;
+    const height = Math.min(320, Math.max(above, below) - 4);
+    menu.style.maxHeight = `${height}px`;
+    const width = Math.min(240, document.documentElement.clientWidth - 2 * margin);
+    menu.style.width = `${width}px`;
+    const rtl = document.documentElement.dir === "rtl";
+    const anchor = rtl ? rect.right - width : rect.left;
+    menu.style.left = `${Math.max(margin, Math.min(anchor, document.documentElement.clientWidth - width - margin))}px`;
+    if (above > below) {
+      menu.style.top = "";
+      menu.style.bottom = `${viewport - rect.top + 4}px`;
+    } else {
+      menu.style.bottom = "";
+      menu.style.top = `${rect.bottom + 4}px`;
+    }
+    const selected = items().find((el) => el.dataset.value === current) || items()[0];
+    selected.scrollIntoView({ block: "center" });
+    selected.focus({ preventScroll: true });
+  };
+
+  const choose = async (value) => {
+    close(false);
+    if (value === current) return;
+    await BDI18n.setOverride(value === "auto" ? null : value);
+    location.reload();
+  };
+
+  menu.addEventListener("click", (event) => {
+    const target = event.target.closest(".language-menu-item");
+    if (target) choose(target.dataset.value);
+  });
+  menu.addEventListener("keydown", (event) => {
+    const list = items();
+    const index = list.indexOf(document.activeElement);
+    const move = (next) => {
+      event.preventDefault();
+      list[Math.max(0, Math.min(list.length - 1, next))].focus();
+    };
+    if (event.key === "ArrowDown") move(index + 1);
+    else if (event.key === "ArrowUp") move(index - 1);
+    else if (event.key === "Home") move(0);
+    else if (event.key === "End") move(list.length - 1);
+    else if (event.key === "Escape") {
+      event.preventDefault();
+      close(true);
+    } else if (event.key === "Tab") close(false);
+  });
+  document.addEventListener("pointerdown", (event) => {
+    if (!menu.hidden && !menu.contains(event.target) && !trigger?.contains(event.target)) close(false);
+  });
+  window.addEventListener("blur", () => close(false));
+
+  for (const button of [$("languageButton"), $("languageSettingButton")]) {
+    if (!button) continue;
+    button.addEventListener("click", () => (menu.hidden || trigger !== button ? open(button) : close(false)));
+  }
+
+  const chipCode = $("langChipCode");
+  if (chipCode) chipCode.textContent = BDI18n.locale.split("-")[0].toUpperCase();
+  const settingName = $("languageSettingName");
+  if (settingName) {
+    settingName.textContent = current === "auto" ? t("settings.languageAuto") : BDI18n.nativeName(current);
+  }
+}
+
+async function initializeLanguage() {
+  const pageLang = await readActiveTabLanguage();
+  await BDI18n.init({ pageLang });
+  BDI18n.apply();
+  renderStaticPrices();
+  await initializeLanguageSelect(pageLang);
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  // Strings first: the loading view stays up until the UI is translated.
+  // A failure here must not leave the popup stuck on the spinner.
+  await initializeLanguage().catch((error) => console.warn("Language setup failed:", error));
   initializeWhatsNew();
   initializeSiteNotice();
   initializeButtons();

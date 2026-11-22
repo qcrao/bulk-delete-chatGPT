@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Une extension Chrome pour supprimer des conversations ChatGPT en masse"
+  },
+  "extDescriptionFirefox": {
+    "message": "Une extension Firefox pour supprimer des conversations ChatGPT en masse"
+  },
+  "actionTitle": {
+    "message": "Supprimer des conversations en masse"
+  }
+}

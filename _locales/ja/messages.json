@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT のチャットをまとめて削除できる Chrome 拡張機能"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT のチャットをまとめて削除できる Firefox 拡張機能"
+  },
+  "actionTitle": {
+    "message": "チャットを一括削除"
+  }
+}

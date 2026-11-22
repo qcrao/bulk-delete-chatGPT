@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Sambungan Chrome untuk memadam perbualan ChatGPT secara pukal"
+  },
+  "extDescriptionFirefox": {
+    "message": "Sambungan Firefox untuk memadam perbualan ChatGPT secara pukal"
+  },
+  "actionTitle": {
+    "message": "Padam Perbualan Secara Pukal"
+  }
+}

@@ -15,6 +15,7 @@ This is a Chrome extension called "ChatGPT Bulk Delete" that allows users to bul
 - **background.js**: Service worker for Chrome extension background tasks
 - **Content Scripts** (injected into ChatGPT pages):
   - `globals.js`: Shared constants and selectors for ChatGPT UI elements
+  - `i18n.js`: Translations, language detection and formatting (see Internationalization)
   - `utils.js`: Utility functions including analytics
   - `addCheckboxes.js`: Adds checkboxes to conversation items
   - `bulkDeleteConversations.js`: Handles bulk deletion logic
@@ -77,6 +78,15 @@ This extension has no build system - files are loaded directly. Changes to any `
 - External API verification at bulk-delete-chatgpt-worker domain
 - Payment flow integration for bulk archive feature
 
+## Internationalization (i18n)
+
+- UI strings live in `locales/<code>.json`, one file per language in ChatGPT's App language menu (66 codes, listed in `LOCALES` in `i18n.js`). `locales/en.json` is the source of truth (`{ key: { message, description } }`); other files are flat (`{ key: message }`). Missing keys fall back to English.
+- Messages use an ICU MessageFormat subset: `{name}`, `{n, plural, one {# chat} other {# chats}}`, `{x, select, ...}`, plus rich-text tags such as `<b>…</b>` that fill `data-i18n-slot` templates (text only, never innerHTML).
+- Language: a manual choice in Settings (`BulkDeleteChatGPT_localeOverride`) wins; otherwise the ChatGPT page's `<html lang>` (set from ChatGPT's App language; the content script stores it in `BulkDeleteChatGPT_pageLang` for the popup), then the browser language, then English. `ar`, `fa` and `ur` are right-to-left.
+- Popup: `data-i18n`, `data-i18n-title`, `data-i18n-aria-label`, `data-i18n-args` in `popup.html`; `t()` in `popup.js`. Content scripts use `window.BDI18n.t()`; their catalogs come from the background (`getLocaleCatalog`) so nothing is web-accessible.
+- Adding or changing a string: edit `locales/en.json` (with a description), translate the key in every other file, then run `node scripts/i18n-check.mjs` (keys, arguments, tags, plural categories, store-description length). `--write` regenerates `_locales/` (manifest description and toolbar title, for the languages Chrome accepts). `scripts/package-extensions.sh` refuses to package if the check fails.
+- Prices are always US dollars, formatted per language with `BDI18n.formatUsd`. Use logical CSS properties (`inset-inline-start`, `padding-inline-start`, `text-align: start`) so right-to-left layouts work.
+
 ## Common Issues & Debugging
 
 ### Selector Breakage
@@ -96,6 +106,7 @@ ChatGPT frequently updates their UI, breaking selectors in `config.js`. When fun
 
 ### Script Loading Order
 Scripts load in dependency order via manifest.json:
+1. `i18n.js` - Translations (`window.BDI18n`)
 1. `config.js` - Configuration constants
 2. `globals.js` - Global state
 3. `utils.js` - Utility functions

@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Chrome додатак за масовно брисање ChatGPT разговора"
+  },
+  "extDescriptionFirefox": {
+    "message": "Firefox додатак за масовно брисање ChatGPT разговора"
+  },
+  "actionTitle": {
+    "message": "Масовно брисање разговора"
+  }
+}

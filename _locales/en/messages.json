@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "A Chrome extension to bulk delete ChatGPT conversations"
+  },
+  "extDescriptionFirefox": {
+    "message": "A Firefox extension to bulk delete ChatGPT conversations"
+  },
+  "actionTitle": {
+    "message": "Bulk Delete Conversations"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "O extensie Chrome pentru ștergerea în bloc a conversațiilor ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "O extensie Firefox pentru ștergerea în bloc a conversațiilor ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Ștergere conversații în bloc"
+  }
+}

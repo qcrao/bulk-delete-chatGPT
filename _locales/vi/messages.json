@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Tiện ích Chrome giúp xóa hàng loạt đoạn chat ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "Tiện ích Firefox giúp xóa hàng loạt đoạn chat ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Xóa hàng loạt đoạn chat"
+  }
+}

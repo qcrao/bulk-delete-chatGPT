@@ -116,7 +116,7 @@
           // `appearance: none` on inputs), which render the checkbox invisible.
           checkbox.style.cssText = `
             position: absolute !important;
-            left: 6px !important;
+            inset-inline-start: 6px !important;
             top: 50% !important;
             transform: translateY(-50%) !important;
             z-index: 10 !important;
@@ -140,10 +140,12 @@
           }
           // Keep the padding from before selection mode ('' included) so a
           // second "Add" doesn't record our own padding as the original.
+          // Inline-start: the left edge, or the right one when ChatGPT is
+          // in a right-to-left language.
           if (!('bulkDeleteOriginalPadding' in conversation.dataset)) {
-            conversation.dataset.bulkDeleteOriginalPadding = conversation.style.paddingLeft || '';
+            conversation.dataset.bulkDeleteOriginalPadding = conversation.style.paddingInlineStart || '';
           }
-          conversation.style.paddingLeft = '28px';
+          conversation.style.paddingInlineStart = '28px';
 
           // Append (don't move React's children!) — appending an extra DOM
           // node React doesn't track is safe, but reordering its children is
@@ -412,7 +414,7 @@
           // Not every exit reloads the page (e.g. a run with nothing selected).
           document.querySelectorAll('[data-bulk-delete-conversation-owner="true"]').forEach((row) => {
             if ('bulkDeleteOriginalPadding' in row.dataset) {
-              row.style.paddingLeft = row.dataset.bulkDeleteOriginalPadding;
+              row.style.paddingInlineStart = row.dataset.bulkDeleteOriginalPadding;
               delete row.dataset.bulkDeleteOriginalPadding;
             }
           });

@@ -130,6 +130,7 @@ body[data-view="legacy"] .view-legacy {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  text-wrap: balance;
   color: var(--gold);
 }
 
@@ -142,7 +143,7 @@ body[data-view="legacy"] .view-legacy {
 }
 
 .fine.left {
-  text-align: left;
+  text-align: start;
 }
 
 .legal a {
@@ -167,6 +168,7 @@ body[data-view="legacy"] .view-legacy {
   font-weight: 700;
   letter-spacing: 0.04em;
   vertical-align: middle;
+  white-space: nowrap;
 }
 
 /* ---------------------------------------------------------------- buttons */
@@ -385,12 +387,16 @@ body[data-view="legacy"] .view-legacy {
   color: var(--muted);
 }
 
+/* The address is never truncated: with a long button label (e.g. "Select &
+   copy" in some languages) the button moves to the next line instead. */
 .copy-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 4px 4px 4px 10px;
+  gap: 4px 8px;
+  padding-block: 4px;
+  padding-inline: 10px 4px;
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.25);
 }
@@ -399,8 +405,7 @@ body[data-view="legacy"] .view-legacy {
   color: var(--gold);
   font-weight: 600;
   user-select: all;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .copy-button {
@@ -413,6 +418,7 @@ body[data-view="legacy"] .view-legacy {
   font: inherit;
   font-size: 12px;
   font-weight: 600;
+  white-space: nowrap;
   cursor: pointer;
 }
 
@@ -445,11 +451,59 @@ body[data-view="legacy"] .view-legacy {
   gap: 8px;
 }
 
-.brand-name {
-  font: 700 17px var(--font-display);
+.topbar {
+  gap: 8px;
 }
 
+.brand {
+  min-width: 0;
+}
+
+/* Long translated names (with the PRO badge) wrap instead of being cut. */
+.brand-name {
+  font: 700 17px/1.15 var(--font-display);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.footer-start {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Language switcher chip in the footer; opens .language-menu. */
+.lang-chip {
+  font-family: inherit;
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+}
+
+.lang-chip:hover,
+.lang-chip:focus-within {
+  color: var(--text, #fff);
+  border-color: var(--muted);
+}
+
+.lang-chip svg {
+  width: 14px;
+  height: 14px;
+}
+
+
 .account-chip {
+  flex: none;
   display: inline-flex;
   align-items: center;
   gap: 2px;
@@ -502,7 +556,7 @@ body[data-view="legacy"] .view-legacy {
   border: 1px solid rgba(242, 184, 75, 0.25);
   border-radius: var(--radius);
   background: var(--gold-soft);
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 
@@ -595,7 +649,7 @@ body[data-view="legacy"] .view-legacy {
 
 .steps {
   margin: 10px 0 0;
-  padding-left: 18px;
+  padding-inline-start: 18px;
   display: grid;
   gap: 3px;
   font-size: 12px;
@@ -618,7 +672,9 @@ body[data-view="legacy"] .view-legacy {
   gap: 8px;
   margin-top: -4px;
   font-size: 10.5px;
+  line-height: 1.25;
   text-align: center;
+  text-wrap: balance;
   color: var(--faint);
 }
 
@@ -687,7 +743,7 @@ body[data-view="legacy"] .view-legacy {
 
 .progress-text {
   position: absolute;
-  left: 12px;
+  inset-inline-start: 12px;
   z-index: 1;
   font-weight: 700;
 }
@@ -695,6 +751,7 @@ body[data-view="legacy"] .view-legacy {
 .button-tag {
   position: relative;
   z-index: 1;
+  white-space: nowrap;
   padding: 1px 6px;
   border-radius: 5px;
   background: var(--gold);
@@ -770,18 +827,21 @@ body[data-view="legacy"] .view-legacy {
   font-weight: 700;
 }
 
+/* Two lines: translations of the tagline are often longer than English. */
 .nav-ad-desc {
+  display: -webkit-box;
   overflow: hidden;
   color: var(--muted);
   font-size: 12px;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .ads-badge {
   position: absolute;
   top: -7px;
-  left: 10px;
+  inset-inline-start: 10px;
   padding: 0 5px;
   border-radius: 4px;
   background: var(--surface-2);
@@ -860,7 +920,7 @@ body[data-view="legacy"] .view-legacy {
   border: 1.5px solid var(--line);
   border-radius: var(--radius);
   background: var(--surface);
-  text-align: left;
+  text-align: start;
   cursor: pointer;
   transition: border-color 0.15s, background 0.15s;
 }
@@ -902,8 +962,9 @@ body[data-view="legacy"] .view-legacy {
 
 .plan-name {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 6px;
+  gap: 2px 6px;
   font-weight: 700;
 }
 
@@ -923,7 +984,7 @@ body[data-view="legacy"] .view-legacy {
 }
 
 .plan-price small {
-  margin-left: 1px;
+  margin-inline-start: 1px;
   color: var(--muted);
   font-size: 12px;
 }
@@ -992,10 +1053,17 @@ body[data-view="legacy"] .view-legacy {
   gap: 8px;
 }
 
+/* Side by side when both labels fit on one line, otherwise stacked. */
 .two-col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-wrap: wrap;
   gap: 8px;
+}
+
+.two-col > .btn {
+  flex: 1 1 auto;
+  width: auto;
+  white-space: nowrap;
 }
 
 .two-col .btn {
@@ -1017,7 +1085,7 @@ body[data-view="legacy"] .view-legacy {
   padding: 10px 14px;
   border: 0;
   background: none;
-  text-align: left;
+  text-align: start;
   text-decoration: none;
   cursor: pointer;
 }
@@ -1085,7 +1153,7 @@ body[data-view="legacy"] .view-legacy {
   margin-top: 8px;
   padding: 14px;
   gap: 8px;
-  text-align: left;
+  text-align: start;
 }
 
 /* ---------------------------------------------------------- limit sheet */
@@ -1210,6 +1278,115 @@ body[data-view="legacy"] .view-legacy {
   font-size: 12px;
 }
 
+.language-select {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  max-width: 70%;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.language-select span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.language-select svg {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+
+/* Scrollable language list that stays inside the popup. */
+.language-menu {
+  position: fixed;
+  z-index: 1000;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+}
+
+/* Slim scrollbar that matches the dark menu (no white track). */
+.language-menu {
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.18) transparent;
+}
+
+.language-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.language-menu::-webkit-scrollbar-track {
+  background: transparent;
+  margin: 6px 0;
+}
+
+.language-menu::-webkit-scrollbar-thumb {
+  border-radius: 3px;
+  background: rgba(255, 255, 255, 0.18);
+}
+
+.language-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.language-menu[hidden] {
+  display: none;
+}
+
+.language-menu-item {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  padding-inline-start: 26px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  text-align: start;
+  cursor: pointer;
+  position: relative;
+}
+
+.language-menu-item:hover,
+.language-menu-item:focus-visible {
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+.language-menu-item[aria-selected="true"] {
+  color: var(--gold);
+  font-weight: 600;
+}
+
+.language-menu-item[aria-selected="true"]::before {
+  content: "✓";
+  position: absolute;
+  inset-inline-start: 9px;
+}
+
+.language-menu-separator {
+  height: 1px;
+  margin: 4px 6px;
+  background: var(--line);
+}
+
 .delay-input-wrapper input {
   width: 86px;
   padding: 6px 8px;
@@ -1281,7 +1458,7 @@ body[data-view="legacy"] .view-legacy {
 
 .site-notice-track span {
   display: inline-block;
-  padding-left: 100%;
+  padding-inline-start: 100%;
   animation: site-notice-scroll 16s linear infinite;
 }
 
@@ -1309,7 +1486,7 @@ body[data-view="legacy"] .view-legacy {
   }
 
   .site-notice-track span {
-    padding-left: 0;
+    padding-inline-start: 0;
     animation: none;
   }
 }
@@ -1348,4 +1525,28 @@ body.has-site-notice {
 body.has-site-notice .view {
   flex: 1;
   min-height: 0;
+}
+
+/* Right-to-left languages (Arabic, Persian, Urdu) */
+[dir="rtl"] .btn-op::before {
+  transform: translateX(100%);
+}
+
+[dir="rtl"] .btn-op.progress::before {
+  transform: translateX(calc(var(--progress, -100%) * -1));
+}
+
+[dir="rtl"] .site-notice-track span {
+  animation-name: site-notice-scroll-rtl;
+}
+
+@keyframes site-notice-scroll-rtl {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+/* Arrows point the other way */
+[dir="rtl"] .back-button svg {
+  transform: scaleX(-1);
 }

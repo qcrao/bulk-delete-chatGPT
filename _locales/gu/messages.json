@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT વાતચીતો એકસાથે ડિલીટ કરવા માટેનું Chrome એક્સ્ટેન્શન"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT વાતચીતો એકસાથે ડિલીટ કરવા માટેનું Firefox એક્સ્ટેન્શન"
+  },
+  "actionTitle": {
+    "message": "વાતચીતો એકસાથે ડિલીટ કરો"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Rozšíření pro Chrome k hromadnému mazání chatů v ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "Rozšíření pro Firefox k hromadnému mazání chatů v ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Hromadné mazání chatů"
+  }
+}

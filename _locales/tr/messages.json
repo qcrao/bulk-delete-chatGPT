@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT sohbetlerini toplu olarak silmek için bir Chrome uzantısı"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT sohbetlerini toplu olarak silmek için bir Firefox uzantısı"
+  },
+  "actionTitle": {
+    "message": "Sohbetleri Toplu Sil"
+  }
+}

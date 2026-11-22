@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Isang Chrome extension para mag-delete ng maraming ChatGPT chat nang sabay-sabay"
+  },
+  "extDescriptionFirefox": {
+    "message": "Isang Firefox extension para mag-delete ng maraming ChatGPT chat nang sabay-sabay"
+  },
+  "actionTitle": {
+    "message": "Maramihang Pag-delete ng Chat"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "一款批次刪除 ChatGPT 對話的 Chrome 擴充功能"
+  },
+  "extDescriptionFirefox": {
+    "message": "一款批次刪除 ChatGPT 對話的 Firefox 擴充功能"
+  },
+  "actionTitle": {
+    "message": "批次刪除對話"
+  }
+}

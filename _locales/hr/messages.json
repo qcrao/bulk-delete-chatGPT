@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Proširenje za Chrome za skupno brisanje razgovora u ChatGPT-u"
+  },
+  "extDescriptionFirefox": {
+    "message": "Proširenje za Firefox za skupno brisanje razgovora u ChatGPT-u"
+  },
+  "actionTitle": {
+    "message": "Skupno brisanje razgovora"
+  }
+}

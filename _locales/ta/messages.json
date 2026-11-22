@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT உரையாடல்களை ஒரே நேரத்தில் மொத்தமாக நீக்க உதவும் Chrome நீட்டிப்பு"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT உரையாடல்களை ஒரே நேரத்தில் மொத்தமாக நீக்க உதவும் Firefox நீட்டிப்பு"
+  },
+  "actionTitle": {
+    "message": "உரையாடல்களை மொத்தமாக நீக்கு"
+  }
+}

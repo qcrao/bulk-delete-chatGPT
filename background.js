@@ -180,7 +180,12 @@ async function signIn() {
     throw new Error("Sign-in failed. Please try again.");
   }
   const error = redirectUrl.searchParams.get("error");
-  if (error) throw new Error(`Sign-in failed (${error}).`);
+  if (error) {
+    // The popup shows a translated message with this code.
+    const failure = new Error(`Sign-in failed (${error}).`);
+    failure.detail = error;
+    throw failure;
+  }
 
   const { token, legacyUpgraded } = await apiFetch("/auth/exchange", {
     method: "POST",
@@ -349,7 +354,32 @@ async function openUpgrade(sender) {
   }
 }
 
+// Content scripts can't fetch extension files without exposing them to the
+// page, so they get UI translations (locales/*.json) from here.
+const LOCALE_CODE = /^[a-z]{2,3}(-[A-Za-z0-9]{2,8})?$/;
+const localeCatalogs = new Map();
+
+async function getLocaleCatalog(locale) {
+  if (typeof locale !== "string" || !LOCALE_CODE.test(locale)) throw new Error("Bad locale");
+  if (!localeCatalogs.has(locale)) {
+    const request = fetch(chrome.runtime.getURL(`locales/${locale}.json`)).then((response) => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    });
+    localeCatalogs.set(locale, request);
+    request.catch(() => localeCatalogs.delete(locale));
+  }
+  return { catalog: await localeCatalogs.get(locale) };
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === "getLocaleCatalog") {
+    getLocaleCatalog(request.locale)
+      .then(sendResponse)
+      .catch((error) => sendResponse({ error: error.message }));
+    return true;
+  }
+
   if (request.action === "openUpgrade") {
     openUpgrade(sender)
       .then(sendResponse)
@@ -367,6 +397,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       console.error(`${request.action} failed:`, error);
       sendResponse({
         error: error.message,
+        detail: error.detail || null,
         status: error.status || 0,
         body: error.body || null
       });

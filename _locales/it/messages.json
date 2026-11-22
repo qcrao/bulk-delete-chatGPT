@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Un'estensione di Chrome per eliminare in blocco le chat di ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "Un'estensione di Firefox per eliminare in blocco le chat di ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Elimina chat in blocco"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Chrome paplašinājums ChatGPT sarunu masveida dzēšanai"
+  },
+  "extDescriptionFirefox": {
+    "message": "Firefox paplašinājums ChatGPT sarunu masveida dzēšanai"
+  },
+  "actionTitle": {
+    "message": "Masveidā dzēst sarunas"
+  }
+}

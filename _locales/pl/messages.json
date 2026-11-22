@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Rozszerzenie Chrome do zbiorczego usuwania czatów ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "Rozszerzenie Firefox do zbiorczego usuwania czatów ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Zbiorcze usuwanie czatów"
+  }
+}

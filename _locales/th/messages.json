@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ส่วนขยาย Chrome สำหรับลบแชท ChatGPT ทีละหลายรายการ"
+  },
+  "extDescriptionFirefox": {
+    "message": "ส่วนขยาย Firefox สำหรับลบแชท ChatGPT ทีละหลายรายการ"
+  },
+  "actionTitle": {
+    "message": "ลบแชทหลายรายการ"
+  }
+}

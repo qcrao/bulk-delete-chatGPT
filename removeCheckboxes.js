@@ -60,7 +60,7 @@
     // Show user notification if possible
     const CommonUtils = core.getModule('CommonUtils');
     if (CommonUtils && CommonUtils.showNotification) {
-      CommonUtils.showNotification(`Failed to remove checkboxes: ${error.message}`, 'error');
+      CommonUtils.showNotification(window.BDI18n.t('error.removeCheckboxes', { error: error.message }), 'error');
     }
   }
 

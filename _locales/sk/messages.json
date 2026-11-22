@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Rozšírenie pre Chrome na hromadné odstraňovanie četov v ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "Rozšírenie pre Firefox na hromadné odstraňovanie četov v ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Hromadné odstránenie četov"
+  }
+}

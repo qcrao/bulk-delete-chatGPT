@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "إضافة Chrome لحذف محادثات ChatGPT دفعة واحدة"
+  },
+  "extDescriptionFirefox": {
+    "message": "إضافة Firefox لحذف محادثات ChatGPT دفعة واحدة"
+  },
+  "actionTitle": {
+    "message": "حذف المحادثات دفعة واحدة"
+  }
+}

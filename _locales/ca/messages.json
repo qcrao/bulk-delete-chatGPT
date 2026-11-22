@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Una extensió de Chrome per suprimir converses de ChatGPT en bloc"
+  },
+  "extDescriptionFirefox": {
+    "message": "Una extensió de Firefox per suprimir converses de ChatGPT en bloc"
+  },
+  "actionTitle": {
+    "message": "Suprimeix converses en bloc"
+  }
+}

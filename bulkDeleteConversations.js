@@ -94,7 +94,7 @@
       // Show user notification if possible
       const CommonUtils = core.getModule('CommonUtils');
       if (CommonUtils && CommonUtils.showNotification) {
-        CommonUtils.showNotification(`Bulk delete failed: ${error.message}`, 'error');
+        CommonUtils.showNotification(window.BDI18n.t('error.bulkDelete', { error: error.message }), 'error');
       }
     }
   })();

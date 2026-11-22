@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "የChatGPT ውይይቶችን በጅምላ ለመሰረዝ የChrome ቅጥያ"
+  },
+  "extDescriptionFirefox": {
+    "message": "የChatGPT ውይይቶችን በጅምላ ለመሰረዝ የFirefox ቅጥያ"
+  },
+  "actionTitle": {
+    "message": "ውይይቶችን በጅምላ ይሰርዙ"
+  }
+}

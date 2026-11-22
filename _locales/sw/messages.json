@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Kiendelezi cha Chrome cha kufuta gumzo nyingi za ChatGPT kwa wakati mmoja"
+  },
+  "extDescriptionFirefox": {
+    "message": "Kiendelezi cha Firefox cha kufuta gumzo nyingi za ChatGPT kwa wakati mmoja"
+  },
+  "actionTitle": {
+    "message": "Futa Gumzo kwa Wingi"
+  }
+}

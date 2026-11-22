@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Chrome-laajennus, jolla poistat ChatGPT-keskusteluja kerralla"
+  },
+  "extDescriptionFirefox": {
+    "message": "Firefox-laajennus, jolla poistat ChatGPT-keskusteluja kerralla"
+  },
+  "actionTitle": {
+    "message": "Poista keskusteluja kerralla"
+  }
+}

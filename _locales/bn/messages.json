@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "একসাথে অনেক ChatGPT কথোপকথন মুছে ফেলার Chrome এক্সটেনশন"
+  },
+  "extDescriptionFirefox": {
+    "message": "একসাথে অনেক ChatGPT কথোপকথন মুছে ফেলার Firefox এক্সটেনশন"
+  },
+  "actionTitle": {
+    "message": "একসাথে কথোপকথন মুছুন"
+  }
+}

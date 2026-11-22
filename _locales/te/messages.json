@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT సంభాషణలను ఒకేసారి బల్క్‌గా తొలగించడానికి Chrome ఎక్స్‌టెన్షన్"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT సంభాషణలను ఒకేసారి బల్క్‌గా తొలగించడానికి Firefox ఎక్స్‌టెన్షన్"
+  },
+  "actionTitle": {
+    "message": "సంభాషణలను బల్క్‌గా తొలగించండి"
+  }
+}

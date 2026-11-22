@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT की बातचीत एक साथ डिलीट करने के लिए Chrome एक्सटेंशन"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT की बातचीत एक साथ डिलीट करने के लिए Firefox एक्सटेंशन"
+  },
+  "actionTitle": {
+    "message": "बातचीत एक साथ डिलीट करें"
+  }
+}

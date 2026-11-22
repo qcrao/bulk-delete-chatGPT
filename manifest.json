@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
   "name": "ChatGPT Bulk Delete",
-  "version": "7.10",
-  "description": "A Chrome extension to bulk delete ChatGPT conversations",
+  "default_locale": "en",
+  "version": "7.11",
+  "description": "__MSG_extDescription__",
   "icons": {
     "48": "icon48.png"
   },
   "action": {
     "default_icon": "icon48.png",
     "default_popup": "popup.html",
-    "default_title": "Bulk Delete Conversations"
+    "default_title": "__MSG_actionTitle__"
   },
   "permissions": ["scripting", "activeTab", "storage", "identity", "identity.email"],
   "host_permissions": ["https://bulk-delete-chatgpt-worker.qcrao.com/*"],
@@ -20,6 +21,7 @@
     {
       "matches": ["*://chat.openai.com/*", "*://chatgpt.com/*"],
       "js": [
+        "i18n.js",
         "extensionCore.js",
         "config.js",
         "remoteConfig.js",

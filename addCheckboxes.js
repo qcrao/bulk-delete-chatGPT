@@ -114,7 +114,7 @@
     // Show user notification if possible
     const CommonUtils = core.getModule('CommonUtils');
     if (CommonUtils && CommonUtils.showNotification) {
-      CommonUtils.showNotification(`Failed to add checkboxes: ${error.message}`, 'error');
+      CommonUtils.showNotification(window.BDI18n.t('error.addCheckboxes', { error: error.message }), 'error');
     }
   }
 

@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Chrome-bővítmény ChatGPT-csevegések tömeges törléséhez"
+  },
+  "extDescriptionFirefox": {
+    "message": "Firefox-bővítmény ChatGPT-csevegések tömeges törléséhez"
+  },
+  "actionTitle": {
+    "message": "Csevegések tömeges törlése"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Επέκταση Chrome για μαζική διαγραφή συνομιλιών του ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "Επέκταση Firefox για μαζική διαγραφή συνομιλιών του ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Μαζική διαγραφή συνομιλιών"
+  }
+}

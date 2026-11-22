@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT 채팅을 한 번에 삭제하는 Chrome 확장 프로그램"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT 채팅을 한 번에 삭제하는 Firefox 확장 프로그램"
+  },
+  "actionTitle": {
+    "message": "채팅 일괄 삭제"
+  }
+}

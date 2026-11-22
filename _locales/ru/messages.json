@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Расширение Chrome для массового удаления чатов ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "Расширение Firefox для массового удаления чатов ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Массовое удаление чатов"
+  }
+}

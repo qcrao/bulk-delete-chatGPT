@@ -1,0 +1,686 @@
+{
+  "manifest.description": {
+    "message": "A Chrome extension to bulk delete ChatGPT conversations",
+    "description": "Chrome Web Store / extensions page description. Max 132 characters."
+  },
+  "manifest.descriptionFirefox": {
+    "message": "A Firefox extension to bulk delete ChatGPT conversations",
+    "description": "Firefox add-ons description. Max 132 characters."
+  },
+  "manifest.actionTitle": {
+    "message": "Bulk Delete Conversations",
+    "description": "Tooltip on the extension's toolbar icon."
+  },
+  "common.copy": {
+    "message": "Copy",
+    "description": "Button that copies the support email address."
+  },
+  "common.copied": {
+    "message": "Copied",
+    "description": "Shown on the copy button after copying succeeded."
+  },
+  "common.selectAndCopy": {
+    "message": "Select & copy",
+    "description": "Shown on the copy button when automatic copying failed; the user should copy manually."
+  },
+  "common.close": {
+    "message": "Close",
+    "description": "Generic close button."
+  },
+  "common.back": {
+    "message": "Back",
+    "description": "Accessible label of the back arrow button."
+  },
+  "common.dismiss": {
+    "message": "Dismiss",
+    "description": "Accessible label of the X button that hides a notice banner."
+  },
+  "common.cancel": {
+    "message": "Cancel",
+    "description": "Generic cancel button."
+  },
+  "signin.title": {
+    "message": "Sign in to start cleaning up ChatGPT",
+    "description": "Headline of the sign-in screen. 'Cleaning up ChatGPT' means deleting/archiving old ChatGPT conversations."
+  },
+  "signin.subtitle": {
+    "message": "Free accounts get one bulk delete a day. Your plan follows your Google account to every browser.",
+    "description": "Text under the sign-in headline."
+  },
+  "signin.google": {
+    "message": "Continue with Google",
+    "description": "Google sign-in button (follow Google's wording in your language if it exists)."
+  },
+  "signin.legacyCallout": {
+    "message": "<b>Paid {legacyPrice} before?</b> Sign in with the Google account that uses the email you paid with, and you'll be upgraded to Lifetime automatically. Forgot that email? Send your receipt to:",
+    "description": "For people who bought the old one-time unlock. Keep the <b>...</b> tags around the first sentence. {legacyPrice} is a price like $0.99. 'Lifetime' is the plan name. The support email address follows on the next line."
+  },
+  "signin.legal": {
+    "message": "Google shares only your name, email and photo. By continuing you agree to the <terms>Terms</terms> and <privacy>Privacy Policy</privacy>.",
+    "description": "Legal line. Keep the <terms>...</terms> and <privacy>...</privacy> tags: they become links."
+  },
+  "signin.error.failed": {
+    "message": "Sign-in failed. Please try again.",
+    "description": "Sign-in error."
+  },
+  "signin.error.withCode": {
+    "message": "Sign-in failed ({code}).",
+    "description": "Sign-in error with a technical code, e.g. access_denied."
+  },
+  "main.brand": {
+    "message": "Bulk Delete",
+    "description": "Product name shown next to the logo at the top of the popup. It is the name of the extension ('Bulk Delete' for ChatGPT), so translate it as a short product name meaning 'bulk delete'."
+  },
+  "main.account": {
+    "message": "Account",
+    "description": "Accessible label of the avatar button that opens the account screen."
+  },
+  "main.freePlan": {
+    "message": "Free plan",
+    "description": "Small label above the free-plan usage line."
+  },
+  "main.freePlan.runsLeft": {
+    "message": "{runs, plural, one {# free run today} other {# free runs today}} · up to {max, plural, one {# chat} other {# chats}}",
+    "description": "Free-plan usage. A 'run' is one bulk delete operation; a 'chat' is a ChatGPT conversation."
+  },
+  "main.freePlan.used": {
+    "message": "Free run used · resets {when}",
+    "description": "Free-plan usage line after today's free bulk delete was used. {when} is a relative time such as 'in 5 hours' (already localized)."
+  },
+  "main.goPro": {
+    "message": "Go Pro",
+    "description": "Short call to action to upgrade. 'Pro' is the paid plan name."
+  },
+  "main.selectChats": {
+    "message": "Select chats",
+    "description": "Section heading."
+  },
+  "main.howItWorks": {
+    "message": "How it works",
+    "description": "Small clickable text at the top-right of the 'Select chats' section; it shows/hides the 3 instruction steps."
+  },
+  "main.step1": {
+    "message": "<b>{add}</b> puts a checkbox next to every chat in the ChatGPT sidebar.",
+    "description": "Instruction step 1. {add} is the label of the Add button; keep it inside <b>...</b>."
+  },
+  "main.step2": {
+    "message": "Tick the chats you want. Shift-click to select a range.",
+    "description": "Instruction step 2."
+  },
+  "main.step3": {
+    "message": "Run a bulk action below.",
+    "description": "Instruction step 3."
+  },
+  "main.add": {
+    "message": "Add",
+    "description": "Button that adds a checkbox next to every conversation in the ChatGPT sidebar (it does not add/create anything else). Very short (button is ~90px wide)."
+  },
+  "main.add.title": {
+    "message": "Add checkboxes to the ChatGPT sidebar",
+    "description": "Tooltip of the Add button."
+  },
+  "main.toggle": {
+    "message": "Toggle",
+    "description": "Button that INVERTS the selection: every ticked checkbox becomes unticked and every unticked one becomes ticked (it is NOT 'select all'). Very short (button is ~90px wide). Use your language's usual word for 'invert selection' (e.g. Chinese 反选)."
+  },
+  "main.toggle.title": {
+    "message": "Invert the selection",
+    "description": "Tooltip of the Toggle button. The button flips every checkbox (ticked ↔ unticked)."
+  },
+  "main.remove": {
+    "message": "Remove",
+    "description": "Button that removes the checkboxes from the ChatGPT sidebar again (it does NOT delete conversations). Very short."
+  },
+  "main.remove.title": {
+    "message": "Remove the checkboxes",
+    "description": "Tooltip of the Remove button."
+  },
+  "main.addHint": {
+    "message": "Show boxes",
+    "description": "Tiny caption under the Add button: makes the checkboxes appear. Very short."
+  },
+  "main.toggleHint": {
+    "message": "Invert selection",
+    "description": "Tiny caption under the Toggle button, which flips every checkbox (ticked ↔ unticked). Very short."
+  },
+  "main.removeHint": {
+    "message": "Hide boxes",
+    "description": "Tiny caption under the Remove button: makes the checkboxes disappear (conversations are not touched). Very short."
+  },
+  "main.bulkActions": {
+    "message": "Bulk actions",
+    "description": "Section heading."
+  },
+  "main.bulkArchive": {
+    "message": "Bulk Archive",
+    "description": "Button / feature name: archive the selected conversations."
+  },
+  "main.bulkDelete": {
+    "message": "Bulk Delete",
+    "description": "Button / feature name: delete the selected conversations."
+  },
+  "main.maxPerRun": {
+    "message": "max {max}",
+    "description": "Small tag on the Bulk Delete button for free users: one run deletes at most {max} conversations."
+  },
+  "main.proNote.lifetime": {
+    "message": "Lifetime · unlimited conversations · no ads",
+    "description": "'Lifetime' is a plan name."
+  },
+  "main.proNote.pro": {
+    "message": "Pro · unlimited conversations · no ads",
+    "description": "'Pro' is a plan name."
+  },
+  "main.ad": {
+    "message": "Ad",
+    "description": "Badge marking an advertisement."
+  },
+  "main.ad.description": {
+    "message": "AI comic maker · Turn ideas into comics",
+    "description": "Description of the advertised product 'Comicory'. Space is tight (2 short lines max): languages with long words may keep only the first part (before ' · ')."
+  },
+  "main.ad.hide": {
+    "message": "Hide",
+    "description": "Small link on the ad card. Clicking it does not hide anything immediately: it opens the Pro plans, because Pro removes ads. Very short."
+  },
+  "main.ad.hide.title": {
+    "message": "Remove ads with Pro",
+    "description": "Tooltip of the Hide link."
+  },
+  "main.settings": {
+    "message": "Settings",
+    "description": "Settings button / panel title."
+  },
+  "main.checkUpdates": {
+    "message": "Check for updates",
+    "description": "Tooltip of the version number at the bottom; opens the extension's store page."
+  },
+  "main.donate": {
+    "message": "Donate",
+    "description": "Tooltip of the heart icon at the bottom; opens the developer's GitHub Sponsors page (voluntary donation)."
+  },
+  "progress.deleting": {
+    "message": "Deleting…",
+    "description": "Delete button label while running."
+  },
+  "progress.archiving": {
+    "message": "Archiving…",
+    "description": "Archive button label while running."
+  },
+  "progress.deleteDone": {
+    "message": "Delete complete",
+    "description": "Label shown on the Bulk Delete button when the run finished."
+  },
+  "progress.archiveDone": {
+    "message": "Archive complete",
+    "description": "Label shown on the Bulk Archive button when the run finished."
+  },
+  "notice.serverUnreachable": {
+    "message": "Can't reach the server. Check your connection and reopen the extension.",
+    "description": "Error notice."
+  },
+  "notice.selectFirst": {
+    "message": "Select conversations first: click {add}, then tick the ones you want.",
+    "description": "{add} is the Add button label."
+  },
+  "notice.serverRetry": {
+    "message": "Can't reach the server right now. Please try again.",
+    "description": "Error notice."
+  },
+  "notice.wrongTab": {
+    "message": "Unable to run this on the current tab. Open chatgpt.com and try again.",
+    "description": "Shown when the current tab isn't ChatGPT. Keep 'chatgpt.com'."
+  },
+  "notice.partialFailure": {
+    "message": "{processed, plural, one {# conversation processed} other {# conversations processed}}, {failed} failed. Reload the ChatGPT page and check the console for details.",
+    "description": "After a run where some conversations could not be deleted/archived. 'console' = the browser developer console."
+  },
+  "notice.refreshing": {
+    "message": "Refreshing the ChatGPT page to update the sidebar.",
+    "description": "Info notice."
+  },
+  "notice.freeLimited": {
+    "message": "Free plan: deleted the first {processed} of {selected, plural, one {# selected conversation} other {# selected conversations}}.",
+    "description": "Free users can delete a limited number per run."
+  },
+  "notice.deleteAllPro": {
+    "message": "Delete all with Pro",
+    "description": "Link after notice.freeLimited that opens the Pro plans."
+  },
+  "pricing.title": {
+    "message": "Clean up ChatGPT without limits",
+    "description": "Headline of the pricing screen. 'Clean up' means deleting/archiving ChatGPT conversations; 'without limits' = no per-run limit."
+  },
+  "pricing.unlimited": {
+    "message": "Unlimited conversations per run",
+    "description": "Pro feature."
+  },
+  "pricing.noAds": {
+    "message": "No ads",
+    "description": "Pro feature."
+  },
+  "pricing.choosePlan": {
+    "message": "Choose a plan",
+    "description": "Accessible label of the plan list."
+  },
+  "pricing.monthly": {
+    "message": "Monthly",
+    "description": "Plan name."
+  },
+  "pricing.monthly.sub": {
+    "message": "Billed monthly · cancel anytime",
+    "description": "Under the Monthly plan."
+  },
+  "pricing.perMonth": {
+    "message": "/mo",
+    "description": "Very short suffix after a monthly price, e.g. $4.90/mo."
+  },
+  "pricing.yearly": {
+    "message": "Yearly",
+    "description": "Plan name."
+  },
+  "pricing.save": {
+    "message": "SAVE {percent}",
+    "description": "Small uppercase badge, e.g. SAVE 66%. {percent} is already formatted."
+  },
+  "pricing.yearly.sub": {
+    "message": "{monthly} / month, billed yearly",
+    "description": "{monthly} is a price such as $1.66."
+  },
+  "pricing.perYear": {
+    "message": "/yr",
+    "description": "Very short suffix after a yearly price."
+  },
+  "pricing.lifetime": {
+    "message": "Lifetime",
+    "description": "Plan name: pay once, use forever."
+  },
+  "pricing.bestValue": {
+    "message": "BEST VALUE",
+    "description": "Small uppercase badge."
+  },
+  "pricing.lifetime.sub": {
+    "message": "Pay once, yours forever",
+    "description": "Under the Lifetime plan."
+  },
+  "pricing.lifetime.credit": {
+    "message": "{full} minus your {credit} payment",
+    "description": "Lifetime price for current subscribers. {full} and {credit} are prices."
+  },
+  "pricing.checkout.monthly": {
+    "message": "Continue · {price} / month",
+    "description": "Checkout button."
+  },
+  "pricing.checkout.yearly": {
+    "message": "Continue · {price} / year",
+    "description": "Checkout button."
+  },
+  "pricing.checkout.lifetime": {
+    "message": "Continue · {price} once",
+    "description": "Checkout button for a one-time payment."
+  },
+  "pricing.checkout.upgrade": {
+    "message": "Upgrade · {price} once",
+    "description": "Checkout button for subscribers upgrading to Lifetime."
+  },
+  "pricing.fine.recurring": {
+    "message": "Renews automatically · Cancel anytime · Secure checkout by Stripe",
+    "description": "Fine print. Keep 'Stripe'."
+  },
+  "pricing.fine.oneTime": {
+    "message": "One-time payment · No renewals · Secure checkout by Stripe",
+    "description": "Fine print. Keep 'Stripe'."
+  },
+  "pricing.fine.upgrade": {
+    "message": "One-time payment · Your subscription won't renew · Secure checkout by Stripe",
+    "description": "Fine print. Keep 'Stripe'."
+  },
+  "pricing.error.alreadyLifetime": {
+    "message": "You already have Lifetime.",
+    "description": "Checkout error."
+  },
+  "pricing.error.alreadySubscribed": {
+    "message": "You're already subscribed. Use {manageBilling} to switch plans.",
+    "description": "{manageBilling} is the 'Manage billing' button label."
+  },
+  "pricing.error.failed": {
+    "message": "Couldn't start checkout. Please try again.",
+    "description": "Checkout error."
+  },
+  "pricing.maker": {
+    "message": "<b>Made by one indie developer.</b> ChatGPT changes its interface often, and each change can break this extension. Your plan pays for the time it takes to keep it working. Thank you for the support!",
+    "description": "Personal note from the developer. Keep the <b>...</b> tags around the first sentence."
+  },
+  "pricing.contact": {
+    "message": "Not working for you? Email me:",
+    "description": "Followed by the support email address."
+  },
+  "account.title": {
+    "message": "Account",
+    "description": "Account screen title."
+  },
+  "account.plan": {
+    "message": "Plan",
+    "description": "Heading of the plan card."
+  },
+  "account.status.active": {
+    "message": "Active",
+    "description": "Subscription status badge: the plan is active."
+  },
+  "account.status.paymentIssue": {
+    "message": "Payment issue",
+    "description": "Subscription status: the last payment failed."
+  },
+  "account.status.canceling": {
+    "message": "Canceling",
+    "description": "Subscription status badge: the user cancelled, the plan stays active until the end of the paid period and will not renew."
+  },
+  "account.planName.free": {
+    "message": "Free",
+    "description": "Plan name."
+  },
+  "account.planName.monthly": {
+    "message": "Pro Monthly",
+    "description": "Plan name."
+  },
+  "account.planName.yearly": {
+    "message": "Pro Yearly",
+    "description": "Plan name."
+  },
+  "account.planName.lifetime": {
+    "message": "Lifetime",
+    "description": "Plan name."
+  },
+  "account.price.monthly": {
+    "message": "{price} / month",
+    "description": "Price of the monthly plan."
+  },
+  "account.price.yearly": {
+    "message": "{price} / year",
+    "description": "Price of the yearly plan."
+  },
+  "account.detail.free": {
+    "message": "{runs, plural, one {# bulk delete a day} other {# bulk deletes a day}} · up to {max, plural, one {# chat} other {# chats}} per run",
+    "description": "Free plan limits."
+  },
+  "account.detail.legacy": {
+    "message": "Upgraded from your earlier {price} purchase. Thank you!",
+    "description": "{price} is like $0.99."
+  },
+  "account.detail.lifetime": {
+    "message": "Paid once. Yours forever.",
+    "description": "Lifetime plan detail."
+  },
+  "account.detail.ends": {
+    "message": "Ends on {date}",
+    "description": "{date} is a localized date."
+  },
+  "account.detail.renews": {
+    "message": "Renews on {date}",
+    "description": "{date} is a localized date."
+  },
+  "account.manageBilling": {
+    "message": "Manage billing",
+    "description": "Button that opens the Stripe customer portal, where the user can change plan, update the card, see invoices or cancel."
+  },
+  "account.goLifetime": {
+    "message": "Go Lifetime",
+    "description": "Button: upgrade to the Lifetime plan."
+  },
+  "account.goLifetimePrice": {
+    "message": "Go Lifetime · {price}",
+    "description": "Same button with the price."
+  },
+  "account.seePlans": {
+    "message": "See Pro plans",
+    "description": "Button that opens the pricing screen."
+  },
+  "account.upgradeNote.credit": {
+    "message": "Your current {price} payment counts toward Lifetime. Your subscription won't renew, so there are no further charges.",
+    "description": "{price} is what the user already paid."
+  },
+  "account.upgradeNote.noCredit": {
+    "message": "Your subscription won't renew, so there are no further charges.",
+    "description": "Upgrade note."
+  },
+  "account.billingError": {
+    "message": "Couldn't open billing. Please try again.",
+    "description": "Error."
+  },
+  "account.help": {
+    "message": "Help",
+    "description": "Accessible label of the help card."
+  },
+  "account.help.title": {
+    "message": "Need help?",
+    "description": "Heading."
+  },
+  "account.help.p1": {
+    "message": "ChatGPT updates its website often, and a change can sometimes break the extension. I fix these as quickly as I can. If something stops working, please email me.",
+    "description": "Written in first person by the solo developer."
+  },
+  "account.help.p2": {
+    "message": "Billing question or anything else? Same address. Paid {legacyPrice} before but not on Lifetime? Send your receipt and I'll restore it.",
+    "description": "{legacyPrice} is like $0.99. 'restore it' = give the user back the Lifetime plan they are entitled to."
+  },
+  "account.actions": {
+    "message": "Account actions",
+    "description": "Accessible label."
+  },
+  "account.signOut": {
+    "message": "Sign out",
+    "description": "Button."
+  },
+  "account.signedInWith": {
+    "message": "Signed in with Google · {version}",
+    "description": "{version} is like v7.11."
+  },
+  "legacy.eyebrow": {
+    "message": "Thank you, early supporter",
+    "description": "Small label above the headline."
+  },
+  "legacy.title": {
+    "message": "You're on Lifetime now",
+    "description": "Headline. 'Lifetime' is the plan name."
+  },
+  "legacy.text": {
+    "message": "Your earlier {legacyPrice} purchase has been upgraded to the Lifetime plan, at no extra cost.",
+    "description": "{legacyPrice} is like $0.99."
+  },
+  "legacy.unlimited": {
+    "message": "Unlimited Bulk Delete",
+    "description": "Feature."
+  },
+  "legacy.noAds": {
+    "message": "No ads, on every browser you sign in to",
+    "description": "Feature."
+  },
+  "legacy.continue": {
+    "message": "Start cleaning up",
+    "description": "Button at the bottom of the thank-you screen shown once to early buyers whose old purchase was upgraded to Lifetime. Clicking it just closes this screen and opens the main screen of the extension. Translate the intent ('Get started' / 'Start using it'), not word for word."
+  },
+  "limit.title": {
+    "message": "Today's free run is used",
+    "description": "Headline of the daily-limit sheet."
+  },
+  "limit.text": {
+    "message": "Go Pro to delete and archive as much as you like, right now.",
+    "description": "Daily-limit text."
+  },
+  "limit.textWithTime": {
+    "message": "Your next free run unlocks {when}. Go Pro to delete and archive as much as you like, right now.",
+    "description": "{when} is a relative time such as 'in 5 hours' (already localized)."
+  },
+  "limit.upgrade": {
+    "message": "See Pro plans · from {price}",
+    "description": "Button. {price} is the cheapest monthly price."
+  },
+  "limit.dismiss": {
+    "message": "Maybe tomorrow",
+    "description": "Button that closes the daily-limit sheet (the user will wait for tomorrow's free run)."
+  },
+  "runWarning.title": {
+    "message": "This may not work right now",
+    "description": "Shown before a run while a service notice says ChatGPT changed something."
+  },
+  "runWarning.text": {
+    "message": "Some conversations may not be deleted or archived until the fix is out. You can try anyway, or come back once the notice is gone.",
+    "description": "Run warning."
+  },
+  "runWarning.continue": {
+    "message": "Continue anyway",
+    "description": "Button that starts the bulk delete/archive despite the warning."
+  },
+  "whatsNew.title": {
+    "message": "New: preview conversations",
+    "description": "Headline of the what's-new sheet."
+  },
+  "whatsNew.p1": {
+    "message": "After you click {add}, each conversation gets an eye icon next to its checkbox. Hover it to peek at the conversation, or click it to keep the preview open.",
+    "description": "{add} is the Add button label."
+  },
+  "whatsNew.p2": {
+    "message": "Check what a conversation says before you delete or archive it.",
+    "description": "What's new."
+  },
+  "checkoutNotice.title": {
+    "message": "Before you subscribe",
+    "description": "Headline shown before payment."
+  },
+  "checkoutNotice.p1": {
+    "message": "ChatGPT updates its website from time to time, and an update can stop this extension from working. I usually have it fixed within a few days.",
+    "description": "Written in first person by the solo developer."
+  },
+  "checkoutNotice.p2": {
+    "message": "If that would be a problem for you, please don't subscribe. If the extension stops working after you subscribe, email me at <email>{supportEmail}</email> and I'll help.",
+    "description": "Keep <email>{supportEmail}</email> unchanged."
+  },
+  "checkoutNotice.continue": {
+    "message": "I understand, continue",
+    "description": "Button."
+  },
+  "checkoutNotice.dismiss": {
+    "message": "Not now",
+    "description": "Button that closes the pre-payment notice without paying."
+  },
+  "settings.title": {
+    "message": "Settings",
+    "description": "Panel title."
+  },
+  "settings.close": {
+    "message": "Close settings",
+    "description": "Accessible label."
+  },
+  "settings.language": {
+    "message": "Language",
+    "description": "Label of the language selector."
+  },
+  "settings.languageAuto": {
+    "message": "Same as ChatGPT",
+    "description": "Default option of the language selector: follow ChatGPT's language."
+  },
+  "settings.delay": {
+    "message": "Delay per conversation",
+    "description": "Label of a number input: how long to wait between two conversations while bulk deleting/archiving (milliseconds)."
+  },
+  "settings.ms": {
+    "message": "ms",
+    "description": "Unit: milliseconds. Use the local abbreviation if there is one."
+  },
+  "settings.autoSlowdown": {
+    "message": "Auto slow down larger batches",
+    "description": "Checkbox label: when many conversations are selected, automatically wait longer between them (to avoid ChatGPT rate limits)."
+  },
+  "settings.preview.fixed": {
+    "message": "Fixed {ms} ms between conversations.",
+    "description": "{ms} is a number of milliseconds."
+  },
+  "settings.preview.auto": {
+    "message": "First {batch}: {first} ms each. Next batch: {second} ms each, with {cooldown} ms cooldown between batches.",
+    "description": "Explains automatic slowdown. {batch} is a count of conversations; the others are milliseconds."
+  },
+  "settings.reset": {
+    "message": "Reset",
+    "description": "Button that resets the delay settings to their defaults."
+  },
+  "settings.save": {
+    "message": "Save",
+    "description": "Button."
+  },
+  "settings.saved": {
+    "message": "Saved",
+    "description": "Save button label right after saving."
+  },
+  "bar.selected": {
+    "message": "{count, plural, one {# conversation selected} other {# conversations selected}}",
+    "description": "Floating bar on the ChatGPT page."
+  },
+  "bar.freeNote": {
+    "message": "Free plan deletes the first {limit}.",
+    "description": "Floating bar, when the selection is over the free limit."
+  },
+  "bar.upgrade": {
+    "message": "Upgrade to delete all {count}",
+    "description": "Button in the floating bar. {count} is the number selected."
+  },
+  "preview.button": {
+    "message": "Preview conversation",
+    "description": "Tooltip of the eye icon next to each conversation."
+  },
+  "preview.panel": {
+    "message": "Conversation preview",
+    "description": "Accessible label of the preview panel."
+  },
+  "preview.select": {
+    "message": "Select this conversation",
+    "description": "Tooltip of the checkbox in the preview header: ticks this conversation in the sidebar (for bulk delete/archive)."
+  },
+  "preview.open": {
+    "message": "Open full conversation",
+    "description": "Link in the preview header that opens the chat in a new tab."
+  },
+  "preview.close": {
+    "message": "Close preview",
+    "description": "Accessible label."
+  },
+  "preview.untitled": {
+    "message": "Conversation",
+    "description": "Preview title when the chat has no title."
+  },
+  "preview.loading": {
+    "message": "Loading conversation…",
+    "description": "Status."
+  },
+  "preview.error": {
+    "message": "Couldn't load this conversation.",
+    "description": "Status."
+  },
+  "preview.errorHint": {
+    "message": "Use “{openFull}” to view it in a new tab.",
+    "description": "{openFull} is the 'Open full conversation' label. Use your language's quotation marks."
+  },
+  "error.addCheckboxes": {
+    "message": "Failed to add checkboxes: {error}",
+    "description": "Alert. {error} is a technical message in English."
+  },
+  "error.toggleCheckboxes": {
+    "message": "Failed to toggle checkboxes: {error}",
+    "description": "Alert when the Toggle (invert selection) button failed. {error} is a technical message in English."
+  },
+  "error.removeCheckboxes": {
+    "message": "Failed to remove checkboxes: {error}",
+    "description": "Alert. {error} is a technical message in English."
+  },
+  "error.bulkDelete": {
+    "message": "Bulk delete failed: {error}",
+    "description": "Alert. {error} is a technical message in English."
+  },
+  "error.bulkArchive": {
+    "message": "Bulk archive failed: {error}",
+    "description": "Alert. {error} is a technical message in English."
+  },
+  "error.generic": {
+    "message": "Something went wrong: {error}",
+    "description": "Alert. {error} is a technical message in English."
+  }
+}

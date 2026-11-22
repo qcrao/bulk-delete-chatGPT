@@ -195,7 +195,7 @@
         // Show user-friendly error notification if available
         const CommonUtils = this.getModule('CommonUtils');
         if (CommonUtils && CommonUtils.showNotification) {
-          CommonUtils.showNotification(`Error in ${operationName}: ${error.message}`, 'error');
+          CommonUtils.showNotification(window.BDI18n.t('error.generic', { error: error.message }), 'error');
         }
         
         throw error;

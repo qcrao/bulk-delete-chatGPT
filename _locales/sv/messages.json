@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Ett Chrome-tillägg för att ta bort många ChatGPT-chattar på en gång"
+  },
+  "extDescriptionFirefox": {
+    "message": "Ett Firefox-tillägg för att ta bort många ChatGPT-chattar på en gång"
+  },
+  "actionTitle": {
+    "message": "Ta bort många chattar på en gång"
+  }
+}

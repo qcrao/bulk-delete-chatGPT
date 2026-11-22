@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "En Chrome-utvidelse for å slette mange ChatGPT-chatter på én gang"
+  },
+  "extDescriptionFirefox": {
+    "message": "En Firefox-utvidelse for å slette mange ChatGPT-chatter på én gang"
+  },
+  "actionTitle": {
+    "message": "Slett mange chatter på én gang"
+  }
+}

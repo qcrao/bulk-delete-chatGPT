@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Eine Chrome-Erweiterung zum Massenlöschen von ChatGPT-Chats"
+  },
+  "extDescriptionFirefox": {
+    "message": "Eine Firefox-Erweiterung zum Massenlöschen von ChatGPT-Chats"
+  },
+  "actionTitle": {
+    "message": "Chats massenweise löschen"
+  }
+}

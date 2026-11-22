@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Razširitev za Chrome za množično brisanje klepetov v ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "Razširitev za Firefox za množično brisanje klepetov v ChatGPT"
+  },
+  "actionTitle": {
+    "message": "Množično brisanje klepetov"
+  }
+}

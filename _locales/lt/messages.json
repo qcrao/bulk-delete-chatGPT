@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "Chrome plėtinys, skirtas masiškai ištrinti ChatGPT pokalbius"
+  },
+  "extDescriptionFirefox": {
+    "message": "Firefox plėtinys, skirtas masiškai ištrinti ChatGPT pokalbius"
+  },
+  "actionTitle": {
+    "message": "Masiškai ištrinti pokalbius"
+  }
+}

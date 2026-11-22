@@ -22,6 +22,8 @@
   }
   window.conversationPreviewLoaded = true;
 
+  const t = (key, params) => window.BDI18n.t(key, params);
+
   const BUTTON_CLASS = 'bulk-delete-preview-button';
   const PANEL_ID = 'bulk-delete-preview-panel';
   const STYLE_ID = 'bulk-delete-preview-style';
@@ -87,7 +89,7 @@
     style.textContent = `
       .${BUTTON_CLASS} {
         position: absolute !important;
-        left: 26px !important;
+        inset-inline-start: 26px !important;
         top: 50% !important;
         transform: translateY(-50%) !important;
         z-index: 11 !important;
@@ -113,6 +115,7 @@
         top: 16px;
         right: 16px;
         bottom: 16px;
+        left: auto;
         width: min(460px, calc(100vw - 32px));
         z-index: 2147483000;
         display: flex;
@@ -196,6 +199,8 @@
         opacity: 0.85;
       }
       #${PANEL_ID} .bdp-status[hidden] { display: none; }
+      /* ChatGPT in a right-to-left language has its sidebar on the right. */
+      #${PANEL_ID}.bdp-page-rtl { right: auto; left: 16px; }
     `;
     (document.head || document.documentElement).appendChild(style);
   }
@@ -233,7 +238,9 @@
     const panel = document.createElement('section');
     panel.id = PANEL_ID;
     panel.setAttribute('role', 'complementary');
-    panel.setAttribute('aria-label', 'Conversation preview');
+    panel.setAttribute('aria-label', t('preview.panel'));
+    window.BDI18n.markElement(panel);
+    panel.classList.toggle('bdp-page-rtl', getComputedStyle(document.body || document.documentElement).direction === 'rtl');
     // Keeps the panel's own /c/ link out of conversation detection.
     panel.dataset.bulkDeleteIgnore = 'true';
 
@@ -245,8 +252,8 @@
     const select = document.createElement('input');
     select.type = 'checkbox';
     select.className = 'bdp-select';
-    select.title = 'Select this conversation';
-    select.setAttribute('aria-label', 'Select this conversation');
+    select.title = t('preview.select');
+    select.setAttribute('aria-label', t('preview.select'));
     select.addEventListener('change', () => {
       const rows = rowCheckboxes(state.activeRoute);
       rows.forEach((checkbox) => {
@@ -265,12 +272,12 @@
     open.className = 'bdp-open';
     open.target = '_blank';
     open.rel = 'noopener';
-    open.textContent = 'Open full conversation';
+    open.textContent = t('preview.open');
 
     const close = document.createElement('button');
     close.type = 'button';
     close.className = 'bdp-close';
-    close.setAttribute('aria-label', 'Close preview');
+    close.setAttribute('aria-label', t('preview.close'));
     close.textContent = '×';
     close.addEventListener('click', (event) => {
       event.preventDefault();
@@ -317,7 +324,7 @@
       const hint = document.createElement('div');
       hint.style.fontSize = '12px';
       hint.style.opacity = '0.75';
-      hint.textContent = 'Use "Open full conversation" to view it in a new tab.';
+      hint.textContent = t('preview.errorHint');
       status.appendChild(hint);
     }
   }
@@ -409,13 +416,13 @@
     // A fresh iframe with src set before insertion doesn't add entries to
     // the tab's history, unlike re-pointing an existing frame.
     const frame = document.createElement('iframe');
-    frame.title = 'Conversation preview';
+    frame.title = t('preview.panel');
     frame.src = routeToUrl(route);
     frame.style.visibility = 'hidden';
     body.insertBefore(frame, body.firstChild);
 
     const startedAt = Date.now();
-    setStatus('Loading conversation…');
+    setStatus(t('preview.loading'));
 
     state.pollTimer = setInterval(() => {
       // A newer preview (or close) superseded this one.
@@ -434,7 +441,7 @@
         stopPolling();
         frame.remove();
         detachFrameKeyListener();
-        setStatus("Couldn't load this conversation.", true);
+        setStatus(t('preview.error'), true);
       }
     }, POLL_INTERVAL_MS);
   }
@@ -452,7 +459,7 @@
         stopPolling();
         frame.remove();
         detachFrameKeyListener();
-        setStatus("Couldn't load this conversation.", true);
+        setStatus(t('preview.error'), true);
         return false;
       }
       return true;
@@ -541,7 +548,7 @@
     }
     const requestId = ++state.requestId;
     state.activeRoute = route;
-    state.panel.title.textContent = title || 'Conversation';
+    state.panel.title.textContent = title || t('preview.untitled');
     state.panel.title.title = title || '';
     state.panel.open.href = routeToUrl(route);
     updatePressedButtons();
@@ -592,7 +599,7 @@
   // project folder) indent their title on their own, so subtract that inner
   // indent instead of stacking our padding on top of it.
   function alignTitle(conversation) {
-    conversation.style.paddingLeft = `${TITLE_START_PX}px`;
+    conversation.style.paddingInlineStart = `${TITLE_START_PX}px`;
     const link = conversation.matches('a[href*="/c/"]')
       ? conversation
       : conversation.querySelector('a[href*="/c/"]');
@@ -614,9 +621,10 @@
     if (!textRect.width || !rowRect.width) {
       return; // not laid out (hidden row); keep the default padding
     }
-    const innerIndent = textRect.left - rowRect.left - TITLE_START_PX;
+    const rtl = window.getComputedStyle(conversation).direction === 'rtl';
+    const innerIndent = (rtl ? rowRect.right - textRect.right : textRect.left - rowRect.left) - TITLE_START_PX;
     if (innerIndent > 1) {
-      conversation.style.paddingLeft = `${Math.max(0, TITLE_START_PX - innerIndent)}px`;
+      conversation.style.paddingInlineStart = `${Math.max(0, TITLE_START_PX - innerIndent)}px`;
     }
   }
 
@@ -633,8 +641,8 @@
     button.type = 'button';
     button.className = BUTTON_CLASS;
     button.dataset.route = route;
-    button.title = 'Preview conversation';
-    button.setAttribute('aria-label', 'Preview conversation');
+    button.title = t('preview.button');
+    button.setAttribute('aria-label', t('preview.button'));
     button.setAttribute('aria-pressed', String(route === state.activeRoute));
     button.innerHTML = EYE_ICON;
 
@@ -681,6 +689,26 @@
     const style = document.getElementById(STYLE_ID);
     if (style) {
       style.remove();
+    }
+  }
+
+  // New language: relabel the eye icons; an open preview is rebuilt on its
+  // next open (closing it is simpler than relabelling every part).
+  function relabelButtons() {
+    document.querySelectorAll(`.${BUTTON_CLASS}`).forEach((button) => {
+      button.title = t('preview.button');
+      button.setAttribute('aria-label', t('preview.button'));
+    });
+  }
+  if (window.BDI18n) {
+    window.BDI18n.onChange(() => {
+      relabelButtons();
+      if (state.panel) {
+        closePreview();
+      }
+    });
+    if (window.BDI18n.ready) {
+      window.BDI18n.ready.then(relabelButtons);
     }
   }
 

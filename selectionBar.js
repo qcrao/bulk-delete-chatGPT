@@ -46,7 +46,8 @@
         align-items: center;
         column-gap: 10px;
         row-gap: 4px;
-        padding: 8px 8px 8px 14px;
+        padding-block: 8px;
+        padding-inline: 14px 8px;
         border-radius: 12px;
         background: #0d0d0d;
         color: #fff;
@@ -57,7 +58,7 @@
       #${BAR_ID} .bdsb-count { font-weight: 600; }
       #${BAR_ID} .bdsb-note { opacity: 0.8; }
       #${BAR_ID} .bdsb-upgrade {
-        margin-left: auto;
+        margin-inline-start: auto;
         padding: 6px 10px;
         border: 0;
         border-radius: 8px;
@@ -93,6 +94,35 @@
     const info = window.ChatGPTBulkDeleteSelectionInfo || {};
     const limit = Number(info.freeMaxPerRun);
     return Number.isFinite(limit) && limit > 0 ? limit : null;
+  }
+
+  // Horizontal space not covered by the sidebar or the preview panel, so the
+  // bar never hides conversation rows. Either can be on the left or the right
+  // (ChatGPT mirrors its layout in right-to-left languages).
+  function freeArea() {
+    const width = window.innerWidth;
+    let left = 0;
+    let right = width;
+    const exclude = (element, anyWidth) => {
+      const rect = element && element.getBoundingClientRect();
+      if (!rect || !rect.width || (!anyWidth && rect.width > width / 2)) {
+        return;
+      }
+      if (rect.left + rect.width / 2 < width / 2) {
+        left = Math.max(left, rect.right);
+      } else {
+        right = Math.min(right, rect.left);
+      }
+    };
+    // The sidebar is whatever <aside>/<nav> holds the conversation links
+    // (ChatGPT's own ids change too often to rely on).
+    const link = Array.from(document.querySelectorAll('a[href*="/c/"]')).find(
+      (a) => !a.closest('[data-bulk-delete-ignore]') && a.getClientRects().length
+    );
+    exclude(link && (link.closest('aside') || link.closest('nav')));
+    // The preview panel can be wider than half a narrow window; still keep clear of it.
+    exclude(document.getElementById('bulk-delete-preview-panel'), true);
+    return { left: Math.round(left), right: Math.round(right) };
   }
 
   function createBar() {
@@ -138,33 +168,52 @@
     const count = selectedCount();
     const limit = freeLimit();
     const overLimit = limit !== null && count > limit;
-    // With the preview panel open on the right, centre in the space left of it.
-    const panel = document.getElementById('bulk-delete-preview-panel');
-    const panelLeft = panel ? Math.round(panel.getBoundingClientRect().left) : 0;
-    const key = `${count}|${limit}|${panelLeft}`;
+    const area = freeArea();
+    const i18n = window.BDI18n;
+    const key = `${count}|${limit}|${area.left}|${area.right}|${i18n.locale}`;
     if (key === lastRendered) {
       return;
     }
     lastRendered = key;
-    bar.style.left = panelLeft > 0 ? `${panelLeft / 2}px` : '';
-    bar.style.maxWidth = panelLeft > 0 ? `${Math.max(240, panelLeft - 32)}px` : '';
+    bar.style.left = `${(area.left + area.right) / 2}px`;
+    const free = area.right - area.left - 32;
+    bar.style.maxWidth = `${Math.min(560, Math.max(Math.min(240, window.innerWidth - 32), free))}px`;
 
-    bar.querySelector('.bdsb-count').textContent =
-      `${count} conversation${count === 1 ? '' : 's'} selected`;
+    i18n.markElement(bar);
+    bar.querySelector('.bdsb-count').textContent = i18n.t('bar.selected', { count });
     const note = bar.querySelector('.bdsb-note');
     const upgrade = bar.querySelector('.bdsb-upgrade');
     note.hidden = !overLimit;
     upgrade.hidden = !overLimit;
     if (overLimit) {
-      note.textContent = `Free plan deletes the first ${limit}.`;
-      upgrade.textContent = `Upgrade to delete all ${count}`;
+      note.textContent = i18n.t('bar.freeNote', { limit });
+      upgrade.textContent = i18n.t('bar.upgrade', { count });
     }
+  }
+
+  // Re-render in the new language when it changes.
+  if (window.BDI18n) {
+    window.BDI18n.onChange(() => {
+      lastRendered = null;
+      if (document.getElementById(BAR_ID)) {
+        render();
+      }
+    });
   }
 
   const SelectionBar = {
     start() {
       lastRendered = null;
       render();
+      // Strings may still be loading on a fresh page: render again once ready.
+      if (window.BDI18n && window.BDI18n.ready) {
+        window.BDI18n.ready.then(() => {
+          lastRendered = null;
+          if (document.getElementById(BAR_ID)) {
+            render();
+          }
+        });
+      }
       if (!refreshTimer) {
         // Checkboxes change through clicks, Shift ranges, "Toggle" and
         // re-renders, most without events.

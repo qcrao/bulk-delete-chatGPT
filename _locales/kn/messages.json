@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "ChatGPT ಸಂಭಾಷಣೆಗಳನ್ನು ಒಟ್ಟಿಗೆ ಅಳಿಸಲು ಒಂದು Chrome ವಿಸ್ತರಣೆ"
+  },
+  "extDescriptionFirefox": {
+    "message": "ChatGPT ಸಂಭಾಷಣೆಗಳನ್ನು ಒಟ್ಟಿಗೆ ಅಳಿಸಲು ಒಂದು Firefox ವಿಸ್ತರಣೆ"
+  },
+  "actionTitle": {
+    "message": "ಸಂಭಾಷಣೆಗಳನ್ನು ಒಟ್ಟಿಗೆ ಅಳಿಸಿ"
+  }
+}

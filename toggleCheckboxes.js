@@ -59,7 +59,7 @@
     // Show user notification if possible
     const CommonUtils = core.getModule('CommonUtils');
     if (CommonUtils && CommonUtils.showNotification) {
-      CommonUtils.showNotification(`Failed to toggle checkboxes: ${error.message}`, 'error');
+      CommonUtils.showNotification(window.BDI18n.t('error.toggleCheckboxes', { error: error.message }), 'error');
     }
   }
 

@@ -94,7 +94,7 @@
       // Show user notification if possible
       const CommonUtils = core.getModule('CommonUtils');
       if (CommonUtils && CommonUtils.showNotification) {
-        CommonUtils.showNotification(`Bulk archive failed: ${error.message}`, 'error');
+        CommonUtils.showNotification(window.BDI18n.t('error.bulkArchive', { error: error.message }), 'error');
       }
     }
   })();

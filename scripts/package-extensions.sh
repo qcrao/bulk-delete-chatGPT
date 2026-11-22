@@ -17,6 +17,13 @@ if [[ "$VERSION" != "$FIREFOX_VERSION" ]]; then
   exit 1
 fi
 
+# Translations must be complete and valid, and _locales/ in sync.
+if ! I18N_OUTPUT="$(node scripts/i18n-check.mjs 2>&1)"; then
+  echo "$I18N_OUTPUT" | grep -v '^warn' >&2
+  echo "i18n check failed" >&2
+  exit 1
+fi
+
 rm -rf "$CHROME_DIR" "$FIREFOX_DIR" "$PACKAGE_DIR"
 mkdir -p "$CHROME_DIR" "$FIREFOX_DIR" "$PACKAGE_DIR"
 
@@ -33,6 +40,7 @@ FILES=(
   domHandler.js
   extensionCore.js
   globals.js
+  i18n.js
   icon48.png
   popup.css
   popup.html
@@ -48,6 +56,8 @@ cp manifest.json "$CHROME_DIR/manifest.json"
 cp manifest.firefox.json "$FIREFOX_DIR/manifest.json"
 cp "${FILES[@]}" "$CHROME_DIR/"
 cp "${FILES[@]}" "$FIREFOX_DIR/"
+cp -R locales _locales "$CHROME_DIR/"
+cp -R locales _locales "$FIREFOX_DIR/"
 
 (
   cd "$CHROME_DIR"

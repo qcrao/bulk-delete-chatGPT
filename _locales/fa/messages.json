@@ -1,0 +1,11 @@
+{
+  "extDescription": {
+    "message": "افزونه Chrome برای حذف گروهی گفتگوهای ChatGPT"
+  },
+  "extDescriptionFirefox": {
+    "message": "افزونه Firefox برای حذف گروهی گفتگوهای ChatGPT"
+  },
+  "actionTitle": {
+    "message": "حذف گروهی گفتگوها"
+  }
+}
