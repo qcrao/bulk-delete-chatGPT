@@ -38,6 +38,29 @@ if (typeof window.configLoaded === "undefined") {
       MAX_INTRA_BATCH_DELAY_MS: 8000,
       MAX_BATCH_COOLDOWN_MS: 30000
     },
+    // Remote on/off switches (remoteConfig.js accepts booleans for these keys).
+    FEATURES: {
+      // Conversations the sidebar clicks could not delete/archive are retried
+      // through ChatGPT's own backend requests (chatgptApi.js).
+      API_FALLBACK: true
+    },
+    API_FALLBACK: {
+      // Floor between two backend requests, on top of the run's normal pacing.
+      MIN_GAP_MS: 1000,
+      // This many sidebar failures in a row means the UI changed; the rest of
+      // the run goes straight to the backend instead of waiting out timeouts.
+      SWITCH_AFTER_CONSECUTIVE_FAILURES: 3,
+      // On HTTP 429: wait Retry-After (default 60s) within these bounds, then
+      // try again with the gap between requests doubled (up to 8x). The third
+      // 429 in one run stops backend requests for the rest of it.
+      RATE_LIMIT_DEFAULT_PAUSE_MS: 60000,
+      RATE_LIMIT_MIN_PAUSE_MS: 30000,
+      RATE_LIMIT_MAX_PAUSE_MS: 300000,
+      RATE_LIMIT_MAX_HITS_PER_RUN: 3,
+      RATE_LIMIT_MAX_GAP_MULTIPLIER: 8,
+      // The sidebar doesn't learn about backend changes; reload after the run.
+      RELOAD_DELAY_MS: 1500
+    },
     TIMEOUTS: {
       ELEMENT_WAIT: 2000,
       ELEMENT_WAIT_SHORT: 1000,

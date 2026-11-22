@@ -25,6 +25,7 @@ FILES=(
   background.js
   bulkArchiveConversations.js
   bulkDeleteConversations.js
+  chatgptApi.js
   checkboxManager.js
   config.js
   conversationHandler.js

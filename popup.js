@@ -4,6 +4,7 @@ const CORE_SCRIPT_FILES = [
   "remoteConfig.js",
   "globals.js",
   "utils.js",
+  "chatgptApi.js",
   "domHandler.js",
   "conversationHandler.js",
   "checkboxManager.js",
@@ -788,6 +789,11 @@ chrome.runtime.onMessage.addListener((request) => {
     );
   } else {
     updateProgressBar(request.buttonId, 100);
+  }
+
+  // The failure notice takes priority; it already says to reload the page.
+  if (request.pageReload && skippedCount === 0) {
+    showNotice("Refreshing the ChatGPT page to update the sidebar.");
   }
 
   if (limitedFrom > 0) {

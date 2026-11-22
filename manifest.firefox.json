@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "ChatGPT Bulk Delete",
-  "version": "7.9",
+  "version": "7.10",
   "description": "A Firefox extension to bulk delete ChatGPT conversations",
   "icons": {
     "48": "icon48.png"
@@ -33,6 +33,7 @@
         "remoteConfig.js",
         "globals.js",
         "utils.js",
+        "chatgptApi.js",
         "domHandler.js",
         "conversationHandler.js",
         "checkboxManager.js",

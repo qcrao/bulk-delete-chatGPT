@@ -29,7 +29,7 @@ if (typeof window.remoteConfigLoaded === "undefined") {
 
   // Returns the overrides that pass validation, plus the keys that were dropped.
   function sanitizeUiConfig(raw, defaults) {
-    const accepted = { SELECTORS: {}, BUTTON_STRATEGIES: {}, STRINGS: {}, TIMEOUTS: {} };
+    const accepted = { SELECTORS: {}, BUTTON_STRATEGIES: {}, STRINGS: {}, TIMEOUTS: {}, FEATURES: {} };
     const rejected = [];
     if (!raw || typeof raw !== "object") return { accepted, rejected };
 
@@ -72,13 +72,19 @@ if (typeof window.remoteConfigLoaded === "undefined") {
       }
     }
 
+    // On/off switches only: a known key and a real boolean.
+    for (const [key, value] of Object.entries(raw.FEATURES || {})) {
+      if (key in defaults.FEATURES && typeof value === "boolean") accepted.FEATURES[key] = value;
+      else rejected.push(`FEATURES.${key}`);
+    }
+
     for (const key of Object.keys(raw)) {
       if (!(key in accepted)) rejected.push(key);
     }
     return { accepted, rejected };
   }
 
-  const SECTIONS = ["SELECTORS", "BUTTON_STRATEGIES", "STRINGS", "TIMEOUTS"];
+  const SECTIONS = ["SELECTORS", "BUTTON_STRATEGIES", "STRINGS", "TIMEOUTS", "FEATURES"];
   const bundledDefaults = JSON.parse(
     JSON.stringify(Object.fromEntries(SECTIONS.map((section) => [section, window.UI_CONFIG[section]])))
   );
