@@ -53,6 +53,9 @@ This extension has no build system - files are loaded directly. Changes to any `
 - Test functionality with actual ChatGPT conversations
 - Monitor browser console for errors/logs
 
+### Release regression test (required before every release)
+After any change, and before packaging, run `scripts/regression-delete.sh` (at least 3 throwaway conversations) and require `RESULT: PASS`. It creates test chats in ego-browser's signed-in ChatGPT, bulk deletes them with this repo's code and verifies them server-side. Prerequisites, what it checks, the timing baseline and what it does not cover are in `docs/regression-test.md`.
+
 ### Deployment
 - Update `version` in `manifest.json`
 - Package as `.zip` file for Chrome Web Store submission

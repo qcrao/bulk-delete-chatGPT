@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "ChatGPT Bulk Delete",
   "default_locale": "en",
-  "version": "7.11",
+  "version": "7.12",
   "description": "__MSG_extDescriptionFirefox__",
   "icons": {
     "48": "icon48.png"

@@ -709,6 +709,26 @@ function confirmBulkOperation(operation) {
   $("runWarning").hidden = false;
 }
 
+function freeMaxPerRun() {
+  return state.account?.usage?.freeMaxPerRun ?? 10;
+}
+
+// Decides the run from the account fetched when the popup opened, so the
+// first conversation doesn't wait on the network. Returns null when the
+// server has to decide (free user with no runs left, or no account yet).
+function startClaimWithoutWaiting(operation) {
+  if (!state.account) return null;
+  // The server records nothing for Pro, so there is nothing to claim.
+  if (isPro()) return { maxPerRun: null };
+  if (operation !== "delete" || !(state.account.usage?.deleteRunsLeftToday > 0)) return null;
+
+  // Still counted against today's free run, just not waited for.
+  sendToBackground("claimUsage", { operation })
+    .catch((error) => console.warn("Background claimUsage failed:", error))
+    .finally(() => refreshAccount());
+  return { maxPerRun: freeMaxPerRun() };
+}
+
 async function runBulkOperation(operation) {
   const buttonId = operation === "delete" ? "bulk-delete" : "bulk-archive";
   const scriptName =
@@ -735,24 +755,33 @@ async function runBulkOperation(operation) {
       return;
     }
 
-    let claim;
-    try {
-      claim = await sendToBackground("claimUsage", { operation });
-    } catch (error) {
-      resetOperationButton(buttonId);
-      if (error.status === 401) return handleAuthLost();
-      if (error.body?.reason === "daily_limit") {
-        showDailyLimit(error.body.resetsAt);
-        refreshAccount();
-        return;
+    // Start at once whenever the cached account already allows the run; only
+    // a free user with no runs left (per the cache) waits for the server.
+    let claim = startClaimWithoutWaiting(operation);
+    if (!claim) {
+      try {
+        claim = await sendToBackground("claimUsage", { operation });
+      } catch (error) {
+        if (error.status === 401) {
+          resetOperationButton(buttonId);
+          return handleAuthLost();
+        }
+        if (error.body?.reason === "daily_limit") {
+          resetOperationButton(buttonId);
+          showDailyLimit(error.body.resetsAt);
+          refreshAccount();
+          return;
+        }
+        if (error.body?.reason === "pro_only") {
+          resetOperationButton(buttonId);
+          refreshAccount();
+          openPricing();
+          return;
+        }
+        // Server unreachable: don't hold the user up, run with the free cap.
+        console.warn("claimUsage failed; running with the free cap:", error);
+        claim = { maxPerRun: freeMaxPerRun() };
       }
-      if (error.body?.reason === "pro_only") {
-        refreshAccount();
-        openPricing();
-        return;
-      }
-      showNotice(t("notice.serverRetry"));
-      return;
     }
 
     updateProgressBar(buttonId, 0);

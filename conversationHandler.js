@@ -20,6 +20,15 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
   // row re-rendered away. Both still have the selected route, which is all the
   // backend needs. Not no_route (nothing to identify the conversation by).
   const API_FALLBACK_STAGES = new Set([...RETRYABLE_STAGES, "row_detached"]);
+  // Longest the first conversation waits for the uncached remote UI config.
+  const REMOTE_CONFIG_WAIT_MS = 800;
+  // Ways to open a row's three-dot menu, tried in order (see openConversationMenu).
+  const MENU_OPENERS = {
+    click: (button) => DOMHandler.dispatchClickSequence(button),
+    pointerdown: (button) => DOMHandler.dispatchPointerDownEvent(button),
+    keyboard: (button) => DOMHandler.dispatchEnterKey(button)
+  };
+  let preferredMenuOpener = "click";
 
   // Conversation operation handler
   const ConversationHandler = {
@@ -142,14 +151,21 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
         selectedConversations = selectedConversations.slice(0, maxPerRun);
       }
 
-      // Pick up selector fixes published since the page was opened.
-      await window.RemoteConfig?.refresh({ fresh: true });
+      // Pick up selector fixes published since the page was opened, but wait
+      // at most a moment: the config loaded with the page is usually current,
+      // and a late answer is still applied in place mid-run.
+      if (window.RemoteConfig) {
+        await Promise.race([
+          window.RemoteConfig.refresh({ fresh: true }),
+          CommonUtils.delay(REMOTE_CONFIG_WAIT_MS)
+        ]);
+      }
 
       console.log(`Selected conversations for ${operation}:`, selectedConversations.length);
       ChromeUtils.sendProgress(buttonId, 0);
       
-      // Send analytics event
-      await APIUtils.sendEvent(EVENTS[operation.toUpperCase()], selectedConversations.length);
+      // Analytics only: don't make the first conversation wait for it.
+      APIUtils.sendEvent(EVENTS[operation.toUpperCase()], selectedConversations.length);
 
       let processedCount = 0;
       let skippedCount = 0;
@@ -810,35 +826,47 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       ));
     },
 
+    // Each failed way of opening the menu costs a full wait, so the one that
+    // worked last on this page is tried first. Current ChatGPT only opens the
+    // menu on the full click sequence, hence the default.
     async openConversationMenu(menuButton, operation) {
-      console.log(`2. Opening three-dot menu with pointerdown...`);
-      DOMHandler.dispatchPointerDownEvent(menuButton);
-
-      let operationButton = await this.waitForOperationButton(
-        operation,
-        document,
-        UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT
-      );
-      if (operationButton) {
-        return operationButton;
+      const order = [
+        preferredMenuOpener,
+        ...Object.keys(MENU_OPENERS).filter((name) => name !== preferredMenuOpener)
+      ];
+      for (let attempt = 0; attempt < order.length; attempt++) {
+        const name = order[attempt];
+        // A slow menu from the previous attempt may have opened by now; every
+        // opener toggles it, so firing another one would close it again.
+        if (attempt > 0 && this.isConversationMenuOpen()) {
+          console.log(`Menu opened late after ${order[attempt - 1]}; waiting for it...`);
+          const lateButton = await this.waitForOperationButton(operation);
+          if (lateButton) preferredMenuOpener = order[attempt - 1];
+          return lateButton;
+        }
+        console.log(`2${"abc"[attempt]}. Opening three-dot menu with ${name}...`);
+        MENU_OPENERS[name](menuButton);
+        // The click sequence is the opener most likely to work, so it always
+        // gets the full wait; the others only a short one.
+        const operationButton = await this.waitForOperationButton(
+          operation,
+          document,
+          name === "click" || attempt === order.length - 1
+            ? UI_CONFIG.TIMEOUTS.ELEMENT_WAIT
+            : UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT
+        );
+        if (operationButton) {
+          preferredMenuOpener = name;
+          return operationButton;
+        }
       }
+      return null;
+    },
 
-      console.log(`2b. Pointerdown did not open menu, retrying with keyboard...`);
-      DOMHandler.dispatchEnterKey(menuButton);
-      operationButton = await this.waitForOperationButton(
-        operation,
-        document,
-        UI_CONFIG.TIMEOUTS.ELEMENT_WAIT_SHORT
-      );
-      if (operationButton) {
-        return operationButton;
-      }
-
-      console.log(`2c. Keyboard did not open menu, retrying with click sequence...`);
-      DOMHandler.dispatchClickSequence(menuButton);
-      await CommonUtils.delay(UI_CONFIG.DELAYS.LONG);
-      operationButton = await this.waitForOperationButton(operation);
-      return operationButton;
+    isConversationMenuOpen() {
+      return Array.from(
+        document.querySelectorAll(`[role="menu"], ${UI_CONFIG.SELECTORS.MENU_ITEM}`)
+      ).some((element) => CommonUtils.isElementVisible(element));
     },
 
     logVisibleMenuItems() {
