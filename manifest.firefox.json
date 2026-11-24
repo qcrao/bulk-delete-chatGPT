@@ -38,6 +38,7 @@
         "chatgptApi.js",
         "domHandler.js",
         "conversationHandler.js",
+        "confetti.js",
         "checkboxManager.js",
         "conversationPreview.js",
         "selectionBar.js"

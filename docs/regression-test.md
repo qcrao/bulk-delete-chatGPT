@@ -44,6 +44,7 @@ The last line is `RESULT: PASS` or `RESULT: FAIL (n)`. The exit code matches.
    - the first one was gone within 3 s (v7.12 baseline: about 1.5 s)
    - the extension logged `DELETE completed: N processed, 0 skipped`
    - every three-dot menu opened on the first try (`2a.` lines only)
+   - the confetti appeared (`canvas[data-bulk-delete-confetti]`)
    - `GET /backend-api/conversation/<id>` returns `conversation_deleted` for each
 8. **Cleans up.** It closes the ego-browser task space on PASS and leaves it open on FAIL.
 

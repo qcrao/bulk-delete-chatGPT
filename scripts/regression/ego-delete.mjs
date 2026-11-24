@@ -113,7 +113,8 @@ for (let n = 1; n <= COUNT; n++) {
   await chat.click(composerSelector, { label: "focus prompt box" });
   await chat.keyboard.insertText(`BDC regression test ${n}/${COUNT}, reply with just: ok`);
   await chat.keyboard.press("Enter");
-  await chat.waitForURL(/\/c\//, { timeout: 30000 });
+  // ChatGPT first shows a temporary /c/local-chatgpt:… URL; wait for the real id.
+  await chat.waitForURL(/\/c\/[0-9a-f]{8}-[0-9a-f]{4}-/, { timeout: 60000 });
   await chat.waitForFunction(
     () => !!document.querySelector(`nav a[href="${location.pathname}"]`),
     undefined,
@@ -179,6 +180,7 @@ await chat.evaluate((rs) => {
     if (!d && dialogOpen) mark(`confirm ${dialogs} closed`);
     dialogOpen = d;
     rs.forEach((r, i) => { if (!document.querySelector(`nav a[href="${r}"]`)) mark(`test chat ${i + 1} gone`); });
+    if (document.querySelector("canvas[data-bulk-delete-confetti]")) mark("confetti shown");
   }).observe(document.body, { subtree: true, childList: true, attributes: true });
 }, routes);
 
@@ -226,6 +228,7 @@ check(
   logs.some((line) => line.includes(`DELETE completed: ${COUNT} processed, 0 skipped`)),
   `extension reports ${COUNT} processed, 0 skipped`
 );
+check(marks.some(([, label]) => label === "confetti shown"), "confetti shown after everything was deleted");
 const opens = logs.filter((line) => line.includes("Opening three-dot menu")).length;
 const firstTryOpens = logs.filter((line) => line.includes("2a. Opening three-dot menu")).length;
 check(
@@ -235,11 +238,19 @@ check(
 const server = await chat.evaluate(async (ids) => {
   const session = await (await fetch("/api/auth/session")).json();
   const out = [];
+  // The last delete can take a few seconds to show up on the server: poll.
   for (const id of ids) {
-    const r = await fetch(`/backend-api/conversation/${id}`, { headers: { Authorization: `Bearer ${session.accessToken}` } });
-    let body = null;
-    try { body = await r.json(); } catch {}
-    out.push({ id, status: r.status, code: body?.detail?.code ?? null, visible: body?.is_visible });
+    const deadline = Date.now() + 15000;
+    let entry;
+    while (true) {
+      const r = await fetch(`/backend-api/conversation/${id}`, { headers: { Authorization: `Bearer ${session.accessToken}` } });
+      let body = null;
+      try { body = await r.json(); } catch {}
+      entry = { id, status: r.status, code: body?.detail?.code ?? null, visible: body?.is_visible };
+      if (entry.code === "conversation_deleted" || entry.visible === false || Date.now() > deadline) break;
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+    out.push(entry);
   }
   return out;
 }, routes.map((r) => r.split("/c/")[1]));

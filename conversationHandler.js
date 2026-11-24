@@ -367,7 +367,12 @@ if (typeof window.conversationHandlerLoaded === "undefined") {
       if (failures.length > 0 || domFailures.length > 0) {
         this.reportFailures(operation, result, failures, retriedCount, { domFailures, api: apiRun.stats });
       }
+      // Every selected chat deleted: celebrate. A reload waits for it to end.
+      const celebration = operation === "DELETE" && processedCount > 0 && skippedCount === 0 && window.BDConfetti
+        ? window.BDConfetti.launch().catch(() => {})
+        : null;
       if (reloadPage) {
+        if (celebration) await celebration;
         this.reloadAfterApiRun(apiRun.doneIds);
       }
       return result;

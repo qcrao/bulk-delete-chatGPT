@@ -8,6 +8,7 @@ const CORE_SCRIPT_FILES = [
   "chatgptApi.js",
   "domHandler.js",
   "conversationHandler.js",
+  "confetti.js",
   "checkboxManager.js",
   "conversationPreview.js",
   "selectionBar.js"

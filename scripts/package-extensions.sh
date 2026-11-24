@@ -34,6 +34,7 @@ FILES=(
   bulkDeleteConversations.js
   chatgptApi.js
   checkboxManager.js
+  confetti.js
   config.js
   conversationHandler.js
   conversationPreview.js
